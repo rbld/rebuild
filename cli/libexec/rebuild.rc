@@ -1,0 +1,6 @@
+# This is the rebuild environment definition file.
+# Define required environment variables here.
+#
+# NOTE: Make sure to prefix definitions with
+# 'export' directive, i.e.
+#export MY_PATH=/path/to/some/location

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+function rebuild_banner
+{
+    echo -e "\e[1;92m$1\e[0m"
+}
+
+userdel $REBUILD_USER_NAME 2>/dev/null
+groupdel $REBUILD_GROUP_NAME 2>/dev/null
+
+groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME 2>/dev/null
+useradd -o -M -N \
+        -g $REBUILD_GROUP_ID \
+        --groups rebuild_sudo \
+        -u $REBUILD_USER_ID \
+        --home-dir $REBUILD_USER_HOME \
+        $REBUILD_USER_NAME 2>/dev/null
+
+cd $REBUILD_PWD
+
+SUDO_PARAMS="-n -H -E -g $REBUILD_GROUP_NAME -u $REBUILD_USER_NAME"
+
+. /rebuild/rebuild.rc
+
+if [[ -n "$*" ]]; then
+    rebuild_banner ">>> rebuild env $HOSTNAME"
+    rebuild_banner ">>> $*"
+    sudo $SUDO_PARAMS /bin/bash -c "$*"
+else
+    rebuild_banner ">>> rebuild env $HOSTNAME interactive"
+    rebuild_banner ">>> Press CTRL-D do leave"
+    sudo $SUDO_PARAMS /bin/bash
+fi
+
+RC=$?
+
+rebuild_banner "<<< rebuild env $HOSTNAME"
+
+exit $RC

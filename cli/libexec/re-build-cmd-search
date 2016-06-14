@@ -1,0 +1,79 @@
+#!/bin/bash
+
+rebuild_prefix=`dirname $BASH_SOURCE`/../
+. $rebuild_prefix/libexec/re-build-globals
+
+function show_usage
+{
+    echo
+    echo "Usage: $rebuild_app_name search [OPTIONS] [NAME[:TAG]|PREFIX]"
+    echo
+    echo Search remote regsitry for published environments
+    echo
+    echo "  -h, --help          Print usage"
+    echo
+}
+
+function search_raw
+{
+    local NAME=$1
+    local TAG=$2
+    local REMOTE=$3
+
+    rebuild_search `rebuild_published_search_wildcard "$REMOTE" "$NAME" "$TAG"`
+}
+
+function parse_raw_results
+{
+    while read raw_published_name
+    do
+        echo -n $raw_published_name | rebuild_strip_published_env_name |  sed -e 's/^/\t/'
+        echo    $raw_published_name | rebuild_strip_published_env_tag | sed -e 's/^/:/'
+    done
+}
+
+function do_search
+{
+    local NAME=$1
+    local TAG=$2
+    local REMOTE=`rebuild_get_remote`
+
+    if [[ -z $REMOTE ]]; then
+        handle_error "Remote not defined"
+    fi
+
+    report_progress "Searching in $REMOTE..."
+
+    echo
+    search_raw "$NAME" "$TAG" "$REMOTE" | parse_raw_results
+    echo
+}
+
+args=$(getopt -l "help" -o "h" -- "$@")
+
+eval set -- "$args"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --)
+            # No more options left.
+            shift
+            break
+           ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+    esac
+
+    shift
+done
+
+env_name=`rebuild_cmd_line_env_name $*`
+env_tag=`rebuild_cmd_line_env_tag_exact $*`
+
+if [[ -z $env_name ]]; then
+    env_tag=""
+fi
+
+do_search "$env_name" "$env_tag"

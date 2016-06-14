@@ -1,0 +1,496 @@
+#!/bin/bash
+
+REBUILD_DEBUG=false
+REBUILD_NO_CLEANUP=false
+
+rebuild_app_name=rbld
+rebuild_command_prefix=re-build-cmd-
+
+rebuild_script=`basename $0`
+rebuild_env_name_prefix=re-build-env-
+rebuild_env_rerun_name_prefix=re-build-env-rerun-
+rebuild_dirty_cont_name_prefix=re-build-env-dirty-
+rebuild_disposable_cont_name_prefix=re-build-env-running-
+rebuild_tag_prefix=-rebuild-tag-
+rebuild_env_label=re-build-environment
+rebuild_env_entrypoint=/rebuild/re-build-entry-point
+rebuild_initial_tag=initial
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+. $rebuild_prefix/etc/rebuild.conf
+
+rebuild_home=~/.re-build
+
+function timestamp()
+{
+ echo `date -u +'%Y-%m-%dT%H-%M-%SZ'`
+}
+
+function handle_error
+{
+    echo
+    echo -e "\e[1;31m\tERROR: $1\e[0m" >&2
+    echo
+    exit 1
+}
+
+function deliver_warning
+{
+    echo -e "\e[1;93mWARNING: $1\e[0m"
+}
+
+function report_progress_color
+{
+    echo -ne "\e[1;92m"
+}
+
+function report_normal_color
+{
+    echo -ne "\e[0m"
+}
+function report_progress
+{
+    echo
+    report_progress_color
+    echo "$1"
+    report_normal_color
+}
+
+function report_progress_start
+{
+    echo
+
+    report_progress_color
+    echo -ne "$1 [.."
+    report_normal_color
+}
+
+function report_progress_tick
+{
+    report_progress_color
+    echo -ne "."
+    report_normal_color
+}
+
+function report_progress_end
+{
+    report_progress_color
+    echo -ne ".]"
+    report_normal_color
+    echo
+}
+
+function colorize_trace
+{
+    RC=0
+    echo -ne "\e[90m"
+
+    $* || RC=$?
+
+    echo -ne "\e[0m"
+
+    return $RC
+}
+
+function print_debug
+{
+    if [[ $REBUILD_DEBUG == true ]]; then
+        echo DEBUG $rebuild_script: $1
+    fi
+}
+
+function filter_debug
+{
+    if [[ $REBUILD_DEBUG == true ]]; then
+        cat
+    else
+        cat > /dev/null
+    fi
+}
+
+function do_cleanup
+{
+    if [[ $REBUILD_NO_CLEANUP != true ]]; then
+        $*
+    fi
+}
+
+function rebuild_get_remote
+{
+    if [[ -n ${REMOTE_NAME+x} ]]; then
+        local REMOTE_VAR=REMOTE_${REMOTE_NAME}
+        echo ${!REMOTE_VAR}
+    fi
+}
+
+function env_ctx_directory
+{
+    local NAME=$1
+    echo $rebuild_home/env-$NAME
+}
+
+function rebuild_env_name
+{
+    local NAME=$1
+    echo $rebuild_env_name_prefix$NAME
+}
+
+function rebuild_env_rerun_name
+{
+    local NAME=$1
+    local TAG=$2
+
+    echo ${rebuild_env_rerun_name_prefix}${NAME}${rebuild_tag_prefix}${TAG}
+}
+
+function rebuild_published_env_name
+{
+    local REMOTE=$1
+    local NAME=$2
+    local TAG=$3
+
+    echo $REMOTE/`rebuild_env_name $NAME`${rebuild_tag_prefix}${TAG}
+}
+
+function rebuild_strip_published_env_name
+{
+    sed -e "s/.*$rebuild_env_name_prefix//" | sed -e "s/$rebuild_tag_prefix.*$//"
+}
+
+
+function rebuild_strip_published_env_tag
+{
+    sed -e "s/.*$rebuild_tag_prefix//" | sed -e "s/\s.*//"
+}
+
+function rebuild_published_search_wildcard
+{
+    local REMOTE=$1
+    local NAME=$2
+    local TAG=$3
+
+    if [[ -z $TAG ]]; then
+        echo $REMOTE/`rebuild_env_name "$NAME"`
+    else
+        echo `rebuild_published_env_name $REMOTE $NAME $TAG`
+    fi
+}
+
+function rebuild_strip_env_name
+{
+    sed -e s/$rebuild_env_name_prefix//
+}
+
+function rebuild_dirty_cont_name
+{
+    local NAME=$1
+    local TAG=$2
+
+    echo ${rebuild_dirty_cont_name_prefix}${NAME}${rebuild_tag_prefix}${TAG}
+}
+
+function rebuild_disposable_cont_name
+{
+    local NAME=$1
+    local TAG=$2
+
+    echo ${rebuild_disposable_cont_name_prefix}${NAME}${rebuild_tag_prefix}${TAG}-`timestamp`
+}
+
+function rebuild_strip_dirty_cont_name
+{
+    sed -e "s/$rebuild_dirty_cont_name_prefix//" -e "s/$rebuild_tag_prefix.*//"
+}
+
+function rebuild_strip_dirty_cont_tag
+{
+    sed -e "s/.*$rebuild_tag_prefix//"
+}
+
+function rebuild_commit_flat
+{
+    local CONTAINER_NAME=$1
+    local IMAGE_NAME=$2
+
+    docker export $CONTAINER_NAME |                                 \
+    docker import                                                   \
+        --change "LABEL $rebuild_env_label=true"                    \
+        --change "ENTRYPOINT [\"$rebuild_env_entrypoint\"]"         \
+        -                                                           \
+        $IMAGE_NAME                                                 \
+        | filter_debug
+}
+
+function rebuild_commit_layered
+{
+    local CONTAINER_NAME=$1
+    local IMAGE_NAME=$2
+
+    docker commit $CONTAINER_NAME $IMAGE_NAME | filter_debug
+}
+
+function rebuild_squash_needed
+{
+    local CONTAINER_NAME=$1
+    local IMAGE=`docker ps -a --filter "name=$CONTAINER_NAME" --format "{{.Image}}"`
+    local LAYERS=`docker history --quiet $IMAGE | wc -l`
+
+    #Different FS backends have different limitations for
+    #maximum number of layers, 40 looks like small enough
+    #to be supported by all possible configurations
+    if [[ "$LAYERS" -ge "40" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function rebuild_commit
+{
+    local CONTAINER_NAME=$1
+    local IMAGE_NAME=$2
+
+    if rebuild_squash_needed $CONTAINER_NAME; then
+        rebuild_commit_flat $CONTAINER_NAME $IMAGE_NAME
+    else
+        rebuild_commit_layered $CONTAINER_NAME $IMAGE_NAME
+    fi
+}
+
+function rebuild_cont_id
+{
+    local NAME=$1
+    local TAG=$2
+
+    local ID=$(docker ps \
+                -a -q \
+                --filter "name=`rebuild_dirty_cont_name "$NAME" \
+                "$TAG"`") \
+             || true
+
+    echo $ID
+}
+
+function rebuild_all_dirty_cont_ids
+{
+    local ID=$(docker ps -a -q --filter "name=$rebuild_dirty_cont_name_prefix") || true
+
+    echo $ID
+}
+
+function rebuild_dirty_cont_list
+{
+    docker ps -a --filter "name=$rebuild_dirty_cont_name_prefix" --format "{{.Names}}"
+}
+
+function rebuild_cont_run_settings
+{
+    echo "-v $HOME:$HOME                 \
+          -e REBUILD_USER_ID=`id -u`     \
+          -e REBUILD_GROUP_ID=`id -g`    \
+          -e REBUILD_USER_NAME=`id -nu`  \
+          -e REBUILD_GROUP_NAME=`id -ng` \
+          -e REBUILD_USER_HOME=$HOME     \
+          -e REBUILD_PWD=`pwd`"          \
+          --security-opt label:disable
+}
+
+function rebuild_env_dirty
+{
+    local NAME=$1
+    local TAG=$2
+
+    if [[ -n "`rebuild_cont_id $NAME $TAG`" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function rebuild_cont_kill
+{
+    local NAME=$1
+    local TAG=$2
+
+    docker rm --force `rebuild_cont_id $NAME $TAG` | filter_debug
+}
+
+function rebuild_list_images
+{
+    docker images --filter "label=$rebuild_env_label" | \
+        tail -n +2                                    | \
+        grep    "^$rebuild_env_name_prefix"           | \
+        grep -v "^$rebuild_env_rerun_name_prefix"
+}
+
+function rebuild_env_id
+{
+    local NAME=$1
+    local TAG=$2
+
+    docker images --quiet `rebuild_env_name $NAME`:$TAG
+}
+
+function rebuild_env_exists
+{
+    local NAME=$1
+    local TAG=$2
+
+    if [[ -n "`rebuild_env_id $NAME $TAG`" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function rebuild_verify_env_exists
+{
+    local NAME=$1
+    local TAG=$2
+
+    if ! rebuild_env_exists $NAME $TAG; then
+        handle_error "Unknown environment $NAME:$TAG"
+    fi
+}
+
+function rebuild_verify_env_doesnt_exist
+{
+    local NAME=$1
+    local TAG=$2
+
+    if rebuild_env_exists $NAME $TAG; then
+        handle_error "Environment $NAME:$TAG already exists"
+        exit 2
+    fi
+}
+
+function rebuild_list_image_ids
+{
+    docker images --quiet --filter "label=$rebuild_env_label"
+}
+
+function rebuild_rerun_image_id
+{
+    local NAME=$1
+    local TAG=$2
+
+    if [[ -n "$NAME" ]];then
+        docker images -q `rebuild_env_rerun_name $NAME $TAG`
+    fi
+}
+
+function rebuild_delete_image_if_dangling
+{
+    local ID=$1
+
+    if [[ -n `docker images -q --filter "dangling=true" | grep "$ID"` ]]; then
+        docker rmi $ID | filter_debug
+    fi
+}
+
+function rebuild_delete_image
+{
+    local NAME=$1
+    local TAG=$2
+
+    if rebuild_env_exists $NAME $TAG; then
+        docker rmi `rebuild_env_name $NAME`:$TAG | filter_debug
+    fi
+}
+
+function rebuild_delete_untagged_images
+{
+    local IMAGES=`docker images | grep "<none>" | awk '{print \$3}'`
+
+    if [[ -n $IMAGES ]]; then
+        docker rmi $IMAGES | filter_debug
+    fi
+}
+
+function rebuild_delete_rerun_image
+{
+    local NAME=$1
+    local TAG=$2
+
+    if [[ -n `rebuild_rerun_image_id $NAME $TAG` ]]; then
+        docker rmi `rebuild_env_rerun_name $NAME $TAG`:$rebuild_initial_tag | filter_debug
+    fi
+}
+
+function rebuild_cmd_line_validate_param
+{
+    local PARAM_NAME="$1"
+    local PARAM="$2"
+
+    if [[ $PARAM =~ ^[[:alnum:]\_\-]*$ ]]; then
+        return 0
+    else
+        handle_error "Invalid $PARAM_NAME ($2), it may contain a-z, A-Z, 0-9, - and _ characters only"
+    fi
+}
+
+function rebuild_cmd_line_env_name
+{
+    if [[ -n $* ]]; then
+        local NAME=`echo $1 | cut -d: -f1`
+        rebuild_cmd_line_validate_param "environment name" "$NAME"
+        echo $NAME
+    fi
+}
+
+function rebuild_cmd_line_env_tag_exact
+{
+    if [[ -n $* ]]; then
+        local TAG=`echo $1 | cut -d: -f2 -s | awk '{print $1}'`
+        rebuild_cmd_line_validate_param "environment tag" "$TAG"
+        echo $TAG
+    fi
+}
+
+function rebuild_cmd_line_env_tag
+{
+    TAG=`rebuild_cmd_line_env_tag_exact $*`
+
+    if [[ -z "$TAG" ]];then
+        TAG=$rebuild_initial_tag
+    fi
+
+    echo $TAG
+}
+
+function rebuild_search
+{
+    local WILDCARD=$1
+
+    docker search --no-trunc $WILDCARD | \
+        tail -n +2                     | \
+        sort
+}
+
+function rebuild_is_published
+{
+    local WILDCARD=$1
+
+    if [[ -z `rebuild_search $WILDCARD` ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+function rebuild_cont_hostname
+{
+    local NAME=$1
+    local TAG=$2
+
+    echo -n $NAME:$TAG
+
+    if [[ -n ${3+x} ]]; then
+        echo "-$3"
+    else
+        echo
+    fi
+}

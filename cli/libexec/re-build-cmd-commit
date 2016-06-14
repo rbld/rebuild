@@ -1,0 +1,77 @@
+#!/bin/bash
+
+rebuild_prefix=`dirname $BASH_SOURCE`/../
+. $rebuild_prefix/libexec/re-build-globals
+
+function show_usage
+{
+    echo
+    echo Usage: $rebuild_app_name commit [OPTIONS] ENVIRONMENT[:TAG]
+    echo
+    echo Commit environment modifications
+    echo
+    echo "  -t TAG,--tag TAG      New TAG to be created"
+    echo "  -h, --help            Print usage"
+    echo
+}
+
+function commit_cont
+{
+    local NAME=$1
+    local TAG=$2
+    local NEW_TAG=$3
+
+    report_progress "Creating new environment $NAME:$NEW_TAG..."
+
+    rebuild_commit_flat `rebuild_dirty_cont_name $NAME $TAG` \
+                        `rebuild_env_name $NAME`:$NEW_TAG
+
+    rebuild_cont_kill $NAME $TAG
+}
+
+new_tag=
+
+args=$(getopt -l "tag:,help" -o "t:h" -- "$@")
+
+eval set -- "$args"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --)
+            # No more options left.
+            shift
+            break
+           ;;
+        -t|--tag)
+            new_tag="$2"
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+    esac
+
+    shift
+done
+
+env_name=`rebuild_cmd_line_env_name $*`
+env_tag=`rebuild_cmd_line_env_tag $*`
+
+if [[ -z $env_name ]]; then
+    handle_error "Environment name not specified"
+fi
+
+if [[ -z $new_tag ]]; then
+    handle_error "New tag not specified"
+fi
+
+rebuild_cmd_line_validate_param "new tag" $new_tag
+
+if ! rebuild_env_dirty $env_name $env_tag; then
+    handle_error "No changes to commit for $env_name:$env_tag"
+fi
+
+rebuild_verify_env_doesnt_exist $env_name $new_tag
+commit_cont $env_name $env_tag $new_tag
+rebuild_delete_rerun_image $env_name $env_tag

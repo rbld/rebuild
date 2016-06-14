@@ -1,0 +1,46 @@
+#!/bin/bash
+
+rebuild_prefix=`dirname $BASH_SOURCE`/../
+. $rebuild_prefix/libexec/re-build-globals
+
+function show_usage
+{
+    echo
+    echo Usage: $rebuild_app_name checkout [OPTIONS] ENVIRONMENT[:TAG]
+    echo
+    echo Discard environment modifications
+    echo
+    echo "  -h, --help          Print usage"
+    echo
+}
+
+args=$(getopt -l "help" -o "h" -- "$@")
+
+eval set -- "$args"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --)
+            # No more options left.
+            shift
+            break
+           ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+    esac
+
+    shift
+done
+
+env_name=`rebuild_cmd_line_env_name $*`
+env_tag=`rebuild_cmd_line_env_tag $*`
+
+if [[ -n $env_name ]]; then
+    if rebuild_env_dirty $env_name $env_tag; then
+        rebuild_cont_kill $env_name $env_tag
+    fi
+
+    rebuild_delete_rerun_image $env_name $env_tag
+fi

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+rebuild_prefix=`dirname $BASH_SOURCE`/../
+. $rebuild_prefix/libexec/re-build-globals
+
+function show_usage
+{
+    echo
+    echo Usage: $rebuild_app_name status [OPTIONS]
+    echo
+    echo List modified environments
+    echo
+    echo "  -h, --help          Print usage"
+    echo
+}
+
+args=$(getopt -l "help" -o "h" -- "$@")
+
+eval set -- "$args"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --)
+            # No more options left.
+            shift
+            break
+           ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+    esac
+
+    shift
+done
+
+echo
+
+for raw_cont_name in `rebuild_dirty_cont_list | sort`
+do
+    echo -n $raw_cont_name | rebuild_strip_dirty_cont_name | sed -e 's/^/\tmodified: /'
+    echo    $raw_cont_name | rebuild_strip_dirty_cont_tag | sed -e 's/^/:/'
+done
+
+echo

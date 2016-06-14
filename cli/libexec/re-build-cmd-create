@@ -1,0 +1,155 @@
+#!/bin/bash
+
+rebuild_prefix=`dirname $BASH_SOURCE`/../
+. $rebuild_prefix/libexec/re-build-globals
+
+function show_usage
+{
+    echo
+    echo Usage: $rebuild_app_name create [OPTIONS] ENVIRONMENT
+    echo
+    echo Create a new environment
+    echo
+    echo "  -b NAME, --base NAME    Base docker image, local or from The Docker Hub"
+    echo "  -h, --help              Print usage"
+    echo
+}
+
+function env_dockerfile
+{
+    local NAME=$1
+    echo `env_ctx_directory`/Dockerfile
+}
+
+function generate_dockerfile
+{
+    local DIR=$1
+    local NAME=$2
+    local BASE=$3
+
+    cat >$DIR/Dockerfile <<EOF
+############################################################
+# Dockerfile for environment $NAME
+############################################################
+
+FROM $BASE
+LABEL $rebuild_env_label=true
+
+COPY re-build-dep-install rebuild.rc /rebuild/
+COPY re-build-entry-point $rebuild_env_entrypoint
+
+# sync after chmod is needed because of an AuFS problem described in:
+# https://github.com/docker/docker/issues/9547
+
+RUN chown root:root /rebuild/re-build-dep-install /rebuild/rebuild.rc && \
+    chmod 700 $rebuild_env_entrypoint /rebuild/re-build-dep-install && \
+    sync && \
+    chmod 644 /rebuild/rebuild.rc && \
+    sync && \
+    /rebuild/re-build-dep-install && \
+    groupadd rebuild_sudo && \
+    echo %rebuild_sudo        ALL=NOPASSWD: ALL >> /etc/sudoers
+
+ENTRYPOINT ["$rebuild_env_entrypoint"]
+
+EOF
+}
+
+function build_image
+{
+    local DIR=$1
+    local NAME=$2
+    local TAG=$3
+
+    local RC=0
+
+    report_progress "Building environment..."
+
+    colorize_trace      \
+        docker build    \
+            --force-rm  \
+            --tag `rebuild_env_name $NAME`:$TAG \
+            $DIR || RC=1
+
+    if [[ ! $RC -eq 0 ]]; then
+        rebuild_delete_untagged_images
+    fi
+
+    return $RC
+}
+
+function pull_base
+{
+    BASE=$1
+
+    report_progress "Downloading the base image..."
+    colorize_trace docker pull $BASE
+}
+
+base_img=
+
+args=$(getopt -l "base:,help" -o "b:h" -- "$@")
+
+eval set -- "$args"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+        --)
+            # No more options left.
+            shift
+            break
+           ;;
+        -b|--base)
+            base_img="$2"
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+    esac
+
+    shift
+done
+
+if [[ -z $base_img ]]; then
+    handle_error "Environment base not specified"
+fi
+
+if [[ -z ${1+x} ]]; then
+    handle_error "Environment name not specified"
+fi
+
+env_name=`rebuild_cmd_line_env_name $*`
+env_tag=`rebuild_cmd_line_env_tag $*`
+
+if [[ -z $env_name ]]; then
+    handle_error "Environment name not specified"
+fi
+
+rebuild_verify_env_doesnt_exist $env_name $env_tag
+
+pull_base $base_img
+
+ENV_CTX_DIR=`env_ctx_directory $env_name`
+rm -rf $ENV_CTX_DIR
+mkdir -p $ENV_CTX_DIR
+cp $rebuild_prefix/libexec/re-build-entry-point \
+   $rebuild_prefix/libexec/re-build-dep-install \
+   $rebuild_prefix/libexec/rebuild.rc \
+   $ENV_CTX_DIR
+
+generate_dockerfile $ENV_CTX_DIR $env_name $base_img
+
+RC=0
+build_image $ENV_CTX_DIR $env_name $env_tag || RC=1
+
+do_cleanup "rm -rf $ENV_CTX_DIR"
+
+if [[ $RC -eq 0 ]]; then
+    report_progress "Successfully created $env_name:$env_tag"
+else
+    report_progress "Failed to create $env_name:$env_tag"
+fi
+
+exit $RC
