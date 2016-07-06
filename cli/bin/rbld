@@ -13,9 +13,9 @@ function list_commands
 
 function show_usage
 {
-    echo "Usage:                                              "
-    echo "  $rebuild_app_name help                Show this help screen  "
-    echo "  $rebuild_app_name help COMMAND        Show help for COMMAND  "
+    echo "Usage:"
+    echo "  $rebuild_app_name help                Show this help screen"
+    echo "  $rebuild_app_name help COMMAND        Show help for COMMAND"
     echo "  $rebuild_app_name COMMAND [PARAMS]    Run COMMAND with PARAMS"
     echo
     echo rebuild: Zero-dependency, reproducible build environments
