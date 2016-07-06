@@ -1,0 +1,7 @@
+<%
+ORIGINAL_PATH=ENV['PATH']
+NEW_PATH=File.expand_path('../cli/bin', __FILE__) + ':' + ORIGINAL_PATH
+%>
+
+default:    PATH=<%= NEW_PATH %>
+installed:  PATH=<%= ORIGINAL_PATH %>
