@@ -30,9 +30,14 @@ function run_cont_disposable
 
     local CONT_NAME=`rebuild_disposable_cont_name $NAME $TAG`
     local ENV_NAME=`rebuild_env_name $NAME`
+    local TTY_PARAM=
+
+    if [[ -t 0 ]]; then
+        TTY_PARAM=-t
+    fi
 
     docker run                                           \
-           -i -t --rm                                    \
+           -i $TTY_PARAM --rm                            \
            --name $CONT_NAME                             \
            --hostname $NAME:$TAG                         \
            --hostname `rebuild_cont_hostname $NAME $TAG` \
