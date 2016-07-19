@@ -28,9 +28,14 @@ function run_cont_raw
     local ENV_NAME=$2
     local ENV_TAG=$3
     local CMD="$4"
+    local TTY_PARAM=
+
+    if [[ -t 0 ]]; then
+        TTY_PARAM=-t
+    fi
 
     docker run                                                    \
-           -i -t                                                  \
+           -i $TTY_PARAM                                          \
            --name $CONT_NAME                                      \
            --hostname `rebuild_cont_hostname $NAME $TAG M` \
            `rebuild_cont_run_settings`                            \
