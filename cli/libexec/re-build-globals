@@ -465,9 +465,13 @@ function rebuild_search
 {
     local WILDCARD=$1
 
+    RC=0
+
     docker search --no-trunc $WILDCARD | \
         tail -n +2                     | \
-        sort
+        sort || RC=1
+
+    return $RC
 }
 
 function rebuild_is_published

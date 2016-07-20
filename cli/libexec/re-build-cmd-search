@@ -20,15 +20,24 @@ function search_raw
     local TAG=$2
     local REMOTE=$3
 
-    rebuild_search `rebuild_published_search_wildcard "$REMOTE" "$NAME" "$TAG"`
+    RC=0
+
+    rebuild_search `rebuild_published_search_wildcard "$REMOTE" "$NAME" "$TAG"` || RC=1
+
+    if [[ ! $RC -eq 0 ]]; then
+        echo >&2
+        handle_error "Failed to search in $REMOTE"
+    fi
 }
 
 function parse_raw_results
 {
     while read raw_published_name
     do
-        echo -n $raw_published_name | rebuild_strip_published_env_name |  sed -e 's/^/\t/'
-        echo    $raw_published_name | rebuild_strip_published_env_tag | sed -e 's/^/:/'
+        if [[ -n $raw_published_name ]]; then
+          echo -n $raw_published_name | rebuild_strip_published_env_name |  sed -e 's/^/\t/'
+          echo    $raw_published_name | rebuild_strip_published_env_tag | sed -e 's/^/:/'
+        fi
     done
 }
 
