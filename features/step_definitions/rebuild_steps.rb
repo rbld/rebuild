@@ -41,6 +41,16 @@ Given(/^existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
   end
 end
 
+Given(/^non-existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  env_list = %x(rbld list)
+
+  if env_list.include? fullname
+    %x(rbld rm #{fullname})
+    raise("Test environment #{fullname} deletion failed") unless $?.success?
+  end
+end
+
 Then(/^environment ([a-zA-Z\d\:\-\_]+) should be marked as modified$/) do |env|
   name, tag, fullname = NormalizeEnvName(env)
   expect(EnvironmentIsModified?(fullname)).to be true
