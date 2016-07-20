@@ -83,7 +83,13 @@ function pull_base
     BASE=$1
 
     report_progress "Downloading the base image..."
-    colorize_trace docker pull $BASE
+
+    RC=0
+    colorize_trace docker pull $BASE || RC=1
+
+    if [[ ! $RC -eq 0 ]]; then
+        handle_error "Failed to download base image $BASE"
+    fi
 }
 
 base_img=
