@@ -46,10 +46,31 @@ Then(/^environment ([a-zA-Z\d\:\-\_]+) should be marked as modified$/) do |env|
   expect(EnvironmentIsModified?(fullname)).to be true
 end
 
+Then(/^environment ([a-zA-Z\d\:\-\_]+) should not be marked as modified$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  expect(EnvironmentIsModified?(fullname)).to be false
+end
+
 Given(/^environment ([a-zA-Z\d\:\-\_]+) is modified$/) do |env|
   name, tag, fullname = NormalizeEnvName(env)
   unless EnvironmentIsModified?(fullname)
     %x(rbld modify #{fullname} -- echo Modifying...)
     raise("Test environment #{fullname} modification failed") unless $?.success?
   end
+end
+
+Given(/^environment ([a-zA-Z\d\:\-\_]+) is not modified$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  if EnvironmentIsModified?(fullname)
+    %x(rbld checkout #{fullname})
+    raise("Test environment #{fullname} checkout failed") unless $?.success?
+  end
+end
+
+Then(/^the output should be empty$/) do
+  steps %Q{
+    Then the output should contain exactly:
+      """
+      """
+  }
 end
