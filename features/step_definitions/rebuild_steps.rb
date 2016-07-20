@@ -1,54 +1,10 @@
-$default_tag="initial"
-
-def NormalizeEnvName(env)
-  name, tag = env.split(/:/)
-  if tag.to_s.empty?
-    tag=$default_tag
-  end
-  fullname=name + ":" + tag
-
-  return name, tag, fullname
-end
-
-def EnvironmentIsModified?(fullname)
-  return %x(rbld status).include? fullname
-end
-
 Given(/^existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  env_list = %x(rbld list)
-
-  unless env_list.include? fullname
-
-    unless env_list.include? name + ":" + $default_tag
-      %x(rbld create --base fedora:20 #{name})
-      raise("Test environment #{name} creation failed") unless $?.success?
-    end
-
-    unless tag == $default_tag
-      %x(rbld modify #{name} -- echo "Modifying the environment")
-      raise("Test environment #{name} modification failed") unless $?.success?
-
-      %x(rbld commit --tag #{tag} #{name})
-      raise("Test environment #{fullname} commit failed") unless $?.success?
-    end
-
-  end
-
-  if EnvironmentIsModified? fullname
-    %x(rbld checkout #{fullname})
-    raise("Test environment #{fullname} checkout failed") unless $?.success?
-  end
+  EnsureTestEnvironmentExists(env)
+  EnsureTestEnvironmentIsNotModified(env)
 end
 
 Given(/^non-existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  env_list = %x(rbld list)
-
-  if env_list.include? fullname
-    %x(rbld rm #{fullname})
-    raise("Test environment #{fullname} deletion failed") unless $?.success?
-  end
+  EnsureTestEnvironmentDoesNotExist(env)
 end
 
 Then(/^environment ([a-zA-Z\d\:\-\_]+) should be marked as modified$/) do |env|
@@ -105,4 +61,34 @@ Then(/^the output should be empty$/) do
       """
       """
   }
+end
+
+def FillConfigFile(content)
+  cfg_file = GetCfgFilePathName();
+
+  %x(sudo tee #{cfg_file}<<END
+#{content}
+END)
+
+  raise("Configuration file #{cfg_file} population failed") unless $?.success?
+end
+
+Given(/^remote registry is not configured$/) do
+  FillConfigFile ""
+end
+
+Given(/^remote registry is not accessible$/) do
+  UseRegistry("127.0.0.1:65536")
+end
+
+Given(/^configured remote registry is (.+)$/) do |url|
+  UseRegistry(url)
+end
+
+Given /^my rebuild registry is populated with test environments$/ do
+  PopulatedTestRegistry.instance.use()
+end
+
+Given /^my rebuild registry is empty$/ do
+  CleanTestRegistry.instance.use()
 end
