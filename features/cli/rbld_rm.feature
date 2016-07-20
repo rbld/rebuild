@@ -39,20 +39,10 @@ Feature: rbld rm
 
   Scenario: removal of existing environment with tag
     When I successfully run `rbld rm test-env:v001`
-    And I run `rbld list`
-    Then the output should not contain:
-      """
-      test-env:v001
-      """
-    But the output should contain:
-      """
-      test-env:initial
-      """
+    Then environment test-env:v001 should not exist
+    But environment test-env should exist
 
   Scenario: removal of existing environment without tag
     When I successfully run `rbld rm test-env`
-    And I run `rbld list`
-    Then the output should not contain:
-      """
-      test-env:initial
-      """
+    Then environment test-env should not exist
+    But environment test-env:v001 should exist

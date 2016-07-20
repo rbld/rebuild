@@ -51,6 +51,28 @@ Then(/^environment ([a-zA-Z\d\:\-\_]+) should not be marked as modified$/) do |e
   expect(EnvironmentIsModified?(fullname)).to be false
 end
 
+Then(/^environment ([a-zA-Z\d\:\-\_]+) should exist$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  steps %Q{
+    When I successfully run `rbld list`
+    Then the output should contain:
+      """
+      #{fullname}
+      """
+  }
+end
+
+Then(/^environment ([a-zA-Z\d\:\-\_]+) should not exist$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  steps %Q{
+    When I successfully run `rbld list`
+    Then the output should not contain:
+      """
+      #{fullname}
+      """
+  }
+end
+
 Given(/^environment ([a-zA-Z\d\:\-\_]+) is modified$/) do |env|
   name, tag, fullname = NormalizeEnvName(env)
   unless EnvironmentIsModified?(fullname)
