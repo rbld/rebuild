@@ -45,3 +45,11 @@ Then(/^environment ([a-zA-Z\d\:\-\_]+) should be marked as modified$/) do |env|
   name, tag, fullname = NormalizeEnvName(env)
   expect(EnvironmentIsModified?(fullname)).to be true
 end
+
+Given(/^environment ([a-zA-Z\d\:\-\_]+) is modified$/) do |env|
+  name, tag, fullname = NormalizeEnvName(env)
+  unless EnvironmentIsModified?(fullname)
+    %x(rbld modify #{fullname} -- echo Modifying...)
+    raise("Test environment #{fullname} modification failed") unless $?.success?
+  end
+end
