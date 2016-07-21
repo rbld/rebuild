@@ -8,7 +8,7 @@ function show_usage
     echo
     echo "Usage: $rebuild_app_name search [OPTIONS] [NAME[:TAG]|PREFIX]"
     echo
-    echo Search remote regsitry for published environments
+    echo Search remote registry for published environments
     echo
     echo "  -h, --help          Print usage"
     echo
