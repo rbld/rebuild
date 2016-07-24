@@ -1,58 +1,34 @@
-Given(/^existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
-  EnsureTestEnvironmentExists(env)
-  EnsureTestEnvironmentIsNotModified(env)
+Given(/^existing (environment #{ENV_NAME_REGEX})$/) do |env|
+  env.EnsureExists
+  env.EnsureNotModified
 end
 
-Given(/^non-existing environment ([a-zA-Z\d\:\-\_]+)$/) do |env|
-  EnsureTestEnvironmentDoesNotExist(env)
+Given(/^non-existing (environment #{ENV_NAME_REGEX})$/) do |env|
+  env.EnsureDoesNotExist
 end
 
-Then(/^environment ([a-zA-Z\d\:\-\_]+) should be marked as modified$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  expect(EnvironmentIsModified?(fullname)).to be true
+Then(/^(environment #{ENV_NAME_REGEX}) should be marked as modified$/) do |env|
+  expect(env.Modified?).to be true
 end
 
-Then(/^environment ([a-zA-Z\d\:\-\_]+) should not be marked as modified$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  expect(EnvironmentIsModified?(fullname)).to be false
+Then(/^(environment #{ENV_NAME_REGEX}) should not be marked as modified$/) do |env|
+  expect(env.Modified?).to be false
 end
 
-Then(/^environment ([a-zA-Z\d\:\-\_]+) should exist$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  steps %Q{
-    When I successfully run `rbld list`
-    Then the output should contain:
-      """
-      #{fullname}
-      """
-  }
+Then(/^(environment #{ENV_NAME_REGEX}) should exist$/) do |env|
+  expect(env.Exists?).to be true
 end
 
-Then(/^environment ([a-zA-Z\d\:\-\_]+) should not exist$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  steps %Q{
-    When I successfully run `rbld list`
-    Then the output should not contain:
-      """
-      #{fullname}
-      """
-  }
+Then(/^(environment #{ENV_NAME_REGEX}) should not exist$/) do |env|
+  expect(env.Exists?).to be false
 end
 
-Given(/^environment ([a-zA-Z\d\:\-\_]+) is modified$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  unless EnvironmentIsModified?(fullname)
-    %x(rbld modify #{fullname} -- echo Modifying...)
-    raise("Test environment #{fullname} modification failed") unless $?.success?
-  end
+Given(/^(environment #{ENV_NAME_REGEX}) is modified$/) do |env|
+  env.EnsureModified
 end
 
-Given(/^environment ([a-zA-Z\d\:\-\_]+) is not modified$/) do |env|
-  name, tag, fullname = NormalizeEnvName(env)
-  if EnvironmentIsModified?(fullname)
-    %x(rbld checkout #{fullname})
-    raise("Test environment #{fullname} checkout failed") unless $?.success?
-  end
+Given(/^(environment #{ENV_NAME_REGEX}) is not modified$/) do |env|
+  env.EnsureNotModified
 end
 
 Then(/^the output should be empty$/) do
@@ -63,26 +39,12 @@ Then(/^the output should be empty$/) do
   }
 end
 
-def FillConfigFile(content)
-  cfg_file = GetCfgFilePathName();
-
-  %x(sudo tee #{cfg_file}<<END
-#{content}
-END)
-
-  raise("Configuration file #{cfg_file} population failed") unless $?.success?
-end
-
 Given(/^remote registry is not configured$/) do
-  FillConfigFile ""
+  rebuild_conf.fill("")
 end
 
 Given(/^remote registry is not accessible$/) do
-  UseRegistry("127.0.0.1:65536")
-end
-
-Given(/^configured remote registry is (.+)$/) do |url|
-  UseRegistry(url)
+  rebuild_conf.set_registry("127.0.0.1:65536")
 end
 
 Given /^my rebuild registry is populated with test environments$/ do
