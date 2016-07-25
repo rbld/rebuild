@@ -100,6 +100,10 @@ class RebuildEnvironment
     RebuildEnvMgr.list.include? full_name
   end
 
+  def Published?
+    RebuildEnvMgr.search.include? full_name
+  end
+
   def EnsureModified
     unless Modified?
       RebuildEnvMgr.modify full_name
@@ -113,7 +117,7 @@ class RebuildEnvironment
   end
 
   def EnsurePublished
-    unless RebuildEnvMgr.search.include? full_name
+    unless Published?
       RebuildEnvMgr.publish full_name
     end
   end

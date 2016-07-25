@@ -72,7 +72,13 @@ class BaseTestRegistry
     end
   end
 
-  def use()
+  def clean?
+    list = %x{docker search --no-trunc '#{REGISTRY_HOST}:#{@registry_port}/'}
+    fail "Failed to search in registry #{REGISTRY_HOST}:#{@registry_port}" unless $?.success?
+    return list.lines.count == 1
+  end
+
+  def use
     @rebuild_conf.set_registry("#{REGISTRY_HOST}:#{@registry_port}")
   end
 end
@@ -93,5 +99,14 @@ class CleanTestRegistry < BaseTestRegistry
   def initialize
     super
     at_exit { CleanTestRegistry.instance.kill_registry }
+  end
+
+  def use
+    unless clean?
+      kill_registry
+      initialize
+    end
+
+    super
   end
 end

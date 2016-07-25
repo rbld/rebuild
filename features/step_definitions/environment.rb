@@ -3,6 +3,14 @@ Given /^existing (environment #{ENV_NAME_REGEX})$/ do |env|
   env.EnsureNotModified
 end
 
+Given /^existing environments:$/ do |table|
+  table.raw.each do |env_name|
+    env = RebuildEnvironment.new(env_name[0])
+    env.EnsureExists
+    env.EnsureNotModified
+  end
+end
+
 Given /^non-existing (environment #{ENV_NAME_REGEX})$/ do |env|
   env.EnsureDoesNotExist
 end
@@ -13,6 +21,10 @@ end
 
 Then /^(environment #{ENV_NAME_REGEX}) should not be marked as modified$/ do |env|
   expect(env.Modified?).to be false
+end
+
+Then /^(environment #{ENV_NAME_REGEX}) should be published$/ do |env|
+  expect(env.Published?).to be true
 end
 
 Then /^(environment #{ENV_NAME_REGEX}) should exist$/ do |env|
