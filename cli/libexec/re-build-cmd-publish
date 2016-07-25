@@ -35,7 +35,14 @@ function do_publish
     report_progress "Publishing at $REMOTE..."
 
     docker tag `rebuild_env_name $NAME`:$TAG $PUBLISHED_NAME | filter_debug
-    colorize_trace docker push $PUBLISHED_NAME
+
+    RC=0
+    colorize_trace docker push $PUBLISHED_NAME || RC=1
+    if [[ ! $RC -eq 0 ]]; then
+        echo >&2
+        handle_error "Failed to publish at $REMOTE"
+    fi
+
     docker rmi $PUBLISHED_NAME | filter_debug
 
     report_progress "Successfully published $NAME:$TAG"
