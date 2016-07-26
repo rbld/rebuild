@@ -72,7 +72,7 @@ class BaseTestRegistry
     end
   end
 
-  def clean?
+  def empty?
     list = %x{docker search --no-trunc '#{REGISTRY_HOST}:#{@registry_port}/'}
     fail "Failed to search in registry #{REGISTRY_HOST}:#{@registry_port}" unless $?.success?
     return list.lines.count == 1
@@ -93,16 +93,16 @@ class PopulatedTestRegistry < BaseTestRegistry
   end
 end
 
-class CleanTestRegistry < BaseTestRegistry
+class EmptyTestRegistry < BaseTestRegistry
   include Singleton
 
   def initialize
     super
-    at_exit { CleanTestRegistry.instance.kill_registry }
+    at_exit { EmptyTestRegistry.instance.kill_registry }
   end
 
   def use
-    unless clean?
+    unless empty?
       kill_registry
       initialize
     end

@@ -11,11 +11,11 @@ Given /^my rebuild registry is populated with test environments$/ do
 end
 
 Given /^my rebuild registry is empty$/ do
-  CleanTestRegistry.instance.use()
+  EmptyTestRegistry.instance.use()
 end
 
 Given /^my rebuild registry contains (environment #{ENV_NAME_REGEX})$/ do |env|
-  CleanTestRegistry.instance.use()
+  EmptyTestRegistry.instance.use()
   env.EnsureExists
   env.EnsureNotModified
   env.EnsurePublished
