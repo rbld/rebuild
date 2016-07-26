@@ -74,7 +74,7 @@ class RebuildEnvironment
     unless env_list.include? full_name
 
       unless env_list.include? name + ":" + DEFAULT_TAG
-        RebuildEnvMgr.create name, "fedora:20"
+        RebuildEnvMgr.create name, test_env_base
       end
 
       unless tag == DEFAULT_TAG
