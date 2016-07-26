@@ -2,11 +2,7 @@ Feature: rbld search
   As a CLI user
   I want to be able to search for published environments with rbld search
 
-  Scenario: search help exit status of 0
-    When I run `rbld search --help`
-    Then the exit status should be 0
-
-  Scenario: search help header is printed
+  Scenario: search help succeeds and usage is printed
     Given I run `rbld search --help`
     Then it should pass with:
       """

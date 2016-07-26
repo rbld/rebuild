@@ -2,16 +2,12 @@ Feature: rbld deploy
   As a CLI user
   I want to be able to deploy environments with rbld deploy
 
-  Scenario: deploy help exit status of 0
-    When I run `rbld deploy --help`
-    Then the exit status should be 0
-
-  Scenario: deploy help header is printed
+  Scenario: deploy help succeeds and usage is printed
     Given I run `rbld deploy --help`
     Then it should pass with:
-      """
-      Deploy environment from remote registry
-      """
+    """
+    Deploy environment from remote registry
+    """
 
   Scenario: no remote registry configured
     Given remote registry is not configured
@@ -36,6 +32,7 @@ Feature: rbld deploy
       """
       Environment <full environment name> does not exist in the registry
       """
+
       Examples:
       | environment name    | full environment name |
       | nonexisting         | nonexisting:initial   |

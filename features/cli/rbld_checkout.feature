@@ -3,40 +3,33 @@ Feature: rbld checkout
   I want to be able to discard environment modifications with rbld checkout
 
   Background:
-    Given existing environment test-env:initial
-      And existing environment test-env:v001
+    Given existing environments:
+    |test-env:initial|
+    |test-env:v001   |
 
-  Scenario: checkout help exit status of 0
-    When I run `rbld checkout --help`
-    Then the exit status should be 0
-
-  Scenario: checkout help header is printed
-    Given I successfully run `rbld checkout --help`
-    Then the output should contain:
+  Scenario: checkout help succeeds and usage is printed
+    Given I run `rbld checkout --help`
+    Then it should pass with:
     """
     Discard environment modifications
     """
 
-  Scenario: checkout of non-existing environment is allowed
-    When I run `rbld checkout nonexisting`
-    Then the exit status should be 0
-    And the output should be empty
+  Scenario Outline: checkout of non-existing environment
+    When I run `rbld checkout <environment name>`
+    Then it should pass with empty output
 
-  Scenario: checkout of non-existing environment with tag is allowed
-    When I run `rbld checkout nonexisting:sometag`
-    Then the exit status should be 0
-    And the output should be empty
+    Examples:
+      | environment name    |
+      | nonexisting         |
+      | nonexisting:sometag |
 
-  Scenario: checkout of modified environment
-    Given environment test-env:v001 is modified
+  Scenario Outline: checkout of existing environment
+    Given environment test-env:v001 is <modified or not modified>
     When I run `rbld checkout test-env:v001`
-    Then the exit status should be 0
-    And the output should be empty
+    Then it should pass with empty output
     And environment test-env:v001 should not be marked as modified
 
-  Scenario: checkout of non-modified environment
-    Given environment test-env:v001 is not modified
-    When I run `rbld checkout test-env:v001`
-    Then the exit status should be 0
-    And the output should be empty
-    And environment test-env:v001 should not be marked as modified
+    Examples:
+      | modified or not modified |
+      | modified                 |
+      | not modified             |

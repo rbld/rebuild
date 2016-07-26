@@ -3,25 +3,21 @@ Feature: rbld list
   I want to be able to list existing environments with rbld list
 
   Background:
-    Given existing environment test-env:initial
-      And existing environment test-env:v001
+    Given existing environments:
+      | test-env:initial |
+      | test-env:v001    |
 
-  Scenario: list help exit status of 0
-    When I run `rbld list --help`
-    Then the exit status should be 0
-
-  Scenario: list help header is printed
-    Given I successfully run `rbld list --help`
-    Then the output should contain:
+  Scenario: list help succeeds and usage is printed
+    Given I run `rbld list --help`
+    Then it should pass with:
     """
     List local environments
     """
 
   Scenario: list existing environment
-    When I successfully run `rbld list`
-    Then the output should contain:
+    When I run `rbld list`
+    Then it should pass with:
     """
     \ttest-env:initial
     \ttest-env:v001
     """
-

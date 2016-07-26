@@ -3,79 +3,66 @@ Feature: rbld modify
   I want to be able to modify existing environments with rbld modify
 
   Background:
-    Given existing environment test-env:initial
-      And existing environment test-env:v001
+    Given existing non-modified environments:
+    | test-env:initial |
+    | test-env:v001    |
 
-  Scenario: modify help exit status of 0
-    When I run `rbld modify --help`
-    Then the exit status should be 0
-
-  Scenario: modify help header is printed
-    Given I successfully run `rbld modify --help`
-    Then the output should contain:
+  Scenario: modify help succeeds and usage is printed
+    Given I run `rbld modify --help`
+    Then it should pass with:
     """
     Modify a local environment
     """
 
-  Scenario: error code returned for non-existing environments
-    When I run `rbld modify nonexisting`
-    Then the exit status should not be 0
+  Scenario Outline: error code returned for non-existing environments
+    When I run `rbld modify <non-existing environment name>`
+    Then it should fail with:
+    """
+    ERROR: Unknown environment <full environment name>
+    """
 
-  Scenario: error printed for non-existing environments
-    When I run `rbld modify nonexisting`
-    Then the exit status should not be 0
-    And the output should contain:
-      """
-      ERROR: Unknown environment nonexisting:initial
-      """
+    Examples:
+      | non-existing environment name | full environment name |
+      | non-existing                  | non-existing:initial  |
+      | non-existing:sometag          | non-existing:sometag  |
 
-  Scenario: error printed for non-existing environment with tag
-    When I run `rbld modify nonexisting:sometag`
-    Then the exit status should not be 0
-    And the output should contain:
+  Scenario Outline: non-interactive modification of environment
+    When I successfully run `rbld modify <environment name> -- echo Hello world!`
+    Then it should pass with:
       """
-      ERROR: Unknown environment nonexisting:sometag
-      """
-
-  Scenario: non-interactive modification of environment with tag
-    When I successfully run `rbld modify test-env:v001 -- echo Hello world!`
-    Then the output should contain:
-      """
-      >>> rebuild env test-env:v001-M
+      >>> rebuild env <full environment name>-M
       >>> echo Hello world!
       Hello world!
-      <<< rebuild env test-env:v001-M
+      <<< rebuild env <full environment name>-M
       """
-    And environment test-env:v001 should be marked as modified
+    And environment <full environment name> should be marked as modified
 
-  Scenario: non-interactive modification of environment without tag
-    When I successfully run `rbld modify test-env -- echo Hello world!`
-    Then the output should contain:
-      """
-      >>> rebuild env test-env:initial-M
-      >>> echo Hello world!
-      Hello world!
-      <<< rebuild env test-env:initial-M
-      """
-    And environment test-env should be marked as modified
+    Examples:
+      | environment name | full environment name |
+      | test-env:v001    | test-env:v001         |
+      | test-env         | test-env:initial      |
 
-  Scenario: interactive modification of environment
-    When I run `rbld modify test-env:v001` interactively
+  Scenario Outline: interactive modification of environment
+    When I run `rbld modify <environment name>` interactively
     And I type "echo Hello interactive world!"
     And I close the stdin stream
-    Then the exit status should be 0
-    Then the output should contain:
+    Then it should pass with:
       """
-      >>> rebuild env test-env:v001-M interactive
+      >>> rebuild env <full environment name>-M interactive
       >>> Press CTRL-D do leave
       Hello interactive world!
-      <<< rebuild env test-env:v001-M
+      <<< rebuild env <full environment name>-M
       """
-    And environment test-env:v001 should be marked as modified
+    And environment <full environment name> should be marked as modified
+
+    Examples:
+      | environment name | full environment name |
+      | test-env:v001    | test-env:v001         |
+      | test-env         | test-env:initial      |
 
   Scenario: hostname of environment set to the environment name with modified sign
-    When I successfully run `rbld modify test-env:v001 -- hostname`
-    Then the output should contain:
+    When I run `rbld modify test-env:v001 -- hostname`
+    Then it should pass with:
       """
       >>> rebuild env test-env:v001-M
       >>> hostname

@@ -1,15 +1,10 @@
 Feature: rbld help
   As a CLI user
-  I want to be able to obtain basic usage info with rbld help
+  I want to be able to obtain usage info with rbld help
 
-  Scenario: Exit status of 0
+  Scenario: rbld help suceeds and header is printed
     Given I run `rbld help`
-    Then the exit status should be 0
-
-  Scenario: Help header is printed
-    Given I successfully run `rbld help`
-
-    Then the output should contain:
+    Then it should pass with:
     """
     Usage:
       rbld help                Show this help screen
@@ -20,9 +15,8 @@ Feature: rbld help
     """
 
   Scenario: List of commands is printed
-    Given I successfully run `rbld help`
-
-    Then the output should contain:
+    Given I run `rbld help`
+    Then it should pass with:
     """
     Commands:
 

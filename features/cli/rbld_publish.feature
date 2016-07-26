@@ -8,11 +8,7 @@ Feature: rbld publish
       | test-env1:v001    |
       | test-env2:v001    |
 
-  Scenario: publish help exit status of 0
-    When I run `rbld publish --help`
-    Then the exit status should be 0
-
-  Scenario: publish help header is printed
+  Scenario: publish help succeeds and usage is printed
     Given I run `rbld publish --help`
     Then it should pass with:
       """
@@ -34,7 +30,8 @@ Feature: rbld publish
       """
       ERROR: Unknown environment <full environment name>
       """
-      Examples:
+
+    Examples:
       | environment name    | full environment name |
       | nonexisting         | nonexisting:initial   |
       | nonexisting:sometag | nonexisting:sometag   |
@@ -56,10 +53,11 @@ Feature: rbld publish
       Successfully published <full environment name>
       """
     And environment <environment name> should be published
-      Examples:
-        | environment name | full environment name |
-        | test-env1        | test-env1:initial     |
-        | test-env1:v001   | test-env1:v001        |
+
+    Examples:
+      | environment name | full environment name |
+      | test-env1        | test-env1:initial     |
+      | test-env1:v001   | test-env1:v001        |
 
   Scenario: publish a modified environment
     Given my rebuild registry is empty

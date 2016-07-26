@@ -3,46 +3,44 @@ Feature: rbld rm
   I want to be able to remove existing environments with rbld rm
 
   Background:
-    Given existing environment test-env:initial
-      And existing environment test-env:v001
+    Given existing environments:
+    | test-env:initial |
+    | test-env:v001    |
 
-  Scenario: rm help exit status of 0
-    When I run `rbld rm --help`
-    Then the exit status should be 0
-
-  Scenario: rm help header is printed
-    Given I successfully run `rbld rm --help`
-    Then the output should contain:
+  Scenario: rm help succeeds and usage is printed
+    Given I run `rbld rm --help`
+    Then it should pass with:
     """
     Remove local environment
     """
 
-  Scenario: error code returned for non-existing environments
-    When I run `rbld rm nonexisting`
-    Then the exit status should not be 0
-
-  Scenario: error printed for non-existing environments
-    When I run `rbld rm nonexisting`
-    Then the exit status should not be 0
-    And the output should contain:
+  Scenario Outline: removal of non-existing environments
+    When I run `rbld rm <non-existing environment name>`
+    Then it should fail with:
       """
-      ERROR: Unknown environment nonexisting:initial
+      ERROR: Unknown environment <full environment name>
       """
 
-  Scenario: error printed for non-existing environment with tag
-    When I run `rbld rm nonexisting:sometag`
-    Then the exit status should not be 0
-    And the output should contain:
-      """
-      ERROR: Unknown environment nonexisting:sometag
-      """
+    Examples:
+      | non-existing environment name | full environment name |
+      | non-existing                  | non-existing:initial  |
+      | non-existing:sometag          | non-existing:sometag  |
 
-  Scenario: removal of existing environment with tag
-    When I successfully run `rbld rm test-env:v001`
-    Then environment test-env:v001 should not exist
-    But environment test-env should exist
+  Scenario Outline: removal of existing environments
+    When I successfully run `rbld rm <environment being removed>`
+    Then environment <environment being removed> should not exist
+    But environment <environment not being removed> should exist
 
-  Scenario: removal of existing environment without tag
-    When I successfully run `rbld rm test-env`
-    Then environment test-env should not exist
-    But environment test-env:v001 should exist
+    Examples:
+      | environment being removed | environment not being removed |
+      | test-env:v001             | test-env:initial              |
+      | test-env                  | test-env:v001                 |
+
+  Scenario: Removal of modified environment
+    Given environment test-env:v001 is modified
+    When I run `rbld rm test-env:v001`
+    Then it should fail with:
+    """
+    ERROR: Environment is modified, commit or checkout first
+    """
+    And environment test-env:v001 should be marked as modified

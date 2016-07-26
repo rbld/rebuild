@@ -1,9 +1,9 @@
-Given /^existing (environment #{ENV_NAME_REGEX})$/ do |env|
+Given /^(?:existing )?(?:non\-modified )?(environment #{ENV_NAME_REGEX})$/ do |env|
   env.EnsureExists
   env.EnsureNotModified
 end
 
-Given /^existing environments:$/ do |table|
+Given /^(?:existing )?(?:non\-modified )?environments:$/ do |table|
   table.raw.each do |env_name|
     env = RebuildEnvironment.new(env_name[0])
     env.EnsureExists
@@ -11,8 +11,28 @@ Given /^existing environments:$/ do |table|
   end
 end
 
+Given /^modified (environment #{ENV_NAME_REGEX})$/ do |env|
+  env.EnsureExists
+  env.EnsureModified
+end
+
+Given /^modified environments:$/ do |table|
+  table.raw.each do |env_name|
+    env = RebuildEnvironment.new(env_name[0])
+    env.EnsureExists
+    env.EnsureModified
+  end
+end
+
 Given /^non-existing (environment #{ENV_NAME_REGEX})$/ do |env|
   env.EnsureDoesNotExist
+end
+
+Given /^non-existing environments:$/ do |table|
+  table.raw.each do |env_name|
+    env = RebuildEnvironment.new(env_name[0])
+    env.EnsureDoesNotExist
+  end
 end
 
 Then /^(environment #{ENV_NAME_REGEX}) should be marked as modified$/ do |env|
