@@ -28,7 +28,20 @@ function do_deploy
 
     local PUBLISHED_NAME=`rebuild_published_env_name $REMOTE $NAME $TAG`
 
-    colorize_trace docker pull $PUBLISHED_NAME
+    rebuild_verify_regsitry_is_accessible $PUBLISHED_NAME
+
+    if ! rebuild_is_published $PUBLISHED_NAME; then
+        handle_error "Environment $env_name:$env_tag does not exist in the registry"
+    fi
+
+    RC=0
+    colorize_trace docker pull $PUBLISHED_NAME || RC=1
+
+    if [[ ! $RC -eq 0 ]]; then
+        echo >&2
+        handle_error "Failed to deploy from $REMOTE"
+    fi
+
     docker tag $PUBLISHED_NAME `rebuild_env_name $NAME`:$TAG | filter_debug
     docker rmi $PUBLISHED_NAME | filter_debug
 
@@ -62,8 +75,6 @@ if [[ -z $env_name ]]; then
     handle_error "Environment name not specified"
 fi
 
-if rebuild_env_dirty $env_name $env_tag; then
-    handle_error "Environment already exists and modified, commit or checkout first"
-fi
+rebuild_verify_env_doesnt_exist $env_name $env_tag
 
 do_deploy $env_name $env_tag

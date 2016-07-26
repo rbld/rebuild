@@ -474,6 +474,20 @@ function rebuild_search
     return $RC
 }
 
+function rebuild_verify_regsitry_is_accessible
+{
+    local WILDCARD=$1
+
+    RC=0
+
+    rebuild_search $WILDCARD || RC=1
+
+    if [[ ! $RC -eq 0 ]]; then
+        echo >&2
+        handle_error "Failed to access the registry"
+    fi
+}
+
 function rebuild_is_published
 {
     local WILDCARD=$1
