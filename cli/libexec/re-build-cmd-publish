@@ -38,12 +38,13 @@ function do_publish
 
     RC=0
     colorize_trace docker push $PUBLISHED_NAME || RC=1
+
+    docker rmi $PUBLISHED_NAME | filter_debug
+
     if [[ ! $RC -eq 0 ]]; then
         echo >&2
         handle_error "Failed to publish at $REMOTE"
     fi
-
-    docker rmi $PUBLISHED_NAME | filter_debug
 
     report_progress "Successfully published $NAME:$TAG"
 }
