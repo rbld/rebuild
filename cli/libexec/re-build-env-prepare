@@ -20,6 +20,12 @@ dep_install()
     elif has_app apk; then
         apk update
         apk add $*
+    elif has_app zypper; then
+        zypper install -y $*
+        #cleaning to make image smaller
+        zypper clean
+    elif has_app urpmi; then
+        urpmi sudo
     else
         echo Failed to install "$*", no supported package manager found
         exit 1
