@@ -6,7 +6,12 @@ DEBUG_OUTPUT=/dev/null
 
 rebuild_banner()
 {
-  echo -e "\e[1;92m$1\e[0m"
+  BEST_ECHO=`which echo 2>/dev/null`
+  if test -z $BEST_ECHO; then
+    BEST_ECHO=echo
+  fi
+
+  $BEST_ECHO -e "\e[1;92m$1\e[0m"
 }
 
 setup_users()
