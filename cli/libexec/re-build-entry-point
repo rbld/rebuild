@@ -17,13 +17,14 @@ rebuild_banner()
 setup_users()
 {
   delete_user $REBUILD_USER_NAME
+  delete_group $REBUILD_USER_NAME
   delete_group $REBUILD_GROUP_NAME
 
   if has_app useradd; then
 
     groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME
 
-    useradd -o -M -N                       \
+    useradd -o -M                          \
             -g $REBUILD_GROUP_ID           \
             --groups rebuild_sudo          \
             -u $REBUILD_USER_ID            \
