@@ -22,14 +22,14 @@ Feature: rbld create
       """
 
   Scenario: create environment with tag
-    When I run `rbld create --base fedora:20 test-env:v001`
+    When I run `rbld create --base alpine:3.4 test-env:v001`
     Then it should fail with:
       """
       ERROR: Environment tag must not be specified
       """
 
   Scenario: create environment with incorrect name
-    When I run `rbld create --base fedora:20 incorrect~name`
+    When I run `rbld create --base alpine:3.4 incorrect~name`
     Then it should fail with:
       """
       ERROR: Invalid environment name (incorrect~name), it may contain a-z, A-Z, 0-9, - and _ characters only
@@ -44,7 +44,7 @@ Feature: rbld create
     And environment test-env should not exist
 
   Scenario: create environment from existing base
-    When I run `rbld create --base fedora:20 test-env`
+    When I run `rbld create --base alpine:3.4 test-env`
     Then the output should contain:
       """
       Successfully created test-env:initial
@@ -54,7 +54,7 @@ Feature: rbld create
 
   Scenario: create environment that already exists
     Given existing environment test-env
-    When I run `rbld create --base fedora:20 test-env`
+    When I run `rbld create --base alpine:3.4 test-env`
     Then it should fail with:
       """
       ERROR: Environment test-env:initial already exists
