@@ -35,20 +35,18 @@ function generate_dockerfile
 FROM $BASE
 LABEL $rebuild_env_label=true
 
-COPY re-build-dep-install rebuild.rc /rebuild/
+COPY re-build-env-prepare re-build-bootstrap-utils rebuild.rc /rebuild/
 COPY re-build-entry-point $rebuild_env_entrypoint
 
 # sync after chmod is needed because of an AuFS problem described in:
 # https://github.com/docker/docker/issues/9547
 
-RUN chown root:root /rebuild/re-build-dep-install /rebuild/rebuild.rc && \
-    chmod 700 $rebuild_env_entrypoint /rebuild/re-build-dep-install && \
+RUN chown root:root /rebuild/re-build-env-prepare /rebuild/re-build-bootstrap-utils /rebuild/rebuild.rc && \
+    chmod 700 $rebuild_env_entrypoint /rebuild/re-build-env-prepare && \
     sync && \
-    chmod 644 /rebuild/rebuild.rc && \
+    chmod 644 /rebuild/rebuild.rc /rebuild/re-build-bootstrap-utils && \
     sync && \
-    /rebuild/re-build-dep-install && \
-    groupadd rebuild_sudo && \
-    echo %rebuild_sudo        ALL=NOPASSWD: ALL >> /etc/sudoers
+    /rebuild/re-build-env-prepare
 
 ENTRYPOINT ["$rebuild_env_entrypoint"]
 
@@ -147,7 +145,8 @@ ENV_CTX_DIR=`env_ctx_directory $env_name`
 rm -rf $ENV_CTX_DIR
 mkdir -p $ENV_CTX_DIR
 cp $rebuild_prefix/libexec/re-build-entry-point \
-   $rebuild_prefix/libexec/re-build-dep-install \
+   $rebuild_prefix/libexec/re-build-env-prepare \
+   $rebuild_prefix/libexec/re-build-bootstrap-utils \
    $rebuild_prefix/libexec/rebuild.rc \
    $ENV_CTX_DIR
 

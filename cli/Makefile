@@ -22,8 +22,9 @@ COMMANDS = libexec/re-build-cmd-checkout  \
            libexec/re-build-cmd-search    \
            libexec/re-build-globals
 
-HELPERS = libexec/re-build-entry-point \
-          libexec/re-build-dep-install \
+HELPERS = libexec/re-build-entry-point     \
+          libexec/re-build-env-prepare     \
+          libexec/re-build-bootstrap-utils \
           libexec/rebuild.rc
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
@@ -53,4 +54,3 @@ dist:
             -vcJ -f rebuild-v$(VERSION).tar.xz      \
             $(DIST_FILES)
 	$(Q)echo && echo rebuild-v$(VERSION).tar.xz created
-

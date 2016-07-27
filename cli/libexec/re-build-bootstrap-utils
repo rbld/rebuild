@@ -1,0 +1,42 @@
+#!/bin/sh
+
+has_app()
+{
+    hash $1 2>/dev/null
+}
+
+create_group()
+{
+  if has_app groupadd; then
+    groupadd $1
+  elif has_app addgroup; then
+    addgroup $1
+  else
+    echo Failed to create a group, no supported group management utils found
+    exit 1
+  fi
+}
+
+delete_group()
+{
+  if has_app groupdel; then
+    groupdel $1
+  elif has_app delgroup; then
+    delgroup $1
+  else
+    echo Failed to delete a group, no supported group management utils found
+    exit 1
+  fi
+}
+
+delete_user()
+{
+  if has_app userdel; then
+    userdel $1
+  elif has_app deluser; then
+    deluser $1
+  else
+    echo Failed to delete a user, no supported user management utils found
+    exit 1
+  fi
+}

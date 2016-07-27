@@ -1,35 +1,71 @@
-#!/bin/bash
+#!/bin/sh
 
-function rebuild_banner
+. /rebuild/re-build-bootstrap-utils
+
+DEBUG_OUTPUT=/dev/null
+
+rebuild_banner()
 {
-    echo -e "\e[1;92m$1\e[0m"
+  echo -e "\e[1;92m$1\e[0m"
 }
 
-userdel $REBUILD_USER_NAME 2>/dev/null
-groupdel $REBUILD_GROUP_NAME 2>/dev/null
+setup_users()
+{
+  delete_user $REBUILD_USER_NAME
+  delete_group $REBUILD_GROUP_NAME
 
-groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME 2>/dev/null
-useradd -o -M -N \
-        -g $REBUILD_GROUP_ID \
-        --groups rebuild_sudo \
-        -u $REBUILD_USER_ID \
-        --home-dir $REBUILD_USER_HOME \
-        $REBUILD_USER_NAME 2>/dev/null
+  if has_app useradd; then
+
+    groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME
+
+    useradd -o -M -N                       \
+            -g $REBUILD_GROUP_ID           \
+            --groups rebuild_sudo          \
+            -u $REBUILD_USER_ID            \
+            --home-dir $REBUILD_USER_HOME  \
+            $REBUILD_USER_NAME
+
+  elif has_app adduser; then
+
+    echo "$REBUILD_GROUP_NAME:x:$REBUILD_GROUP_ID:" >> /etc/group
+    echo "$REBUILD_USER_NAME:x:$REBUILD_USER_ID:$REBUILD_GROUP_ID:Linux User,,,:$REBUILD_USER_HOME:" >> /etc/passwd
+
+    adduser $REBUILD_USER_NAME rebuild_sudo
+
+  else
+    echo Failed to setup users, no supported user management utils found
+    exit 1
+  fi
+}
+
+rebuild_shell()
+{
+  if test -f /bin/bash; then
+    echo /bin/bash
+  else
+    echo /bin/sh
+  fi
+}
+
+sudo_params()
+{
+  echo "-n -H -E -g $REBUILD_GROUP_NAME -u $REBUILD_USER_NAME"
+}
+
+setup_users 2>$DEBUG_OUTPUT
 
 cd $REBUILD_PWD
 
-SUDO_PARAMS="-n -H -E -g $REBUILD_GROUP_NAME -u $REBUILD_USER_NAME"
-
 . /rebuild/rebuild.rc
 
-if [[ -n "$*" ]]; then
+if test -n "$*"; then
     rebuild_banner ">>> rebuild env $HOSTNAME"
     rebuild_banner ">>> $*"
-    sudo $SUDO_PARAMS /bin/bash -c "$*"
+    sudo `sudo_params` `rebuild_shell` -c "$*"
 else
     rebuild_banner ">>> rebuild env $HOSTNAME interactive"
     rebuild_banner ">>> Press CTRL-D do leave"
-    sudo $SUDO_PARAMS /bin/bash
+    sudo `sudo_params` `rebuild_shell`
 fi
 
 RC=$?
