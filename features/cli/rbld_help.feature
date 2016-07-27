@@ -2,8 +2,8 @@ Feature: rbld help
   As a CLI user
   I want to be able to obtain usage info with rbld help
 
-  Scenario: rbld help suceeds and header is printed
-    Given I run `rbld help`
+  Scenario Outline: rbld help suceeds and header is printed
+    Given I run `<command>`
     Then it should pass with:
     """
     Usage:
@@ -14,8 +14,13 @@ Feature: rbld help
     rebuild: Zero-dependency, reproducible build environments
     """
 
-  Scenario: List of commands is printed
-    Given I run `rbld help`
+    Examples:
+      | command   |
+      | rbld help |
+      | rbld      |
+
+  Scenario Outline: List of commands is printed
+    Given I run `<command>`
     Then it should pass with:
     """
     Commands:
@@ -32,3 +37,8 @@ Feature: rbld help
       search
       status
     """
+
+    Examples:
+      | command   |
+      | rbld help |
+      | rbld      |
