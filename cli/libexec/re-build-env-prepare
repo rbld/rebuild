@@ -36,6 +36,7 @@ create_sudoers_group()
 {
     create_group $1
     echo %$1        ALL=NOPASSWD: ALL >> /etc/sudoers
+    sed -i -e 's/Defaults    requiretty.*/ #Defaults    requiretty/g' /etc/sudoers
 }
 
 if ! has_app sudo; then
