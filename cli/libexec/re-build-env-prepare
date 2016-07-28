@@ -41,7 +41,8 @@ configure_sudo()
 }
 
 if ! has_app sudo; then
-    dep_install sudo
+    # Download may fail unpredictably so we try a few times
+    dep_install sudo || dep_install sudo || dep_install sudo
 fi
 
 configure_sudo
