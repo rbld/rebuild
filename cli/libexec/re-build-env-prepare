@@ -32,10 +32,11 @@ dep_install()
     fi
 }
 
-create_sudoers_group()
+configure_sudo()
 {
-    create_group $1
-    echo %$1        ALL=NOPASSWD: ALL >> /etc/sudoers
+    create_group rebuild_sudo
+    echo "%rebuild_sudo        ALL=NOPASSWD: ALL" >> /etc/sudoers
+    echo "root    ALL=(ALL:ALL) ALL" >> /etc/sudoers
     sed -i -e 's/Defaults    requiretty.*/ #Defaults    requiretty/g' /etc/sudoers
 }
 
@@ -43,4 +44,4 @@ if ! has_app sudo; then
     dep_install sudo
 fi
 
-create_sudoers_group rebuild_sudo
+configure_sudo
