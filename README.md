@@ -1,8 +1,7 @@
-
-
 # Project documentation
 
 See project WiKi at GitHub: https://github.com/daynix/rebuild/wiki
+and Living Documentation at RelishApp: http://www.relishapp.com/daynix/rebuild
 
 # Running tests
 
@@ -13,6 +12,9 @@ rebuild test suite is based on cucumber/aruba:
   * `cucumber` to run all tests using binaries from the working copy
   * `cucmber -p installed` to run tests using installed binaries
   * `cucumber -t ~@slow` to exclude slow tests
+
+# Living Documentation by Relish:
+
 
 ---
 
