@@ -1,0 +1,34 @@
+sudo: required
+language: ruby
+
+matrix:
+  include:
+    - rvm: 1.9.3
+      env: installed=1 fast=1
+      services: docker
+    - rvm: 2.0.0
+      env: installed=1 fast=1
+      services: docker
+    - rvm: 2.1.8
+      env: installed=1 fast=1
+      services: docker
+    - rvm: 2.3.0
+      env: installed=1 fast=1
+      services: docker
+    - rvm: 2.2.4
+      env: installed=1
+      services: docker
+    - rvm: 2.2.4
+      env: installed=0
+      services: docker
+
+notifications:
+  email:
+    - rbld-devel@rbld.io
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine='1.9.1*'
+
+install: ./tools/travis-install.sh
+script: bundle exec rake test
