@@ -39,7 +39,6 @@ function run_cont_disposable
     docker run                                           \
            -i $TTY_PARAM --rm                            \
            --name $CONT_NAME                             \
-           --hostname $NAME:$TAG                         \
            --hostname `rebuild_cont_hostname $NAME $TAG` \
            `rebuild_cont_run_settings`                   \
            $ENV_NAME:$TAG                                \

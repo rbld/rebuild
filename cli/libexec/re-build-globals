@@ -504,7 +504,7 @@ function rebuild_cont_hostname
     local NAME=$1
     local TAG=$2
 
-    echo -n $NAME:$TAG
+    echo -n $NAME-$TAG
 
     if [[ -n ${3+x} ]]; then
         echo "-$3"

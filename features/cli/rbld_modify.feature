@@ -30,17 +30,17 @@ Feature: rbld modify
     When I successfully run `rbld modify <environment name> -- echo Hello world!`
     Then it should pass with:
       """
-      >>> rebuild env <full environment name>-M
+      >>> rebuild env <environment host name>-M
       >>> echo Hello world!
       Hello world!
-      <<< rebuild env <full environment name>-M
+      <<< rebuild env <environment host name>-M
       """
-    And environment <full environment name> should be marked as modified
+    And environment <environment name> should be marked as modified
 
     Examples:
-      | environment name | full environment name |
-      | test-env:v001    | test-env:v001         |
-      | test-env         | test-env:initial      |
+      | environment name | environment host name |
+      | test-env:v001    | test-env-v001         |
+      | test-env         | test-env-initial      |
 
   Scenario Outline: interactive modification of environment
     When I run `rbld modify <environment name>` interactively
@@ -48,26 +48,26 @@ Feature: rbld modify
     And I close the stdin stream
     Then it should pass with:
       """
-      >>> rebuild env <full environment name>-M interactive
+      >>> rebuild env <environment host name>-M interactive
       >>> Press CTRL-D do leave
       Hello interactive world!
-      <<< rebuild env <full environment name>-M
+      <<< rebuild env <environment host name>-M
       """
-    And environment <full environment name> should be marked as modified
+    And environment <environment name> should be marked as modified
 
     Examples:
-      | environment name | full environment name |
-      | test-env:v001    | test-env:v001         |
-      | test-env         | test-env:initial      |
+      | environment name | environment host name |
+      | test-env:v001    | test-env-v001         |
+      | test-env         | test-env-initial      |
 
   Scenario: hostname of environment set to the environment name with modified sign
     When I run `rbld modify test-env:v001 -- hostname`
     Then it should pass with:
       """
-      >>> rebuild env test-env:v001-M
+      >>> rebuild env test-env-v001-M
       >>> hostname
-      test-env:v001-M
-      <<< rebuild env test-env:v001-M
+      test-env-v001-M
+      <<< rebuild env test-env-v001-M
       """
 
   Scenario Outline: rbld modify propagates exit code

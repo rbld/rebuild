@@ -30,16 +30,16 @@ Feature: rbld run
     When I successfully run `rbld run <environment name> -- echo Hello world!`
     Then it should pass with exactly:
       """
-      >>> rebuild env <full environment name>
+      >>> rebuild env <environment host name>
       >>> echo Hello world!
       Hello world!
-      <<< rebuild env <full environment name>
+      <<< rebuild env <environment host name>
       """
 
     Examples:
-      | environment name | full environment name |
-      | test-env:v001    | test-env:v001         |
-      | test-env         | test-env:initial      |
+      | environment name | environment host name |
+      | test-env:v001    | test-env-v001         |
+      | test-env         | test-env-initial      |
 
   Scenario Outline: interactive running of environment
     When I run `rbld run <environment name>` interactively
@@ -47,16 +47,16 @@ Feature: rbld run
     And I close the stdin stream
     Then it should pass with exactly:
       """
-      >>> rebuild env <full environment name> interactive
+      >>> rebuild env <environment host name> interactive
       >>> Press CTRL-D do leave
       Hello interactive world!
-      <<< rebuild env <full environment name>
+      <<< rebuild env <environment host name>
       """
 
     Examples:
-      | environment name | full environment name |
-      | test-env:v001    | test-env:v001         |
-      | test-env         | test-env:initial      |
+      | environment name | environment host name |
+      | test-env:v001    | test-env-v001         |
+      | test-env         | test-env-initial      |
 
   Scenario: warning printed when running modified environment
     Given environment test-env:v001 is modified
@@ -64,20 +64,20 @@ Feature: rbld run
     Then it should pass with exactly:
       """
       WARNING: Environment is modified, running original version
-      >>> rebuild env test-env:v001
+      >>> rebuild env test-env-v001
       >>> echo Hello world!
       Hello world!
-      <<< rebuild env test-env:v001
+      <<< rebuild env test-env-v001
       """
 
   Scenario: hostname of environment set to the environment name
     When I run `rbld run test-env:v001 -- hostname`
     Then it should pass with exactly:
       """
-      >>> rebuild env test-env:v001
+      >>> rebuild env test-env-v001
       >>> hostname
-      test-env:v001
-      <<< rebuild env test-env:v001
+      test-env-v001
+      <<< rebuild env test-env-v001
       """
 
   Scenario Outline: rbld run propagates exit code

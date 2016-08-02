@@ -15,10 +15,10 @@ Feature: various base images
     When I run `rbld run test-env-base -- sudo echo \$HOSTNAME`
     Then it should pass with exactly:
       """
-      >>> rebuild env test-env-base:initial
+      >>> rebuild env test-env-base-initial
       >>> sudo echo $HOSTNAME
-      test-env-base:initial
-      <<< rebuild env test-env-base:initial
+      test-env-base-initial
+      <<< rebuild env test-env-base-initial
       """
     When I run `rbld run test-env-base -- "exit 5"`
     Then the exit status should be 5
