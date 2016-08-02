@@ -7,3 +7,7 @@ group :test do
   gem 'ptools', '1.3.3'
   gem 'retriable', '2.1.0'
 end
+
+group :development do
+  gem 'travis'
+end

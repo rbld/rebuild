@@ -27,3 +27,14 @@ rescue LoadError
     abort 'Cucumber rake task is not available. Be sure to install cucumber as a gem or plugin'
   end
 end
+
+task :lint do
+    begin
+      require 'travis/yaml'
+
+      puts 'Linting .travis.yml ... No output is good!'
+      Travis::Yaml.parse! File.read('.travis.yml')
+    rescue LoadError => e
+      $stderr.puts "Failed to lint .travis.yml: #{e.message}"
+    end
+end
