@@ -474,7 +474,7 @@ function rebuild_search
     return $RC
 }
 
-function rebuild_verify_regsitry_is_accessible
+function rebuild_verify_registry_is_accessible
 {
     local WILDCARD=$1
 

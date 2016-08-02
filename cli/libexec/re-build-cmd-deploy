@@ -28,7 +28,7 @@ function do_deploy
 
     local PUBLISHED_NAME=`rebuild_published_env_name $REMOTE $NAME $TAG`
 
-    rebuild_verify_regsitry_is_accessible $PUBLISHED_NAME
+    rebuild_verify_registry_is_accessible $PUBLISHED_NAME
 
     if ! rebuild_is_published $PUBLISHED_NAME; then
         handle_error "Environment $env_name:$env_tag does not exist in the registry"
