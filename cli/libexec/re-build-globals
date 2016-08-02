@@ -320,10 +320,10 @@ function rebuild_cont_kill
 
 function rebuild_list_images
 {
-    docker images --filter "label=$rebuild_env_label" | \
-        tail -n +2                                    | \
-        grep    "^$rebuild_env_name_prefix"           | \
-        grep -v "^$rebuild_env_rerun_name_prefix"
+    docker images --filter "label=$rebuild_env_label"          | \
+        tail -n +2                                             | \
+        { grep    "^$rebuild_env_name_prefix" || true; }       | \
+        { grep -v "^$rebuild_env_rerun_name_prefix" || true; }
 }
 
 function rebuild_env_id
@@ -386,7 +386,7 @@ function rebuild_delete_image_if_dangling
 {
     local ID=$1
 
-    if [[ -n `docker images -q --filter "dangling=true" | grep "$ID"` ]]; then
+    if [[ -n `docker images -q --filter "dangling=true" | { grep "$ID" || true; }` ]]; then
         docker rmi $ID | filter_debug
     fi
 }
