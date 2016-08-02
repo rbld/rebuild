@@ -1,50 +1,46 @@
 class RebuildEnvMgr
+  def self.run_command(command)
+    output = %x(#{command} 2>&1)
+    fail "Failed to run \"#{command}\": #{output}" unless $?.success?
+    return output
+  end
+
+  private_class_method :run_command
+
   def self.list
-    env_list = %x(rbld list)
-    fail "Failed to list existing environments" unless $?.success?
-    return env_list
+    run_command("rbld list")
   end
 
   def self.checkout(name)
-    %x(rbld checkout #{name})
-    fail "Failed to checkout #{name}" unless $?.success?
+    run_command("rbld checkout #{name}")
   end
 
   def self.rm(name)
-    %x(rbld rm #{name})
-    fail "Failed to delete #{name}" unless $?.success?
+    run_command("rbld rm #{name}")
   end
 
   def self.publish(name)
-    %x(rbld publish #{name})
-    fail "Failed to publish #{name}" unless $?.success?
+    run_command("rbld publish #{name}")
   end
 
   def self.status
-    modified_list = %x(rbld status)
-    fail "Failed to list modified environments" unless $?.success?
-    return modified_list
+    run_command("rbld status")
   end
 
   def self.search
-    published_list = %x(rbld search)
-    fail "Failed to search for published environments" unless $?.success?
-    return published_list
+    run_command("rbld search")
   end
 
   def self.modify(name)
-    %x(rbld modify #{name} -- echo Modifying...)
-    fail "Failed to modify #{name}" unless $?.success?
+    run_command("rbld modify #{name} -- echo Modifying...")
   end
 
   def self.commit(name, tag)
-    %x(rbld commit --tag #{tag} #{name})
-    fail "Test environment #{name} commit failed" unless $?.success?
+    run_command("rbld commit --tag #{tag} #{name}")
   end
 
   def self.create(name, base)
-    %x(rbld create --base #{base} #{name})
-    fail "Failed to create #{name} from #{base}" unless $?.success?
+    run_command("rbld create --base #{base} #{name}")
   end
 end
 
