@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rbld/rebuild.svg?branch=master)](https://travis-ci.org/rbld/rebuild)
+
 # Project documentation
 
 See project WiKi at GitHub: https://github.com/daynix/rebuild/wiki
