@@ -8,18 +8,20 @@ Feature: various base images
 
   Scenario Outline: create environments on top of various base images
     When I run `rbld create --base <base image> test-env-base`
-    Then it should pass with:
+    Then the output should contain:
       """
       Successfully created test-env-base:initial
       """
+    And the exit status should be 0
     When I run `rbld run test-env-base -- sudo echo \$HOSTNAME`
-    Then it should pass with exactly:
+    Then the output should contain:
       """
       >>> rebuild env test-env-base-initial
       >>> sudo echo $HOSTNAME
       test-env-base-initial
       <<< rebuild env test-env-base-initial
       """
+    And the exit status should be 0
     When I run `rbld run test-env-base -- "exit 5"`
     Then the exit status should be 5
 
