@@ -28,7 +28,7 @@ class BaseTestRegistry
     for @registry_port in 5001..20000
       @registry_name = "#{REGISTRY_BASE}_#{@registry_port}"
 
-      output = %x(docker run -d -p #{@registry_port}:5000 --name #{@registry_name} registry 2>&1)
+      output = %x(docker run -d -p #{@registry_port}:5000 --name #{@registry_name} #{registry_image_name} 2>&1)
       return if $?.success?
 
       next if output.include? "is already in use by container"
