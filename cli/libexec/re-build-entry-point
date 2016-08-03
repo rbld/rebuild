@@ -26,21 +26,15 @@ setup_users()
 
     useradd -o -M                          \
             -g $REBUILD_GROUP_ID           \
-            --groups rebuild_sudo          \
             -u $REBUILD_USER_ID            \
             --home-dir $REBUILD_USER_HOME  \
             $REBUILD_USER_NAME
 
-  elif has_app adduser; then
+  else
 
     echo "$REBUILD_GROUP_NAME:x:$REBUILD_GROUP_ID:" >> /etc/group
     echo "$REBUILD_USER_NAME:x:$REBUILD_USER_ID:$REBUILD_GROUP_ID:Linux User,,,:$REBUILD_USER_HOME:" >> /etc/passwd
 
-    adduser $REBUILD_USER_NAME rebuild_sudo
-
-  else
-    echo Failed to setup users, no supported user management utils found
-    exit 1
   fi
 }
 

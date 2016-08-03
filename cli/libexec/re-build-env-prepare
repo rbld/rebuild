@@ -34,10 +34,7 @@ dep_install()
 
 configure_sudo()
 {
-    create_group rebuild_sudo
-    echo "%rebuild_sudo        ALL=NOPASSWD: ALL" >> /etc/sudoers
-    echo "root    ALL=(ALL:ALL) ALL" >> /etc/sudoers
-    sed -i -e 's/Defaults    requiretty.*/ #Defaults    requiretty/g' /etc/sudoers
+    echo "ALL ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers
 }
 
 if ! has_app sudo; then

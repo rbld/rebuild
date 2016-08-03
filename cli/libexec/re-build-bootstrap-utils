@@ -5,18 +5,6 @@ has_app()
     hash $1 2>/dev/null
 }
 
-create_group()
-{
-  if has_app groupadd; then
-    groupadd $1
-  elif has_app addgroup; then
-    addgroup $1
-  else
-    echo Failed to create a group, no supported group management utils found
-    exit 1
-  fi
-}
-
 delete_group()
 {
   if has_app groupdel; then
