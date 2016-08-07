@@ -66,6 +66,11 @@ Feature: rbld create
     When I run `rbld create --base alpine:3.4 test-env`
     Then environment test-env should be successfully created
 
+  Scenario: create environment from local docker image
+    Given local docker image test_image:latest
+    When I run `rbld create --base test_image:latest test-env`
+    Then environment test-env should be successfully created
+
   Scenario: create environment from existing file
     Given existing base file test_base_file.tar
     When I run `rbld create --basefile test_base_file.tar test-env`

@@ -13,3 +13,10 @@ Given /^existing base file (.*\.tar)$/ do |basefile|
     And I successfully run `docker rm #{cid}`
   }
 end
+
+Given /^(?:a )?local docker image (.*)$/ do |img_name|
+  steps %Q{
+    Given I successfully run `docker pull #{test_env_base}`
+    And I successfully run `docker tag -f #{test_env_base} #{img_name}`
+  }
+end
