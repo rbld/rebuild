@@ -9,10 +9,13 @@ Feature: rbld create
 
   Scenario: create help succeeds and usage is printed
     Given I run `rbld create --help`
-    Then it should pass with:
+    Then the output should match:
     """
     Create a new environment
+    .*-b.*--base.*
+    .*--help.*
     """
+    And the exit status should be 0
 
   Scenario: create environment without base
     When I run `rbld create test-env`
