@@ -42,6 +42,10 @@ class RebuildEnvMgr
   def self.create(name, base)
     run_command("rbld create --base #{base} #{name}")
   end
+
+  def self.run(name, cmd)
+    run_command("rbld run #{name} -- #{cmd}")
+  end
 end
 
 class RebuildEnvironment
@@ -117,4 +121,9 @@ class RebuildEnvironment
       RebuildEnvMgr.publish full_name
     end
   end
+
+  def functional?
+    RebuildEnvMgr.run(full_name, 'sudo echo \$HOSTNAME').include? "#{name}-#{tag}"
+  end
+
 end

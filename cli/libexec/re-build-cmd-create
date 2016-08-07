@@ -10,8 +10,9 @@ function show_usage
     echo
     echo Create a new environment
     echo
-    echo "  -b NAME, --base NAME    Base docker image, local or from The Docker Hub"
-    echo "  -h, --help              Print usage"
+    echo "  -b NAME, --base NAME     Base docker image from The Docker Hub"
+    echo "  -f NAME, --basefile NAME Base file"
+    echo "  -h, --help               Print usage"
     echo
 }
 
@@ -25,14 +26,24 @@ function generate_dockerfile
 {
     local DIR=$1
     local NAME=$2
-    local BASE=$3
+    local BASE_IMG=$3
+    local BASE_FILE=$4
+
+    if [[ -n $BASE_IMG ]]; then
+      FROM_TEXT="FROM $BASE_IMG"
+      ADD_TEXT=
+    else
+      FROM_TEXT="FROM scratch"
+      ADD_TEXT="ADD $BASE_FILE /"
+    fi
 
     cat >$DIR/Dockerfile <<EOF
 ############################################################
 # Dockerfile for environment $NAME
 ############################################################
 
-FROM $BASE
+$FROM_TEXT
+$ADD_TEXT
 LABEL $rebuild_env_label=true
 
 COPY re-build-env-prepare re-build-bootstrap-utils rebuild.rc /rebuild/
@@ -77,8 +88,9 @@ function build_image
 }
 
 base_img=
+base_file=
 
-args=$(getopt -l "base:,help" -o "b:h" -- "$@")
+args=$(getopt -l "base:,basefile:,help" -o "b:f:h" -- "$@")
 
 eval set -- "$args"
 
@@ -93,6 +105,10 @@ while [ $# -ge 1 ]; do
             base_img="$2"
             shift
             ;;
+        -f|--basefile)
+            base_file="$2"
+            shift
+            ;;
         -h|--help)
             show_usage
             exit 0
@@ -102,8 +118,16 @@ while [ $# -ge 1 ]; do
     shift
 done
 
-if [[ -z $base_img ]]; then
+if [[ -z $base_img && -z $base_file ]]; then
     handle_error "Environment base not specified"
+fi
+
+if [[ -n $base_img && -n $base_file ]]; then
+    handle_error "Exactly one environment base must be specified"
+fi
+
+if [[ -n $base_file && ! -f $base_file ]]; then
+    handle_error "Base file $base_file does not exist"
 fi
 
 if [[ -z ${1+x} ]]; then
@@ -134,7 +158,14 @@ cp $rebuild_prefix/libexec/re-build-entry-point \
    $rebuild_prefix/libexec/rebuild.rc \
    $ENV_CTX_DIR
 
-generate_dockerfile $ENV_CTX_DIR $env_name $base_img
+BASE_FILE_IN_CTX=
+
+if [[ -n $base_file ]]; then
+  BASE_FILE_IN_CTX=`basename $base_file`
+  cp $base_file $ENV_CTX_DIR/$BASE_FILE_IN_CTX
+fi
+
+generate_dockerfile $ENV_CTX_DIR $env_name "$base_img" "$BASE_FILE_IN_CTX"
 
 RC=0
 build_image $ENV_CTX_DIR $env_name $env_tag || RC=1

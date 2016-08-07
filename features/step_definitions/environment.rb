@@ -55,6 +55,11 @@ Then /^(environment #{ENV_NAME_REGEX}) should not exist$/ do |env|
   expect(env.exists?).to be false
 end
 
+Then /^(environment #{ENV_NAME_REGEX}) should be functional$/ do |env|
+  expect(env.exists?).to be true
+  expect(env.functional?).to be true
+end
+
 Given /^(environment #{ENV_NAME_REGEX}) is modified$/ do |env|
   env.ensure_modified
 end

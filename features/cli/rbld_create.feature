@@ -13,6 +13,7 @@ Feature: rbld create
     """
     Create a new environment
     .*-b.*--base.*
+    .*-f.*--basefile.*
     .*--help.*
     """
     And the exit status should be 0
@@ -22,6 +23,13 @@ Feature: rbld create
     Then it should fail with:
       """
       ERROR: Environment base not specified
+      """
+
+  Scenario: create environment with multiple bases
+    When I run `rbld create --base base --basefile basefile test-env`
+    Then it should fail with:
+      """
+      ERROR: Exactly one environment base must be specified
       """
 
   Scenario: create environment with tag
@@ -46,6 +54,14 @@ Feature: rbld create
       """
     And environment test-env should not exist
 
+  Scenario: create environment from nonexisting file
+    When I run `rbld create --basefile nonexisting.file test-env`
+    Then it should fail with:
+      """
+      ERROR: Base file nonexisting.file does not exist
+      """
+    And environment test-env should not exist
+
   Scenario: create environment from existing base
     When I run `rbld create --base alpine:3.4 test-env`
     Then the output should contain:
@@ -53,7 +69,17 @@ Feature: rbld create
       Successfully created test-env:initial
       """
     And the exit status should be 0
-    And environment test-env should exist
+    And environment test-env should be functional
+
+  Scenario: create environment from existing file
+    Given existing base file test_base_file.tar
+    When I run `rbld create --basefile test_base_file.tar test-env`
+    Then the output should contain:
+      """
+      Successfully created test-env:initial
+      """
+    And the exit status should be 0
+    And environment test-env should be functional
 
   Scenario: create environment that already exists
     Given existing environment test-env
