@@ -64,7 +64,7 @@ class RebuildEnvironment
     "#{name}:#{DEFAULT_TAG}"
   end
 
-  def EnsureExists
+  def ensure_exists
     env_list = RebuildEnvMgr.list
 
     unless env_list.include? full_name
@@ -81,39 +81,39 @@ class RebuildEnvironment
     end
   end
 
-  def EnsureDoesNotExist
+  def ensure_does_not_exist
     if RebuildEnvMgr.list.include? full_name
       RebuildEnvMgr.checkout full_name
       RebuildEnvMgr.rm full_name
     end
   end
 
-  def Modified?
+  def modified?
     RebuildEnvMgr.status.include? full_name
   end
 
-  def Exists?
+  def exists?
     RebuildEnvMgr.list.include? full_name
   end
 
-  def Published?
+  def published?
     RebuildEnvMgr.search.include? full_name
   end
 
-  def EnsureModified
-    unless Modified?
+  def ensure_modified
+    unless modified?
       RebuildEnvMgr.modify full_name
     end
   end
 
-  def EnsureNotModified
-    if Modified?
+  def ensure_not_modified
+    if modified?
       RebuildEnvMgr.checkout full_name
     end
   end
 
-  def EnsurePublished
-    unless Published?
+  def ensure_published
+    unless published?
       RebuildEnvMgr.publish full_name
     end
   end

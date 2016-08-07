@@ -66,9 +66,9 @@ class BaseTestRegistry
   def populate_registry
     ["1:v001", "1:v002", "2:v001"].each do |suffix|
       env = RebuildEnvironment.new("test-env#{suffix}")
-      env.EnsureExists
-      env.EnsureNotModified
-      env.EnsurePublished
+      env.ensure_exists
+      env.ensure_not_modified
+      env.ensure_published
     end
   end
 

@@ -16,7 +16,7 @@ end
 
 Given /^my rebuild registry contains (environment #{ENV_NAME_REGEX})$/ do |env|
   EmptyTestRegistry.instance.use()
-  env.EnsureExists
-  env.EnsureNotModified
-  env.EnsurePublished
+  env.ensure_exists
+  env.ensure_not_modified
+  env.ensure_published
 end
