@@ -64,22 +64,12 @@ Feature: rbld create
 
   Scenario: create environment from existing base
     When I run `rbld create --base alpine:3.4 test-env`
-    Then the output should contain:
-      """
-      Successfully created test-env:initial
-      """
-    And the exit status should be 0
-    And environment test-env should be functional
+    Then environment test-env should be successfully created
 
   Scenario: create environment from existing file
     Given existing base file test_base_file.tar
     When I run `rbld create --basefile test_base_file.tar test-env`
-    Then the output should contain:
-      """
-      Successfully created test-env:initial
-      """
-    And the exit status should be 0
-    And environment test-env should be functional
+    Then environment test-env should be successfully created
 
   Scenario: create environment that already exists
     Given existing environment test-env

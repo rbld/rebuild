@@ -55,7 +55,15 @@ Then /^(environment #{ENV_NAME_REGEX}) should not exist$/ do |env|
   expect(env.exists?).to be false
 end
 
-Then /^(environment #{ENV_NAME_REGEX}) should be functional$/ do |env|
+Then /^(environment #{ENV_NAME_REGEX}) should be successfully created$/ do |env|
+  steps %Q{
+    Then the output should contain:
+      """
+      Successfully created #{env.full_name}
+      """
+    And the exit status should be 0
+  }
+
   expect(env.exists?).to be true
   expect(env.functional?).to be true
 end
