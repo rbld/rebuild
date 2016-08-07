@@ -42,7 +42,7 @@ Feature: rbld create
     When I run `rbld create --base nonexisting:nonexisting test-env`
     Then it should fail with:
       """
-      ERROR: Failed to download base image nonexisting:nonexisting
+      Failed to create test-env:initial
       """
     And environment test-env should not exist
 

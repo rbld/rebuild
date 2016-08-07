@@ -76,20 +76,6 @@ function build_image
     return $RC
 }
 
-function pull_base
-{
-    BASE=$1
-
-    report_progress "Downloading the base image..."
-
-    RC=0
-    colorize_trace docker pull $BASE || RC=1
-
-    if [[ ! $RC -eq 0 ]]; then
-        handle_error "Failed to download base image $BASE"
-    fi
-}
-
 base_img=
 
 args=$(getopt -l "base:,help" -o "b:h" -- "$@")
@@ -138,8 +124,6 @@ fi
 env_tag=$rebuild_initial_tag
 
 rebuild_verify_env_doesnt_exist $env_name $env_tag
-
-pull_base $base_img
 
 ENV_CTX_DIR=`env_ctx_directory $env_name`
 rm -rf $ENV_CTX_DIR
