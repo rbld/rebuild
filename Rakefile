@@ -7,6 +7,7 @@ begin
   def cucumber_opts
     %{
       --format pretty
+      --strict
       #{ENV['fast'] == '1' ? "-t ~@slow" : ""}
       #{ENV['installed'] == '1' ? "-p installed" : ""}
     }
