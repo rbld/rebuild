@@ -15,6 +15,7 @@ rebuild_tag_prefix=-rebuild-tag-
 rebuild_env_label=re-build-environment
 rebuild_env_entrypoint=/rebuild/re-build-entry-point
 rebuild_initial_tag=initial
+rebuild_saved_env_extention=.rbld
 
 set -o errexit
 set -o nounset
@@ -388,6 +389,15 @@ function rebuild_delete_image_if_dangling
 
     if [[ -n `docker images -q --filter "dangling=true" | { grep "$ID" || true; }` ]]; then
         docker rmi $ID | filter_debug
+    fi
+}
+
+function rebuild_delete_dangling_images
+{
+    local IDS=`docker images -q --filter "dangling=true" --filter "label=re-build-environment"`
+
+    if [[ -n $IDS ]]; then
+      docker rmi $IDS | filter_debug
     fi
 }
 

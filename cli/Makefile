@@ -20,6 +20,8 @@ COMMANDS = libexec/re-build-cmd-checkout  \
            libexec/re-build-cmd-modify    \
            libexec/re-build-cmd-rm        \
            libexec/re-build-cmd-search    \
+           libexec/re-build-cmd-save      \
+           libexec/re-build-cmd-load      \
            libexec/re-build-globals
 
 HELPERS = libexec/re-build-entry-point     \

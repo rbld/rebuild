@@ -30,10 +30,12 @@ Feature: rbld help
       create
       deploy
       list
+      load
       modify
       publish
       rm
       run
+      save
       search
       status
     """

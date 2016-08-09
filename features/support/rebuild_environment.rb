@@ -46,6 +46,14 @@ class RebuildEnvMgr
   def self.run(name, cmd)
     run_command("rbld run #{name} -- #{cmd}")
   end
+
+  def self.save_to(name, file)
+    run_command("rbld save #{name} #{file}")
+  end
+
+  def self.load_from(file)
+    run_command("rbld load #{file}")
+  end
 end
 
 class RebuildEnvironment
@@ -126,4 +134,7 @@ class RebuildEnvironment
     RebuildEnvMgr.run(full_name, 'sudo echo \$HOSTNAME').include? "#{name}-#{tag}"
   end
 
+  def save_to(file_name)
+    RebuildEnvMgr.save_to full_name, file_name
+  end
 end
