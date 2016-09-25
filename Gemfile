@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake'
+gem 'colorize'
 
 group :test do
   gem 'aruba', '~> 0.14.1'

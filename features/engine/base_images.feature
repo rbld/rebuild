@@ -13,7 +13,7 @@ Feature: various base images
       Successfully created test-env-base:initial
       """
     And the exit status should be 0
-    When I run `rbld run test-env-base -- sudo echo \$HOSTNAME`
+    When I run `rbld run test-env-base -- sudo echo \\\$HOSTNAME`
     Then the output should contain:
       """
       >>> rebuild env test-env-base-initial

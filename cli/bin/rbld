@@ -1,59 +1,88 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-rebuild_prefix=`dirname $BASH_SOURCE`/../
-. $rebuild_prefix/libexec/re-build-globals
+require 'pp'
+require 'colorize'
 
-function list_commands
-{
-    for i in $rebuild_prefix/libexec/$rebuild_command_prefix*;
-    do
-        echo $i | sed -e"s/.*$rebuild_command_prefix//"
-    done
-}
+REBUILD_PREFIX=File.dirname( __FILE__ )
 
-function show_usage
-{
-    echo "Usage:"
-    echo "  $rebuild_app_name help                Show this help screen"
-    echo "  $rebuild_app_name help COMMAND        Show help for COMMAND"
-    echo "  $rebuild_app_name COMMAND [PARAMS]    Run COMMAND with PARAMS"
-    echo
-    echo rebuild: Zero-dependency, reproducible build environments
-    echo
-    echo Commands:
-    echo
-    list_commands | sort | sed -e"s/^/  /"
-    echo
-}
+class RebuildCommands
+  extend Enumerable
 
-function run_command
-{
-    if [[ -f $rebuild_prefix/libexec/$rebuild_command_prefix$1 ]]; then
-        $rebuild_prefix/libexec/$rebuild_command_prefix$*
-        return $?
+  private
+
+  @COMMAND_PREFIX="re-build-cmd-"
+  @COMMANDS_PATH=File.join( "..", "libexec" )
+
+  def self.script_path(name)
+    File.join( REBUILD_PREFIX,
+               @COMMANDS_PATH,
+               @COMMAND_PREFIX + name )
+  end
+
+  def self.list_scripts
+    commands_list = Dir[self.script_path( '*' )]
+    commands_list.reject {|f| File.directory? f}
+  end
+
+  def self.list_commands
+    self.list_scripts.map { |script| script.sub( /^.*#{@COMMAND_PREFIX}/, '' )}
+  end
+
+  @KNOWN_COMMANDS=self.list_commands
+
+  public
+
+  def self.each
+    @KNOWN_COMMANDS.each { |cmd| yield( cmd ) }
+  end
+
+  def self.run(command, parameters)
+    unless @KNOWN_COMMANDS.include? command
+      raise "Unknown command: #{command}"
+    end
+
+    system( "#{script_path( command )} #{parameters.join(" ")}" )
+
+    $?.exitstatus
+  end
+end
+
+class RebuildMain
+
+  def self.usage
+    main_name = File.basename( __FILE__ )
+    usage_text = <<USAGE
+Usage:
+  #{main_name} help                Show this help screen
+  #{main_name} help COMMAND        Show help for COMMAND
+  #{main_name} COMMAND [PARAMS]    Run COMMAND with PARAMS
+
+rebuild: Zero-dependency, reproducible build environments
+
+Commands:
+
+USAGE
+
+    RebuildCommands.sort.each { |cmd| usage_text << "  #{cmd}\n"}
+
+    usage_text
+  end
+end
+
+begin
+  if ARGV[0] == "help" || !ARGV[0]
+    if !ARGV[1]
+      puts RebuildMain.usage
+      puts
     else
-        handle_error "Unknown command: $1"
-    fi
-}
-
-if [[ -z ${1+x} ]]; then
-    show_usage
-    exit 0
-fi
-
-COMMAND=$1
-
-if [[ $COMMAND == "help" ]]; then
-    if [[ -z ${2+x} ]]; then
-        show_usage
-        exit 0
-    fi
-
-    COMMAND=$2
-
-    run_command $COMMAND --help
-    exit $?
-fi
-
-run_command $*
-exit $?
+      exit RebuildCommands.run( ARGV[1], ["--help"] )
+    end
+  else
+    exit RebuildCommands.run( ARGV[0], ARGV.drop(1) )
+  end
+rescue RuntimeError => msg
+  puts
+  puts "\tERROR: #{msg}".light_red
+  puts
+  exit 1
+end
