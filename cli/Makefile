@@ -30,7 +30,8 @@ HELPERS = libexec/re-build-entry-point     \
           libexec/re-build-bootstrap-utils \
           libexec/rebuild.rc
 
-RUBY_MODULES = lib/rbld_log.rb
+RUBY_MODULES = lib/rbld_log.rb      \
+               lib/rbld_commands.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 

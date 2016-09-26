@@ -3,80 +3,7 @@
 require 'pp'
 require 'colorize'
 require_relative '../lib/rbld_log'
-
-REBUILD_PREFIX=File.dirname( __FILE__ )
-
-class RebuildCommands
-  extend Enumerable
-
-  private
-
-  @COMMAND_PREFIX="re-build-cmd-"
-  @COMMANDS_PATH=File.join( "..", "libexec" )
-
-  def self.script_path(name)
-    File.join( REBUILD_PREFIX,
-               @COMMANDS_PATH,
-               @COMMAND_PREFIX + name )
-  end
-
-  def self.list_scripts
-    commands_list = Dir[self.script_path( '*' )]
-    commands_list.reject {|f| File.directory? f}
-  end
-
-  def self.list_commands
-    self.list_scripts.map { |script| script.sub( /^.*#{@COMMAND_PREFIX}/, '' )}
-  end
-
-  @KNOWN_COMMANDS=self.list_commands
-
-  public
-
-  def self.each
-    @KNOWN_COMMANDS.each { |cmd| yield( cmd ) }
-  end
-
-  def self.run(command, parameters)
-    parameters = parameters.join(" ")
-
-    rbld_log.info( "Running #{command}(#{parameters})" )
-
-    unless @KNOWN_COMMANDS.include? command
-      raise "Unknown command: #{command}"
-    end
-
-    system( "#{script_path( command )} #{parameters}" )
-
-    errcode = $?.exitstatus
-
-    rbld_log.info( "Command returned with code #{errcode}" )
-
-    errcode
-  end
-end
-
-class RebuildMain
-
-  def self.usage
-    main_name = File.basename( __FILE__ )
-    usage_text = <<USAGE
-Usage:
-  #{main_name} help                Show this help screen
-  #{main_name} help COMMAND        Show help for COMMAND
-  #{main_name} COMMAND [PARAMS]    Run COMMAND with PARAMS
-
-rebuild: Zero-dependency, reproducible build environments
-
-Commands:
-
-USAGE
-
-    RebuildCommands.sort.each { |cmd| usage_text << "  #{cmd}\n"}
-
-    usage_text
-  end
-end
+require_relative '../lib/rbld_commands'
 
 begin
 
@@ -84,13 +11,13 @@ begin
 
   if ARGV[0] == "help" || !ARGV[0]
     if !ARGV[1]
-      puts RebuildMain.usage
+      puts Rebuild::Main.usage
       puts
     else
-      exit RebuildCommands.run( ARGV[1], ["--help"] )
+      exit Rebuild::Commands.run( ARGV[1], ["--help"] )
     end
   else
-    exit RebuildCommands.run( ARGV[0], ARGV.drop(1) )
+    exit Rebuild::Commands.run( ARGV[0], ARGV.drop(1) )
   end
 rescue RuntimeError => msg
   puts
