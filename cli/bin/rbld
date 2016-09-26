@@ -2,6 +2,7 @@
 
 require 'pp'
 require 'colorize'
+require_relative '../lib/rbld_log'
 
 REBUILD_PREFIX=File.dirname( __FILE__ )
 
@@ -37,13 +38,21 @@ class RebuildCommands
   end
 
   def self.run(command, parameters)
+    parameters = parameters.join(" ")
+
+    rbld_log.info( "Running #{command}(#{parameters})" )
+
     unless @KNOWN_COMMANDS.include? command
       raise "Unknown command: #{command}"
     end
 
-    system( "#{script_path( command )} #{parameters.join(" ")}" )
+    system( "#{script_path( command )} #{parameters}" )
 
-    $?.exitstatus
+    errcode = $?.exitstatus
+
+    rbld_log.info( "Command returned with code #{errcode}" )
+
+    errcode
   end
 end
 
@@ -70,6 +79,9 @@ USAGE
 end
 
 begin
+
+  rbld_log.info( "ARGV: #{ARGV.join(' ')}" )
+
   if ARGV[0] == "help" || !ARGV[0]
     if !ARGV[1]
       puts RebuildMain.usage

@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'colorize'
+gem 'logger-better'
 
 group :test do
   gem 'aruba', '~> 0.14.1'
