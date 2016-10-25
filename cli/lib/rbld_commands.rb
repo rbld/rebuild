@@ -24,12 +24,35 @@ module Rebuild
       self.list_scripts.map { |script| script.sub( /^.*#{COMMAND_PREFIX}/, '' )}
     end
 
+    def self.deduce_cmd_name(handler_class)
+      match = handler_class.name.match(/Rbld(.*)Command/)
+      return nil unless match
+      match.captures[0].downcase
+    end
+
+    def self.find_handler_class(command)
+      @handler_classes.each do |klass|
+        return klass if command == deduce_cmd_name( klass )
+      end
+      nil
+    end
+
     KNOWN_COMMANDS=self.list_commands
+    @handler_classes = []
 
     public
 
+    def self.register_handler_class(klass)
+      unless deduce_cmd_name( klass )
+        raise LoadError.new("Failed to bind command handler class #{klass}")
+      end
+
+      @handler_classes << klass
+    end
+
     def self.each
       KNOWN_COMMANDS.each { |cmd| yield( cmd ) }
+      @handler_classes.each { |klass| yield( deduce_cmd_name( klass ) ) }
     end
 
     def self.run(command, parameters)
@@ -48,6 +71,13 @@ module Rebuild
       rbld_log.info( "Command returned with code #{errcode}" )
 
       errcode
+    end
+  end
+
+  class Command
+    def self.inherited( handler_class )
+      Commands.register_handler_class( handler_class )
+      rbld_log.info( "Command handler class #{handler_class} registered" )
     end
   end
 
