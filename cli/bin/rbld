@@ -14,11 +14,17 @@ begin
       puts Rebuild::Main.usage
       puts
     else
-      exit Rebuild::Commands.run( ARGV[1], ["--help"] )
+      Rebuild::Commands.usage( ARGV[1] )
+      exit 0
     end
   else
-    exit Rebuild::Commands.run( ARGV[0], ARGV.drop(1) )
+    Rebuild::Commands.run( ARGV[0], ARGV.drop(1) )
+    exit 0
   end
+
+rescue Rebuild::CommandError => error
+  exit error.code
+
 rescue RuntimeError => msg
   puts
   puts "\tERROR: #{msg}".light_red

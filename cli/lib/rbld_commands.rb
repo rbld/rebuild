@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 
 module Rebuild
+  class CommandError < RuntimeError
+    def initialize(errcode)
+      @code = errcode
+    end
+
+    attr_reader :code
+  end
+
   class Commands
     extend Enumerable
 
@@ -30,9 +38,9 @@ module Rebuild
       match.captures[0].downcase
     end
 
-    def self.find_handler_class(command)
+    def self.get_cmd_handler(command)
       @handler_classes.each do |klass|
-        return klass if command == deduce_cmd_name( klass )
+        return klass.new if command == deduce_cmd_name( klass )
       end
       nil
     end
@@ -55,7 +63,17 @@ module Rebuild
       @handler_classes.each { |klass| yield( deduce_cmd_name( klass ) ) }
     end
 
+    def self.usage(command)
+      handler = get_cmd_handler( command )
+      return handler.usage if handler
+
+      run(command, ["--help"])
+    end
+
     def self.run(command, parameters)
+      handler = get_cmd_handler( command )
+      return handler.run(parameters) if handler
+
       parameters = parameters.join(" ")
 
       rbld_log.info( "Running #{command}(#{parameters})" )
@@ -70,14 +88,64 @@ module Rebuild
 
       rbld_log.info( "Command returned with code #{errcode}" )
 
-      errcode
+      raise CommandError, errcode if errcode != 0
     end
   end
 
   class Command
+
+    private
+
     def self.inherited( handler_class )
       Commands.register_handler_class( handler_class )
       rbld_log.info( "Command handler class #{handler_class} registered" )
+    end
+
+    def self.legacy_usage_implementation( cmd_name )
+      code = %Q{
+        def usage
+          LegacyCommand.run("#{cmd_name}", ["--help"])
+        end
+      }
+      class_eval( code )
+    end
+
+    def self.legacy_run_implementation( cmd_name )
+      code = %Q{
+        def run(parameters)
+          LegacyCommand.run("#{cmd_name}", parameters)
+        end
+      }
+      class_eval( code )
+    end
+  end
+
+  class LegacyCommand
+    private
+
+    COMMAND_PREFIX="re-build-legacy-cmd-"
+
+    def self.script_path(name)
+      File.join( File.dirname( __FILE__ ),
+                 "..",
+                 "libexec",
+                 COMMAND_PREFIX + name )
+    end
+
+    public
+
+    def self.run(command, parameters)
+      parameters = parameters.join(" ")
+
+      rbld_log.info( "Running legacy #{command}(#{parameters})" )
+
+      system( "#{script_path( command )} #{parameters}" )
+
+      errcode = $?.exitstatus
+
+      rbld_log.info( "Legacy command returned with code #{errcode}" )
+
+      raise CommandError, errcode if errcode != 0
     end
   end
 
