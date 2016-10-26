@@ -9,8 +9,8 @@ Feature: rbld commit
     And non-existing environment test-env:v002
 
   Scenario: commit help succeeds and usage is printed
-    Given I run `rbld commit --help`
-    Then it should pass with:
+    Given I successfully request help for rbld commit
+    Then help output should contain:
     """
     Commit environment modifications
     """

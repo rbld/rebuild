@@ -8,8 +8,8 @@ Feature: rbld modify
     | test-env:v001    |
 
   Scenario: modify help succeeds and usage is printed
-    Given I run `rbld modify --help`
-    Then it should pass with:
+    Given I successfully request help for rbld modify
+    Then help output should contain:
     """
     Modify a local environment
     """

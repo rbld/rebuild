@@ -8,8 +8,8 @@ Feature: rbld rm
     | test-env:v001    |
 
   Scenario: rm help succeeds and usage is printed
-    Given I run `rbld rm --help`
-    Then it should pass with:
+    Given I successfully request help for rbld rm
+    Then help output should contain:
     """
     Remove local environment
     """

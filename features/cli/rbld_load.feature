@@ -3,8 +3,8 @@ Feature: rbld load
   I want to be able to load an environment from file with rbld load
 
   Scenario: load help succeeds and usage is printed
-    Given I run `rbld load --help`
-    Then it should pass with:
+    Given I successfully request help for rbld load
+    Then help output should contain:
     """
     Load environment from file
     """

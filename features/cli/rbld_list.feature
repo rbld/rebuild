@@ -8,8 +8,8 @@ Feature: rbld list
       | test-env:v001    |
 
   Scenario: list help succeeds and usage is printed
-    Given I run `rbld list --help`
-    Then it should pass with:
+    Given I successfully request help for rbld list
+    Then help output should contain:
     """
     List local environments
     """

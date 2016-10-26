@@ -3,8 +3,8 @@ Feature: rbld save
   I want to be able to save an existing environment to file with rbld save
 
   Scenario: save help succeeds and usage is printed
-    Given I run `rbld save --help`
-    Then it should pass with:
+    Given I successfully request help for rbld save
+    Then help output should contain:
     """
     Save local environment to file
     """

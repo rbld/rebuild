@@ -3,8 +3,8 @@ Feature: rbld status
   I want to be able to list modified environments with rbld status
 
   Scenario: status help succeeds and usage is printed
-    Given I run `rbld status --help`
-    Then it should pass with:
+    Given I successfully request help for rbld status
+    Then help output should contain:
       """
       List modified environments
       """

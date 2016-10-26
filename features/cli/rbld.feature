@@ -9,6 +9,13 @@ Feature: rbld
     ERROR: Unknown command: _unknown_command_
     """
 
+  Scenario: rbld help _unknown_command_ fails with error
+    Given I run `rbld help _unknown_command_`
+    Then it should fail with:
+    """
+    ERROR: Unknown command: _unknown_command_
+    """
+
   Scenario: there is no log by default
     Given I run `rbld`
     Then the output should not contain "INFO: ARGV:"

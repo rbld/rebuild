@@ -3,8 +3,8 @@ Feature: rbld deploy
   I want to be able to deploy environments with rbld deploy
 
   Scenario: deploy help succeeds and usage is printed
-    Given I run `rbld deploy --help`
-    Then it should pass with:
+    Given I successfully request help for rbld deploy
+    Then help output should contain:
     """
     Deploy environment from remote registry
     """

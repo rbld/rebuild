@@ -9,8 +9,8 @@ Feature: rbld publish
       | test-env2:v001    |
 
   Scenario: publish help succeeds and usage is printed
-    Given I run `rbld publish --help`
-    Then it should pass with:
+    Given I successfully request help for rbld publish
+    Then help output should contain:
       """
       Publish environment at remote registry
       """

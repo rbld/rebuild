@@ -8,8 +8,8 @@ Feature: rbld run
       | test-env:v001    |
 
   Scenario: run help succeeds and usage is printed
-    Given I run `rbld run --help`
-    Then it should pass with:
+    Given I successfully request help for rbld run
+    Then help output should contain:
     """
     Run command in a local environment
     """

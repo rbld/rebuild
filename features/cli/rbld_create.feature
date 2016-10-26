@@ -8,8 +8,8 @@ Feature: rbld create
       | test-env:v001 |
 
   Scenario: create help succeeds and usage is printed
-    Given I run `rbld create --help`
-    Then the output should match:
+    Given I successfully request help for rbld create
+    Then help output should match:
     """
     Create a new environment
     .*-b.*--base.*

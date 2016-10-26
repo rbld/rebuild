@@ -8,8 +8,8 @@ Feature: rbld checkout
     |test-env:v001   |
 
   Scenario: checkout help succeeds and usage is printed
-    Given I run `rbld checkout --help`
-    Then it should pass with:
+    Given I successfully request help for rbld checkout
+    Then help output should contain:
     """
     Discard environment modifications
     """

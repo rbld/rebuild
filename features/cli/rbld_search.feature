@@ -3,8 +3,8 @@ Feature: rbld search
   I want to be able to search for published environments with rbld search
 
   Scenario: search help succeeds and usage is printed
-    Given I run `rbld search --help`
-    Then it should pass with:
+    Given I successfully request help for rbld search
+    Then help output should contain:
       """
       Search remote registry for published environments
       """
