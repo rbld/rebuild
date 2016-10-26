@@ -2,7 +2,11 @@
 
 module Rebuild
   class RbldListCommand < Command
-    legacy_usage_implementation :list
+    def initialize
+      @usage = "list [OPTIONS]"
+      @description = "List local environments"
+    end
+
     legacy_run_implementation :list
   end
 end
