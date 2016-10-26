@@ -118,6 +118,26 @@ module Rebuild
       }
       class_eval( code )
     end
+
+    def options_text
+      options = (@options || []) + [["--help", "Print usage"]]
+      text = ""
+      options.each { |o| text << "  #{o[0]}            #{o[1]}\n" }
+      text
+    end
+
+    public
+
+    def usage
+      puts <<END_USAGE
+
+Usage: rbld #{@usage}
+
+#{@description}
+
+#{options_text}
+END_USAGE
+    end
   end
 
   class LegacyCommand
