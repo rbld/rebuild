@@ -10,18 +10,24 @@ begin
 
   rbld_log.info( "ARGV: #{ARGV.join(' ')}" )
 
-  if ARGV[0] == "help" || !ARGV[0]
-    if !ARGV[1]
-      puts Rebuild::Main.usage
-      puts
-    else
-      Rebuild::Commands.usage( ARGV[1] )
-      exit 0
-    end
-  else
-    Rebuild::Commands.run( ARGV[0], ARGV.drop(1) )
+  if !ARGV[0] || (ARGV[0] == "help" && !ARGV[1])
+    puts Rebuild::Main.usage
+    puts
     exit 0
   end
+
+  if ARGV[0] == "help"
+    Rebuild::Commands.usage( ARGV[1] )
+    exit 0
+  end
+
+  if ARGV[1] == "--help"
+    Rebuild::Commands.usage( ARGV[0] )
+    exit 0
+  end
+
+  Rebuild::Commands.run( ARGV[0], ARGV.drop(1) )
+  exit 0
 
 rescue Rebuild::CommandError => error
   exit error.code
