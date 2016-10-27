@@ -3,9 +3,6 @@ language: ruby
 
 matrix:
   include:
-    - rvm: 1.9.3
-      env: installed=1 fast=1
-      services: docker
     - rvm: 2.0.0
       env: installed=1 fast=1
       services: docker
