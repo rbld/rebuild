@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require_relative 'rbld_envmgr'
+
 module Rebuild
   class RbldListCommand < Command
     def initialize
@@ -7,6 +9,13 @@ module Rebuild
       @description = "List local environments"
     end
 
-    legacy_run_implementation :list
+    def run(parameters)
+      EnvManager.new do |mgr|
+        names = mgr.all.map { |env| env.to_s }
+        puts
+        names.sort.each { |env| puts "    #{env}"}
+        puts
+      end
+    end
   end
 end

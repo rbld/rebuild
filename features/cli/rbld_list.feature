@@ -18,8 +18,8 @@ Feature: rbld list
     When I run `rbld list`
     Then it should pass with:
     """
-    \ttest-env:initial
-    \ttest-env:v001
+        test-env:initial
+        test-env:v001
     """
 
     Scenario: correct listing of similar environments
