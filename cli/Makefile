@@ -12,7 +12,6 @@ EXEC_FILES = bin/rbld
 
 COMMANDS = libexec/re-build-cmd-checkout  \
            libexec/re-build-cmd-create    \
-           libexec/re-build-legacy-cmd-list      \
            libexec/re-build-cmd-publish   \
            libexec/re-build-cmd-run       \
            libexec/re-build-cmd-status    \
