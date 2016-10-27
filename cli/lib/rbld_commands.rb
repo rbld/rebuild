@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require_relative 'rbld_envmgr'
+
 module Rebuild
   class CommandError < RuntimeError
     def initialize(errcode)
@@ -124,6 +126,26 @@ module Rebuild
       text = ""
       options.each { |o| text << "  #{o[0]}            #{o[1]}\n" }
       text
+    end
+
+    def print_names(names, prefix = '')
+      strings = names.map { |n| n.to_s }
+      puts
+      strings.sort.each { |s| puts "    #{prefix}#{s}"}
+      puts
+    end
+
+    def print_env_list(retriever, prefix = '')
+      print_names( EnvManager.new.send( retriever ), prefix )
+    end
+
+    def self.run_prints( retriever, prefix = '' )
+      code = %Q{
+        def run(parameters)
+          print_env_list( \"#{retriever}\".to_sym, \"#{prefix}\" )
+        end
+      }
+      class_eval( code )
     end
 
     public
