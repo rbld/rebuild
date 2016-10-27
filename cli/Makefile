@@ -32,6 +32,7 @@ HELPERS = libexec/re-build-entry-point     \
 
 RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_commands.rb \
+               lib/rbld_envmgr.rb   \
                lib/rbld_list.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile

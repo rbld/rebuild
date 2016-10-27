@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'colorize'
 gem 'logger-better'
+gem 'docker-api', '~> 1.32.1'
 
 group :test do
   gem 'aruba', '~> 0.14.1'
