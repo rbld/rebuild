@@ -4,7 +4,11 @@ require_relative 'rbld_envmgr'
 
 module Rebuild
   class RbldStatusCommand < Command
-    legacy_usage_implementation :status
+    def initialize
+      @usage = "status [OPTIONS]"
+      @description = "List modified environments"
+    end
+
     legacy_run_implementation :status
   end
 end
