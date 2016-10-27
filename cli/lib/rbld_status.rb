@@ -9,6 +9,6 @@ module Rebuild
       @description = "List modified environments"
     end
 
-    legacy_run_implementation :status
+    run_prints :modified, "modified: "
   end
 end
