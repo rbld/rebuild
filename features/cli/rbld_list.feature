@@ -21,3 +21,14 @@ Feature: rbld list
     \ttest-env:initial
     \ttest-env:v001
     """
+
+    Scenario: correct listing of similar environments
+      Given existing environments:
+        | samebase1:initial |
+        | samebase2:initial |
+      When I run `rbld list`
+      Then it should pass with:
+      """
+          samebase1:initial
+          samebase2:initial
+      """
