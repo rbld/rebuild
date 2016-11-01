@@ -44,3 +44,10 @@ Feature: rbld rm
     ERROR: Environment is modified, commit or checkout first
     """
     And environment test-env:v001 should be marked as modified
+
+  Scenario: Error is printed when no environment name specified
+    Given I run `rbld rm`
+    Then it should fail with:
+    """
+    ERROR: Environment name not specified
+    """
