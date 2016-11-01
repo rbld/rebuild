@@ -6,6 +6,7 @@ require_relative '../lib/rbld_log'
 require_relative '../lib/rbld_commands'
 require_relative '../lib/rbld_list'
 require_relative '../lib/rbld_status'
+require_relative '../lib/rbld_rm'
 
 begin
 
