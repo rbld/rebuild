@@ -17,7 +17,6 @@ COMMANDS = libexec/re-build-cmd-checkout  \
            libexec/re-build-cmd-commit    \
            libexec/re-build-cmd-deploy    \
            libexec/re-build-cmd-modify    \
-           libexec/re-build-legacy-cmd-rm        \
            libexec/re-build-cmd-search    \
            libexec/re-build-cmd-save      \
            libexec/re-build-cmd-load      \
