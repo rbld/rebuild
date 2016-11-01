@@ -2,7 +2,11 @@
 
 module Rebuild
   class RbldRmCommand < Command
-    legacy_usage_implementation :rm
+    def initialize
+      @usage = "rm [OPTIONS] [ENVIRONMENT[:TAG]]"
+      @description = "Remove local environment"
+    end
+
     legacy_run_implementation :rm
   end
 end
