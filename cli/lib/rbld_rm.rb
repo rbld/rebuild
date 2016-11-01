@@ -7,6 +7,13 @@ module Rebuild
       @description = "Remove local environment"
     end
 
-    legacy_run_implementation :rm
+    def run(parameters)
+      EnvManager.new do |mgr|
+        with_target_name( parameters[0] ) do |fullname|
+          rbld_log.info("Going to remove #{fullname}")
+          mgr.remove!( fullname )
+        end
+      end
+    end
   end
 end

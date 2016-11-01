@@ -148,6 +148,12 @@ module Rebuild
       class_eval( code )
     end
 
+    def with_target_name(parameter)
+      raise "Environment name not specified" if !parameter
+      name, tag = Environment.deduce_name_tag( parameter )
+      yield Environment.build_full_name( name, tag )
+    end
+
     public
 
     def usage
