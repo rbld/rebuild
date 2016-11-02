@@ -28,6 +28,7 @@ HELPERS = libexec/re-build-entry-point     \
           libexec/rebuild.rc
 
 RUBY_MODULES = lib/rbld_log.rb      \
+               lib/rbld_print.rb    \
                lib/rbld_commands.rb \
                lib/rbld_envmgr.rb   \
                lib/rbld_list.rb     \
