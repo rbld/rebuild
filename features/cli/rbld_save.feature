@@ -68,6 +68,15 @@ Feature: rbld save
     And the exit status should be 0
     And file named "test-env-initial.rbld" should contain a valid saved environment test-env
 
+  Scenario: save produces error report on failure
+    Given existing environment test-env
+    And a directory named "dir-name"
+    When I run `rbld save test-env dir-name`
+    Then it should fail with:
+      """
+      ERROR: Failed to save environment test-env:initial to dir-name
+      """
+
   Scenario: save a modified environment
     Given environment test-env is modified
     And a file named "test-env.rbld" does not exist
