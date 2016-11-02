@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'docker'
+require_relative 'rbld_print'
 
 module Rebuild
   class Environment
@@ -153,6 +154,19 @@ module Rebuild
       env.api_obj.remove( :name => self.class.internal_env_name(env) )
     end
 
+    def with_gzip_writer( filename )
+      begin
+        File.open(filename, 'w') do |f|
+          gz = Zlib::GzipWriter.new(f)
+          yield gz
+          gz.close
+        end
+      rescue
+        FileUtils::safe_unlink(filename)
+        raise
+      end
+    end
+
     public
 
     attr_reader :all, :modified
@@ -168,5 +182,30 @@ module Rebuild
         raise "Unknown environment #{fullname}"
       end
     end
+
+    def save(fullname, filename)
+      rbld_print.warning "Environment is modified, saving original version" \
+        if @modified.include? fullname
+
+      if idx = @all.index(fullname)
+        begin
+          with_gzip_writer( filename ) do |gz|
+            int_name = self.class.internal_env_name(@all[idx])
+            Docker::Image.save_stream( int_name ) do |chunk|
+              gz.write chunk
+            end
+          end
+        rescue => e
+          raise "Failed to save environment "\
+                "#{fullname} to #{filename} (#{e})"
+        else
+          rbld_print.progress "Successfully saved environment "\
+                              "#{fullname} to #{filename}"
+        end
+      else
+        raise "Unknown environment #{fullname}"
+      end
+    end
+
   end
 end

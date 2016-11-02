@@ -151,7 +151,7 @@ module Rebuild
     def with_target_name(parameter)
       raise "Environment name not specified" if !parameter
       name, tag = Environment.deduce_name_tag( parameter )
-      yield Environment.build_full_name( name, tag )
+      yield Environment.build_full_name( name, tag ), name, tag
     end
 
     public
