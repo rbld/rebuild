@@ -155,6 +155,13 @@ module Rebuild
       env.api_obj.remove( :name => self.class.internal_env_name(env) )
     end
 
+    def delete_all_dangling
+      rbld_images( { :dangling => [ "true" ] } ).each do |env|
+        rbld_log.info("Removing dangling image #{env}")
+        env.remove
+      end
+    end
+
     def with_gzip_writer( filename )
       begin
         File.open(filename, 'w') do |f|
@@ -165,6 +172,13 @@ module Rebuild
       rescue
         FileUtils::safe_unlink(filename)
         raise
+      end
+    end
+
+    def with_gzip_reader( filename )
+      Zlib::GzipReader.open( filename ) do |gz|
+        yield gz
+        gz.close
       end
     end
 
@@ -205,6 +219,21 @@ module Rebuild
         end
       else
         raise "Unknown environment #{fullname}"
+      end
+    end
+
+    def load!(filename)
+      begin
+        with_gzip_reader( filename ) { |gz| Docker::Image.load(gz) }
+      rescue => e
+        raise "Failed to load environment from #{filename} (#{e})"
+      else
+        rbld_print.progress "Successfully loaded environment from #{filename}"
+        # If image with the same name but another
+        # ID existed before load it becomes dangling
+        # and should be ditched
+        delete_all_dangling
+        refresh!
       end
     end
 
