@@ -93,6 +93,16 @@ module Rebuild
       end
     end
 
+    def self.internal_env_name( env_or_name, tag = nil )
+      if env_or_name.respond_to?( :name ) \
+        && env_or_name.respond_to?( :tag )
+        "#{ENV_NAME_PREFIX}#{env_or_name.name}" \
+        "#{ENV_NAME_SEPARATOR}#{env_or_name.tag}"
+      else
+        "#{ENV_NAME_PREFIX}#{env_or_name}#{ENV_NAME_SEPARATOR}#{tag}"
+      end
+    end
+
     def is_rebuild_object( object )
       labels = object.info['Labels']
       labels && labels[ENV_LABEL] == 'true'
@@ -140,8 +150,7 @@ module Rebuild
     end
 
     def delete_env(env)
-      env.api_obj.remove( :name => "#{ENV_NAME_PREFIX}#{env.name}" \
-                                   "#{ENV_NAME_SEPARATOR}#{env.tag}" )
+      env.api_obj.remove( :name => self.class.internal_env_name(env) )
     end
 
     public
