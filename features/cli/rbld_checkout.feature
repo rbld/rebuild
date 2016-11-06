@@ -16,12 +16,15 @@ Feature: rbld checkout
 
   Scenario Outline: checkout of non-existing environment
     When I run `rbld checkout <environment name>`
-    Then it should pass with empty output
+    Then it should fail with:
+    """
+    ERROR: Unknown environment <full environment name>
+    """
 
     Examples:
-      | environment name    |
-      | nonexisting         |
-      | nonexisting:sometag |
+      | environment name    | full environment name |
+      | nonexisting         | nonexisting:initial   |
+      | nonexisting:sometag | nonexisting:sometag   |
 
   Scenario Outline: checkout of existing environment
     Given environment test-env:v001 is <modified or not modified>

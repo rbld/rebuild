@@ -10,8 +10,7 @@ Q=@
 
 EXEC_FILES = bin/rbld
 
-COMMANDS = libexec/re-build-cmd-checkout  \
-           libexec/re-build-cmd-create    \
+COMMANDS = libexec/re-build-cmd-create    \
            libexec/re-build-cmd-publish   \
            libexec/re-build-cmd-run       \
            libexec/re-build-cmd-commit    \
@@ -33,7 +32,8 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_status.rb   \
                lib/rbld_rm.rb       \
                lib/rbld_save.rb     \
-               lib/rbld_load.rb
+               lib/rbld_load.rb     \
+               lib/rbld_checkout.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 

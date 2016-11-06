@@ -9,7 +9,6 @@ module Rebuild
     ENV_NAME_SEPARATOR = ':'
     private_constant :ENV_NAME_SEPARATOR
     INITIAL_TAG_NAME = 'initial'
-    private_constant :INITIAL_TAG_NAME
 
     private
 
@@ -106,6 +105,12 @@ module Rebuild
       end
     end
 
+    def self.internal_rerun_env_name(name, tag)
+      "#{ENV_RERUN_NAME_PREFIX}#{name}" \
+      "#{MODIFIED_SEPARATOR}#{tag}" \
+      ":#{Environment::INITIAL_TAG_NAME}"
+    end
+
     def rbld_images(filters = nil)
       filters = RBLD_OBJ_FILTER.merge( filters || {} )
       Docker::Image.all( :filters => filters.to_json )
@@ -162,6 +167,14 @@ module Rebuild
       end
     end
 
+    def delete_rerun_image(name, tag)
+      int_name = self.class.internal_rerun_env_name( name, tag )
+      Docker::Image.all( :filter => int_name ).each do |img|
+        rbld_log.info("Removing image #{int_name}")
+        img.remove( :name => int_name )
+      end
+    end
+
     def with_gzip_writer( filename )
       begin
         File.open(filename, 'w') do |f|
@@ -196,6 +209,18 @@ module Rebuild
       else
         raise "Unknown environment #{fullname}"
       end
+    end
+
+    def checkout!(fullname, name, tag)
+      raise "Unknown environment #{fullname}" unless @all.include? fullname
+
+      if idx = @modified.index( fullname )
+        rbld_log.info("Removing container #{@modified[idx].api_obj.info}")
+        @modified[idx].api_obj.delete( :force => true )
+      end
+
+      delete_rerun_image( name, tag )
+      @modified.delete_at( idx ) if idx
     end
 
     def save(fullname, filename)
