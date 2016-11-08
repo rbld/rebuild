@@ -156,11 +156,24 @@ module Rebuild
 
     public
 
+    def format_usage_text
+      text = ""
+      if @usage.respond_to?(:each)
+        text << "\n"
+        @usage.each do |mode|
+          text << "\n  rbld #{mode[:syntax]}\n\n" \
+                  "    #{mode[:description]}\n"
+        end
+      else
+        text << "rbld #{@usage}\n"
+      end
+      text
+    end
+
     def usage
       puts <<END_USAGE
 
-Usage: rbld #{@usage}
-
+Usage: #{format_usage_text}
 #{@description}
 
 #{options_text}
