@@ -18,6 +18,15 @@ Then(/^help output should contain:$/) do |string|
   }
 end
 
+Then(/^help output should contain "([^"]*)"$/) do |string|
+  steps %Q{
+    Then help output should contain:
+    """
+    #{string}
+    """
+  }
+end
+
 Then(/^help output should match:$/) do |regex|
   steps %Q{
     Given I successfully run `rbld #{@rbld_cmd} --help`

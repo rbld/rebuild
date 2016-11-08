@@ -9,10 +9,12 @@ Feature: rbld run
 
   Scenario: run help succeeds and usage is printed
     Given I successfully request help for rbld run
-    Then help output should contain:
-    """
-    Run command in a local environment
-    """
+    Then help output should contain "rbld run [OPTIONS] [ENVIRONMENT[:TAG]]"
+    And help output should contain "Interactive mode: opens shell in the specified enviroment"
+    And help output should contain "rbld run [OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS"
+    And help output should contain "Scripting mode: runs COMMANDS in the specified environment"
+    And help output should contain "Run command in a local environment"
+    And help output should contain "--help            Print usage"
 
   Scenario Outline: error printed for non-existing environments
     When I run `rbld run <non-existing environment name>`
