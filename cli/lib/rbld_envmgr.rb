@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'docker'
+require 'etc'
 require_relative 'rbld_print'
 
 module Rebuild
@@ -74,6 +75,7 @@ module Rebuild
     MODIFIED_PREFIX='re-build-env-dirty-'
     NAME_TAG_SEPARATOR='-rebuild-tag-'
     RBLD_OBJ_FILTER={:label => ["#{ENV_LABEL}=true"] }
+    ENV_RUNNING_PREFIX='re-build-env-running-'
 
     private_constant :ENV_LABEL
     private_constant :ENV_NAME_PREFIX
@@ -82,6 +84,7 @@ module Rebuild
     private_constant :MODIFIED_PREFIX
     private_constant :NAME_TAG_SEPARATOR
     private_constant :RBLD_OBJ_FILTER
+    private_constant :ENV_RUNNING_PREFIX
 
     def add_environment( tag, api_obj )
       if match = tag.match(/^#{ENV_NAME_PREFIX}(.*)#{ENV_NAME_SEPARATOR}(.*)/)
@@ -103,6 +106,34 @@ module Rebuild
       else
         "#{ENV_NAME_PREFIX}#{env_or_name}#{ENV_NAME_SEPARATOR}#{tag}"
       end
+    end
+
+    def self.running_cont_name( env )
+      "#{ENV_RUNNING_PREFIX}#{env.name}#{NAME_TAG_SEPARATOR}#{env.tag}"
+    end
+
+    def self.env_hostname( env, modified = false )
+      "#{env.name}-#{env.tag}" + ( modified ? "-M" : "" )
+    end
+
+    def self.cont_run_settings
+       %Q{ -v #{Dir.home}:#{Dir.home}                                 \
+           -e REBUILD_USER_ID=#{Process.uid}                          \
+           -e REBUILD_GROUP_ID=#{Process.gid}                         \
+           -e REBUILD_USER_NAME=#{Etc.getlogin}                       \
+           -e REBUILD_GROUP_NAME=#{Etc.getgrgid(Process.gid)[:name]}  \
+           -e REBUILD_USER_HOME=#{Dir.home}                           \
+           -e REBUILD_PWD=#{Dir.pwd}                                  \
+           --security-opt label:disable                               \
+       }
+    end
+
+    def self.run_external(cmdline)
+      rbld_log.info("Executing external command #{cmdline}")
+      system( cmdline )
+      errcode = $?.exitstatus
+      rbld_log.info( "External command returned with code #{errcode}" )
+      raise CommandError, errcode if errcode != 0
     end
 
     def self.internal_rerun_env_name(name, tag)
@@ -160,6 +191,32 @@ module Rebuild
       env.api_obj.remove( :name => self.class.internal_env_name(env) )
     end
 
+    def delete_cont_if_exists(name)
+      rbld_containers.each do |cont|
+        cont.info['Names'].each do |cname|
+          rbld_log.debug("Checking if #{cname} matches /#{name}")
+          cont.delete( :force => true ) if "/#{name}" == cname
+        end
+      end
+    end
+
+    def run_env_disposable(env, cmd)
+      delete_cont_if_exists( self.class.running_cont_name( env ) )
+
+      cmdline = %Q{
+        docker run                                          \
+             -i #{STDIN.tty? ? '-t' : ''}                   \
+             --rm                                           \
+             --name #{self.class.running_cont_name( env )}  \
+             --hostname #{self.class.env_hostname( env )}   \
+             #{self.class.cont_run_settings}                \
+             #{env.api_obj.id}                              \
+             "#{cmd.join(' ')}"                             \
+      }
+
+      self.class.run_external( cmdline )
+    end
+
     def delete_all_dangling
       rbld_images( { :dangling => [ "true" ] } ).each do |env|
         rbld_log.info("Removing dangling image #{env}")
@@ -209,6 +266,16 @@ module Rebuild
       else
         raise "Unknown environment #{fullname}"
       end
+    end
+
+    def run(fullname, cmd)
+      rbld_print.warning "Environment is modified, running original version" \
+        if @modified.include? fullname
+
+      raise "Unknown environment #{fullname}" \
+        unless idx = @all.index( fullname )
+
+      run_env_disposable( @all[idx], cmd )
     end
 
     def checkout!(fullname, name, tag)

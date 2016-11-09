@@ -154,6 +154,11 @@ module Rebuild
       yield Environment.build_full_name( name, tag ), name, tag
     end
 
+    def get_cmdline_tail(parameters)
+      parameters.shift if parameters[0] == '--'
+      parameters
+    end
+
     public
 
     def format_usage_text
