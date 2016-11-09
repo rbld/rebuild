@@ -72,7 +72,7 @@ module Rebuild
     ENV_RERUN_NAME_PREFIX = 're-build-env-rerun-'
     ENV_NAME_SEPARATOR = ':'
     MODIFIED_PREFIX='re-build-env-dirty-'
-    MODIFIED_SEPARATOR='-rebuild-tag-'
+    NAME_TAG_SEPARATOR='-rebuild-tag-'
     RBLD_OBJ_FILTER={:label => ["re-build-environment=true"] }
 
     private_constant :ENV_LABEL
@@ -80,7 +80,7 @@ module Rebuild
     private_constant :ENV_RERUN_NAME_PREFIX
     private_constant :ENV_NAME_SEPARATOR
     private_constant :MODIFIED_PREFIX
-    private_constant :MODIFIED_SEPARATOR
+    private_constant :NAME_TAG_SEPARATOR
     private_constant :RBLD_OBJ_FILTER
 
     def add_environment( tag, api_obj )
@@ -90,7 +90,7 @@ module Rebuild
     end
 
     def add_modified_environment( name, api_obj )
-      if match = name.match(/^\/#{MODIFIED_PREFIX}(.*)#{MODIFIED_SEPARATOR}(.*)/)
+      if match = name.match(/^\/#{MODIFIED_PREFIX}(.*)#{NAME_TAG_SEPARATOR}(.*)/)
         @modified << Environment.new( *match.captures, api_obj )
       end
     end
@@ -107,7 +107,7 @@ module Rebuild
 
     def self.internal_rerun_env_name(name, tag)
       "#{ENV_RERUN_NAME_PREFIX}#{name}" \
-      "#{MODIFIED_SEPARATOR}#{tag}" \
+      "#{NAME_TAG_SEPARATOR}#{tag}" \
       ":#{Environment::INITIAL_TAG_NAME}"
     end
 
