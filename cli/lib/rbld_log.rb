@@ -1,4 +1,5 @@
 require 'logger-better'
+require 'docker'
 
 module Rebuild
   module Logger
@@ -17,3 +18,9 @@ module Rebuild
 end
 
 include Rebuild::Logger
+
+#Hook up docker API logs
+#for the higher log level
+if ENV['RBLD_LOG_LEVEL'] && (ENV['RBLD_LOG_LEVEL'].to_sym == :debug)
+    Docker::logger = rbld_log
+end
