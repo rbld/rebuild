@@ -43,6 +43,16 @@ Feature: rbld run
       | test-env:v001    | test-env-v001         |
       | test-env         | test-env-initial      |
 
+  Scenario: non-interactive run without command line options separator
+    When I successfully run `rbld run test-env:v001 echo Hello world!`
+    Then it should pass with exactly:
+      """
+      >>> rebuild env test-env-v001
+      >>> echo Hello world!
+      Hello world!
+      <<< rebuild env test-env-v001
+      """
+
   Scenario Outline: interactive running of environment
     When I run `rbld run <environment name>` interactively
     And I type "echo Hello interactive world!"
