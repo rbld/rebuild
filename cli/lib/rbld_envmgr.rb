@@ -73,7 +73,7 @@ module Rebuild
     ENV_NAME_SEPARATOR = ':'
     MODIFIED_PREFIX='re-build-env-dirty-'
     NAME_TAG_SEPARATOR='-rebuild-tag-'
-    RBLD_OBJ_FILTER={:label => ["re-build-environment=true"] }
+    RBLD_OBJ_FILTER={:label => ["#{ENV_LABEL}=true"] }
 
     private_constant :ENV_LABEL
     private_constant :ENV_NAME_PREFIX
