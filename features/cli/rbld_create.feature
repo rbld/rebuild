@@ -9,13 +9,11 @@ Feature: rbld create
 
   Scenario: create help succeeds and usage is printed
     Given I successfully request help for rbld create
-    Then help output should match:
-    """
-    Create a new environment
-    .*-b.*--base.*
-    .*-f.*--basefile.*
-    .*--help.*
-    """
+    Then help output should contain "Usage: rbld create [OPTIONS] [ENVIRONMENT]"
+    And help output should contain "Create a new environment"
+    And help output should match ".*-b.*--base.*Base image from Docker Hub"
+    And help output should match ".*-f.*--basefile.*Base file"
+    And help output should match ".*--help.*Print usage"
     And the exit status should be 0
 
   Scenario: create environment without base

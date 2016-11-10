@@ -48,3 +48,12 @@ Then(/^help output should match:$/) do |regex|
     """
   }
 end
+
+Then(/^help output should match "([^"]*)"$/) do |regex|
+  steps %Q{
+    Then help output should match:
+    """
+    #{regex}
+    """
+  }
+end

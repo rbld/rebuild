@@ -124,7 +124,7 @@ module Rebuild
     def options_text
       options = (@options || []) + [["-h, --help", "Print usage"]]
       text = ""
-      options.each { |o| text << "  #{o[0]}            #{o[1]}\n" }
+      options.each { |o| text << "  #{o[0].ljust(30)}#{o[1]}\n" }
       text
     end
 
