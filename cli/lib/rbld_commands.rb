@@ -128,6 +128,15 @@ module Rebuild
       text
     end
 
+    def replace_argv(parameters)
+      orig_argv = ARGV.clone
+      ARGV.clear
+      parameters.each { |x| ARGV << x }
+      yield
+      ARGV.clear
+      orig_argv.each { |x| ARGV << x }
+    end
+
     def print_names(names, prefix = '')
       strings = names.map { |n| n.to_s }
       puts

@@ -10,16 +10,16 @@ Feature: rbld commit
 
   Scenario: commit help succeeds and usage is printed
     Given I successfully request help for rbld commit
-    Then help output should contain:
-    """
-    Commit environment modifications
-    """
+    Then help output should contain "Commit environment modifications"
+    And help output should contain "Usage: rbld commit [OPTIONS] [ENVIRONMENT[:TAG]]"
+    And help output should match "-t TAG,--tag TAG.*New tag to be created"
+    And help output should match "-h, --help.*Print usage"
 
   Scenario Outline: commit non-existing environment
     When I run `rbld commit --tag some_new_tag <non-existing environment name>`
     Then it should fail with:
     """
-    ERROR: No changes to commit for <full environment name>
+    ERROR: Unknown environment <full environment name>
     """
 
     Examples:

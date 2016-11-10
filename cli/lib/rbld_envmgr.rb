@@ -2,6 +2,7 @@
 
 require 'docker'
 require 'etc'
+require 'thread'
 require_relative 'rbld_print'
 
 module Rebuild
@@ -76,6 +77,7 @@ module Rebuild
     NAME_TAG_SEPARATOR='-rebuild-tag-'
     RBLD_OBJ_FILTER={:label => ["#{ENV_LABEL}=true"] }
     ENV_RUNNING_PREFIX='re-build-env-running-'
+    ENV_ENTRYPOINT='/rebuild/re-build-entry-point'
 
     private_constant :ENV_LABEL
     private_constant :ENV_NAME_PREFIX
@@ -85,6 +87,7 @@ module Rebuild
     private_constant :NAME_TAG_SEPARATOR
     private_constant :RBLD_OBJ_FILTER
     private_constant :ENV_RUNNING_PREFIX
+    private_constant :ENV_ENTRYPOINT
 
     def add_environment( tag, api_obj )
       if match = tag.match(/^#{ENV_NAME_PREFIX}(.*)#{ENV_NAME_SEPARATOR}(.*)/)
@@ -252,6 +255,33 @@ module Rebuild
       end
     end
 
+    def commit_container_flat(cont, name, tag)
+      data_queue = Queue.new
+      new_img = nil
+      new_img_int_name = self.class.internal_env_name(name, tag)
+
+      exporter = Thread.new do
+        cont.export { |chunk| data_queue << chunk }
+        data_queue << ''
+      end
+
+      importer = Thread.new do
+        opts = {
+                  :repo => new_img_int_name,
+                  :changes => ["LABEL #{ENV_LABEL}=true",
+                               "ENTRYPOINT [\"#{ENV_ENTRYPOINT}\"]"]
+        }
+        new_img = Docker::Image.import_stream(opts) {  data_queue.pop }
+      end
+
+      exporter.join
+      importer.join
+
+      rbld_log.info("Created image #{new_img} from #{cont}")
+      add_environment( new_img_int_name, new_img )
+      cont.delete( :force => true )
+    end
+
     public
 
     attr_reader :all, :modified
@@ -288,6 +318,27 @@ module Rebuild
 
       delete_rerun_image( name, tag )
       @modified.delete_at( idx ) if idx
+    end
+
+    def commit!(fullname, name, tag, new_tag)
+      raise "Unknown environment #{fullname}" unless @all.include? fullname
+
+      new_full_name = Environment.build_full_name( name, new_tag )
+      raise "Environment #{new_full_name} already exists" \
+        if @all.include? new_full_name
+
+      if idx = @modified.index( fullname )
+        cont = @modified[idx].api_obj
+
+        rbld_log.info("Committing container #{cont.info}")
+        rbld_print.progress "Creating new environment #{new_full_name}..."
+
+        commit_container_flat(cont, name, new_tag)
+        delete_rerun_image( name, tag )
+        @modified.delete_at( idx )
+      else
+        raise "No changes to commit for #{fullname}"
+      end
     end
 
     def save(fullname, filename)
