@@ -122,7 +122,7 @@ module Rebuild
     end
 
     def options_text
-      options = (@options || []) + [["--help", "Print usage"]]
+      options = (@options || []) + [["-h, --help", "Print usage"]]
       text = ""
       options.each { |o| text << "  #{o[0]}            #{o[1]}\n" }
       text

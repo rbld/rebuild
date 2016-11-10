@@ -27,7 +27,7 @@ begin
     exit 0
   end
 
-  if ARGV[1] == "--help"
+  if ARGV[1] == "--help" || ARGV[1] == "-h"
     Rebuild::Commands.usage( ARGV[0] )
     exit 0
   end

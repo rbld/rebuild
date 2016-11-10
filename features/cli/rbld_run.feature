@@ -14,7 +14,7 @@ Feature: rbld run
     And help output should contain "rbld run [OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS"
     And help output should contain "Scripting mode: runs COMMANDS in the specified environment"
     And help output should contain "Run command in a local environment"
-    And help output should contain "--help            Print usage"
+    And help output should contain "-h, --help            Print usage"
 
   Scenario Outline: error printed for non-existing environments
     When I run `rbld run <non-existing environment name>`

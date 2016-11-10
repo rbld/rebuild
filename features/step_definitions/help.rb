@@ -10,6 +10,12 @@ Then(/^help output should contain:$/) do |string|
     #{string}
     """
 
+    Given I run `rbld #{@rbld_cmd} -h`
+    Then it should pass with:
+    """
+    #{string}
+    """
+
     Given I run `rbld help #{@rbld_cmd}`
     Then it should pass with:
     """
