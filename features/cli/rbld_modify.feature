@@ -80,3 +80,12 @@ Feature: rbld modify
       | internal status | external status |
       |  0              | 0               |
       |  5              | 5               |
+
+  @slow
+  Scenario: multiple emvironment modifications supported
+    Given non-existing environment test-env:multimod
+    Given I successfully run `rbld modify test-env -- echo Hi` for 130 times
+    Then environment test-env should be marked as modified
+    When I successfully run `rbld commit --tag multimod test-env`
+    And I successfully run `rbld run test-env:multimod -- echo Hello from multimod`
+    Then the output should contain "Hello from multimod"
