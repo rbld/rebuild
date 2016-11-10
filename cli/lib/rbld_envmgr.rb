@@ -115,6 +115,10 @@ module Rebuild
       "#{ENV_RUNNING_PREFIX}#{env.name}#{NAME_TAG_SEPARATOR}#{env.tag}"
     end
 
+    def self.modified_cont_name( env )
+      "#{MODIFIED_PREFIX}#{env.name}#{NAME_TAG_SEPARATOR}#{env.tag}"
+    end
+
     def self.env_hostname( env, modified = false )
       "#{env.name}-#{env.tag}" + ( modified ? "-M" : "" )
     end
@@ -220,6 +224,20 @@ module Rebuild
       self.class.run_external( cmdline )
     end
 
+    def run_env(env, cmd)
+      cmdline = %Q{
+        docker run                                                    \
+               -i #{STDIN.tty? ? '-t' : ''}                           \
+               --name #{self.class.modified_cont_name( env )}         \
+               --hostname #{self.class.env_hostname( env, true )}     \
+               #{self.class.cont_run_settings}                        \
+               #{env.api_obj.id}                                      \
+               "#{cmd.join(' ')}"                                     \
+      }
+
+      self.class.run_external( cmdline )
+    end
+
     def delete_all_dangling
       rbld_images( { :dangling => [ "true" ] } ).each do |env|
         rbld_log.info("Removing dangling image #{env}")
@@ -255,10 +273,17 @@ module Rebuild
       end
     end
 
-    def commit_container_flat(cont, name, tag)
+    def commit_opts(img_name)
+      {
+        :repo => img_name,
+        :changes => ["LABEL #{ENV_LABEL}=true",
+                     "ENTRYPOINT [\"#{ENV_ENTRYPOINT}\"]"]
+      }
+    end
+
+    def commit_container_flat(cont, img_name)
       data_queue = Queue.new
       new_img = nil
-      new_img_int_name = self.class.internal_env_name(name, tag)
 
       exporter = Thread.new do
         cont.export { |chunk| data_queue << chunk }
@@ -266,11 +291,7 @@ module Rebuild
       end
 
       importer = Thread.new do
-        opts = {
-                  :repo => new_img_int_name,
-                  :changes => ["LABEL #{ENV_LABEL}=true",
-                               "ENTRYPOINT [\"#{ENV_ENTRYPOINT}\"]"]
-        }
+        opts = commit_opts(img_name)
         new_img = Docker::Image.import_stream(opts) {  data_queue.pop }
       end
 
@@ -278,8 +299,46 @@ module Rebuild
       importer.join
 
       rbld_log.info("Created image #{new_img} from #{cont}")
-      add_environment( new_img_int_name, new_img )
       cont.delete( :force => true )
+
+      new_img
+    end
+
+    def commit_container_layered(cont, img_name)
+      new_img = cont.commit(commit_opts(img_name))
+      rbld_log.info("Created image #{new_img} from #{cont}")
+      cont.delete( :force => true )
+
+      new_img
+    end
+
+    def self.squash_needed?(cont)
+      #Different FS backends have different limitations for
+      #maximum number of layers, 40 looks like small enough
+      #to be supported by all possible configurations
+      Docker::Image.get(cont.api_obj.info["ImageID"]).history.size >= 40
+    end
+
+    def commit_container(cont, img_name)
+        self.class.squash_needed?(cont) \
+          ? commit_container_flat(cont.api_obj, img_name) \
+          : commit_container_layered(cont.api_obj, img_name)
+    end
+
+    def rerun_cont(cont, cmd)
+        rbld_print.progress_tick
+
+        rerun_name = self.class.internal_rerun_env_name( cont.name, cont.tag )
+        new_img = commit_container( cont, rerun_name )
+
+        rbld_print.progress_tick
+
+        #Remove old re-run image in case it became dangling
+        delete_all_dangling
+
+        rbld_print.progress_end
+
+        run_env( Environment.new( cont.name, cont.tag, new_img ), cmd )
     end
 
     public
@@ -308,6 +367,22 @@ module Rebuild
       run_env_disposable( @all[idx], cmd )
     end
 
+    def modify!(fullname, cmd)
+      raise "Unknown environment #{fullname}" \
+        unless env_idx = @all.index( fullname )
+
+      rbld_print.progress_start 'Initializing environment'
+
+      if cont_idx = @modified.index( fullname )
+        rbld_log.info("Running container #{@modified[cont_idx].api_obj.info}")
+        rerun_cont(@modified[cont_idx], cmd)
+      else
+        rbld_log.info("Running environment #{@all[env_idx].api_obj.info}")
+        rbld_print.progress_end
+        run_env(@all[env_idx], cmd)
+      end
+    end
+
     def checkout!(fullname, name, tag)
       raise "Unknown environment #{fullname}" unless @all.include? fullname
 
@@ -333,7 +408,9 @@ module Rebuild
         rbld_log.info("Committing container #{cont.info}")
         rbld_print.progress "Creating new environment #{new_full_name}..."
 
-        commit_container_flat(cont, name, new_tag)
+        new_img_name = self.class.internal_env_name( name, new_tag )
+        new_img = commit_container_flat(cont, new_img_name )
+        add_environment( new_img_name, new_img )
         delete_rerun_image( name, tag )
         @modified.delete_at( idx )
       else

@@ -9,10 +9,12 @@ Feature: rbld modify
 
   Scenario: modify help succeeds and usage is printed
     Given I successfully request help for rbld modify
-    Then help output should contain:
-    """
-    Modify a local environment
-    """
+    Then help output should contain "rbld modify [OPTIONS] [ENVIRONMENT[:TAG]]"
+    And help output should contain "Interactive mode: opens shell in the specified enviroment"
+    And help output should contain "rbld modify [OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS"
+    And help output should contain "Scripting mode: runs COMMANDS in the specified environment"
+    And help output should contain "Modify a local environment"
+    And help output should match "-h, --help.*Print usage"
 
   Scenario Outline: error code returned for non-existing environments
     When I run `rbld modify <non-existing environment name>`

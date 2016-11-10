@@ -12,6 +12,7 @@ require_relative '../lib/rbld_load'
 require_relative '../lib/rbld_checkout'
 require_relative '../lib/rbld_run'
 require_relative '../lib/rbld_commit'
+require_relative '../lib/rbld_modify'
 
 begin
 

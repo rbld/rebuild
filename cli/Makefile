@@ -13,7 +13,6 @@ EXEC_FILES = bin/rbld
 COMMANDS = libexec/re-build-cmd-create    \
            libexec/re-build-cmd-publish   \
            libexec/re-build-cmd-deploy    \
-           libexec/re-build-cmd-modify    \
            libexec/re-build-cmd-search    \
            libexec/re-build-globals
 
@@ -33,7 +32,8 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_load.rb     \
                lib/rbld_checkout.rb \
                lib/rbld_run.rb      \
-               lib/rbld_commit.rb
+               lib/rbld_commit.rb   \
+               lib/rbld_modify.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 
