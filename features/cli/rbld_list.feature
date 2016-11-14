@@ -19,10 +19,10 @@ Feature: rbld list
     Then the output should contain "test-env:initial"
     And the output should contain "test-env:v001"
 
-    Scenario: correct listing of similar environments
-      Given existing environments:
-        | samebase1:initial |
-        | samebase2:initial |
-      When I successfully run `rbld list`
-      Then the output should contain "samebase1:initial"
-      And the output should contain "samebase2:initial"
+  Scenario: correct listing of similar environments
+    Given existing environments:
+      | samebase1:initial |
+      | samebase2:initial |
+    When I successfully run `rbld list`
+    Then the output should contain "samebase1:initial"
+    And the output should contain "samebase2:initial"
