@@ -163,6 +163,15 @@ module Rebuild
       yield Environment.build_full_name( name, tag ), name, tag
     end
 
+    def with_target_name_initial_tag(parameter)
+      raise "Environment name not specified" if !parameter
+      name, tag = Environment.parse_name_tag( parameter )
+      raise "Environment name not specified" if name.empty?
+      raise "Environment tag must not be specified" unless tag.empty?
+      tag = Environment::INITIAL_TAG_NAME
+      yield Environment.build_full_name( name, tag ), name, tag
+    end
+
     def get_cmdline_tail(parameters)
       parameters.shift if parameters[0] == '--'
       parameters

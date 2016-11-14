@@ -10,16 +10,15 @@ Q=@
 
 EXEC_FILES = bin/rbld
 
-COMMANDS = libexec/re-build-cmd-create    \
-           libexec/re-build-cmd-publish   \
+COMMANDS = libexec/re-build-cmd-publish   \
            libexec/re-build-cmd-deploy    \
            libexec/re-build-cmd-search    \
            libexec/re-build-globals
 
-HELPERS = libexec/re-build-entry-point     \
-          libexec/re-build-env-prepare     \
-          libexec/re-build-bootstrap-utils \
-          libexec/rebuild.rc
+HELPERS = lib/bootstrap/re-build-entry-point     \
+          lib/bootstrap/re-build-env-prepare     \
+          lib/bootstrap/re-build-bootstrap-utils \
+          lib/bootstrap/rebuild.rc
 
 RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_print.rb    \
@@ -33,7 +32,8 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_checkout.rb \
                lib/rbld_run.rb      \
                lib/rbld_commit.rb   \
-               lib/rbld_modify.rb
+               lib/rbld_modify.rb   \
+               lib/rbld_create.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 
@@ -51,11 +51,13 @@ install:
 	$(Q)install -vd $(bin_dir)
 	$(Q)install -vt $(bin_dir) $(EXEC_FILES)
 	$(Q)install -vd $(libexec_dir)
-	$(Q)install -vt $(libexec_dir) $(COMMANDS) $(HELPERS)
+	$(Q)install -vt $(libexec_dir) $(COMMANDS)
 	$(Q)install -vd $(config_dir)
 	$(Q)install -vt $(config_dir) $(CONFIG)
 	$(Q)install -vd $(lib_dir)
 	$(Q)install -vt $(lib_dir) $(RUBY_MODULES)
+	$(Q)install -vd $(lib_dir)/bootstrap
+	$(Q)install -vt $(lib_dir)/bootstrap $(HELPERS)
 
 uninstall:
 	$(Q)cd $(prefix) && rm -vf $(EXEC_FILES) $(COMMANDS) $(CONFIG) $(HELPERS) $(RUBY_MODULES)

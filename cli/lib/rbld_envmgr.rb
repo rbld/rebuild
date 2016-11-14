@@ -78,6 +78,10 @@ module Rebuild
     RBLD_OBJ_FILTER={:label => ["#{ENV_LABEL}=true"] }
     ENV_RUNNING_PREFIX='re-build-env-running-'
     ENV_ENTRYPOINT='/rebuild/re-build-entry-point'
+    BOOTSTRAP_FILE_NAMES = ["re-build-bootstrap-utils",
+                            "re-build-entry-point",
+                            "re-build-env-prepare",
+                            "rebuild.rc"]
 
     private_constant :ENV_LABEL
     private_constant :ENV_NAME_PREFIX
@@ -88,6 +92,7 @@ module Rebuild
     private_constant :RBLD_OBJ_FILTER
     private_constant :ENV_RUNNING_PREFIX
     private_constant :ENV_ENTRYPOINT
+    private_constant :BOOTSTRAP_FILE_NAMES
 
     def add_environment( tag, api_obj )
       if match = tag.match(/^#{ENV_NAME_PREFIX}(.*)#{ENV_NAME_SEPARATOR}(.*)/)
@@ -341,6 +346,76 @@ module Rebuild
         run_env( Environment.new( cont.name, cont.tag, new_img ), cmd )
     end
 
+    def bootstrap_files
+      src_path = File.join( File.dirname( __FILE__ ), "bootstrap" )
+      src_path = File.expand_path( src_path )
+      BOOTSTRAP_FILE_NAMES.map { |f| File.join( src_path, f ) }
+    end
+
+    def generate_dockerfile(base, is_base_file)
+      if is_base_file
+        base_commands = %Q{
+          FROM scratch
+          ADD #{base} /
+        }
+      else
+        base_commands = %Q{
+          FROM #{base}
+        }
+      end
+
+      # sync after chmod is needed because of an AuFS problem described in:
+      # https://github.com/docker/docker/issues/9547
+      %Q{
+        #{base_commands}
+        LABEL #{ENV_LABEL}=true
+        COPY #{BOOTSTRAP_FILE_NAMES.join(' ')} /rebuild/
+        RUN chown root:root \
+              /rebuild/re-build-env-prepare \
+              /rebuild/re-build-bootstrap-utils \
+              /rebuild/rebuild.rc && \
+            chmod 700 \
+              /rebuild/re-build-entry-point \
+              /rebuild/re-build-env-prepare && \
+            sync && \
+            chmod 644 \
+              /rebuild/rebuild.rc \
+              /rebuild/re-build-bootstrap-utils && \
+            sync && \
+            /rebuild/re-build-env-prepare
+        ENTRYPOINT ["/rebuild/re-build-entry-point"]
+      }
+    end
+
+    def with_docker_context(basefile, dockerfile)
+      tarfile_name = Dir::Tmpname.create('rbldctx') {}
+
+      rbld_log.info("Storing context in #{tarfile_name}")
+
+      File.open(tarfile_name, 'wb+') do |tarfile|
+        Gem::Package::TarWriter.new( tarfile ) do |tar|
+
+          files = bootstrap_files
+          files << basefile unless basefile.nil?
+
+          files.each do |file_name|
+            tar.add_file(File.basename(file_name), 0640) do |t|
+              IO.copy_stream(file_name, t)
+            end
+          end
+
+          tar.add_file('Dockerfile', 0640) do |t|
+            t.write( dockerfile )
+          end
+
+        end
+      end
+
+      File.open(tarfile_name, 'r') { |f| yield f }
+    ensure
+      FileUtils::rm_f( tarfile_name )
+    end
+
     public
 
     attr_reader :all, :modified
@@ -457,5 +532,35 @@ module Rebuild
       end
     end
 
+    def create!(base, basefile, fullname, name, tag)
+      begin
+        raise "Environment #{fullname} already exists" \
+          if @all.include? fullname
+
+        rbld_print.progress "Building environment..."
+
+        dockerfile = generate_dockerfile( base || basefile, !basefile.nil? )
+        new_img = nil
+
+        with_docker_context( basefile, dockerfile ) do |tar|
+          opts = { :t => self.class.internal_env_name(name, tag),
+                   :rm => true }
+          new_img = Docker::Image.build_from_tar( tar, opts ) do |v|
+            if ( log = JSON.parse( v ) ) && log.has_key?( "stream" )
+              rbld_print.raw_trace( log["stream"] )
+            end
+          end
+        end
+
+        new_img_name = self.class.internal_env_name( name, tag )
+        add_environment( new_img_name, new_img )
+
+        rbld_print.progress "Successfully created #{fullname}"
+      rescue Docker::Error::DockerError => msg
+        new_img.remove( :force => true ) if new_img
+        rbld_print.trace( msg )
+        raise "Failed to create #{fullname}"
+      end
+    end
   end
 end
