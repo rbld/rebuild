@@ -15,20 +15,14 @@ Feature: rbld list
     """
 
   Scenario: list existing environment
-    When I run `rbld list`
-    Then it should pass with:
-    """
-        test-env:initial
-        test-env:v001
-    """
+    When I successfully run `rbld list`
+    Then the output should contain "test-env:initial"
+    And the output should contain "test-env:v001"
 
     Scenario: correct listing of similar environments
       Given existing environments:
         | samebase1:initial |
         | samebase2:initial |
-      When I run `rbld list`
-      Then it should pass with:
-      """
-          samebase1:initial
-          samebase2:initial
-      """
+      When I successfully run `rbld list`
+      Then the output should contain "samebase1:initial"
+      And the output should contain "samebase2:initial"
