@@ -60,19 +60,29 @@ Feature: rbld create
       """
     And environment test-env should not exist
 
-  Scenario: create environment from existing base
-    When I run `rbld create --base alpine:3.4 test-env`
+  Scenario Outline: create environment from existing base
+    When I run `rbld create <base option> alpine:3.4 test-env`
     Then environment test-env should be successfully created
+
+      Examples:
+      |base option|
+      |--base     |
+      |-b         |
 
   Scenario: create environment from local docker image
     Given local docker image test_image:latest
     When I run `rbld create --base test_image:latest test-env`
     Then environment test-env should be successfully created
 
-  Scenario: create environment from existing file
+  Scenario Outline: create environment from existing file
     Given existing base file test_base_file.tar
-    When I run `rbld create --basefile test_base_file.tar test-env`
+    When I run `rbld create <basefile option> test_base_file.tar test-env`
     Then environment test-env should be successfully created
+
+      Examples:
+      |basefile option|
+      |--basefile     |
+      |-f             |
 
   Scenario: create environment that already exists
     Given existing environment test-env
