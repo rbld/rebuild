@@ -4,6 +4,7 @@ gem 'rake'
 gem 'colorize'
 gem 'logger-better'
 gem 'docker-api', '~> 1.32.1'
+gem 'parseconfig', '~> 1.0.8'
 
 group :test do
   gem 'aruba', '~> 0.14.1'
