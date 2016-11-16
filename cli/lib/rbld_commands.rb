@@ -172,6 +172,11 @@ module Rebuild
       yield Environment.build_full_name( name, tag ), name, tag
     end
 
+    def with_target_name_tag(parameter)
+      yield parameter ? Environment.parse_name_tag( parameter )
+                      : ["", ""]
+    end
+
     def get_cmdline_tail(parameters)
       parameters.shift if parameters[0] == '--'
       parameters

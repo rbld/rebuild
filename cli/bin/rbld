@@ -14,6 +14,7 @@ require_relative '../lib/rbld_run'
 require_relative '../lib/rbld_commit'
 require_relative '../lib/rbld_modify'
 require_relative '../lib/rbld_create'
+require_relative '../lib/rbld_search'
 
 begin
 

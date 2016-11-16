@@ -16,15 +16,14 @@ module Rebuild
     end
 
     def search(name, tag)
-      rbld_print.progress "Searching in #{@remote}..."
       wildcard = EnvManager.published_env_name( name, tag )
       rbld_log.info( "Searching for #{wildcard} (#{name}, #{tag})" )
       begin
         @api.search(wildcard).map do |n|
           rbld_log.debug( "Found #{n}" )
-          name, tag = EnvManager.demungle_published_name!( n )
-          Environment.build_full_name(name, tag)
-        end
+          name, tag = EnvManager.demungle_published_name( n )
+          (name && tag) ? Environment.build_full_name(name, tag) : nil
+        end.compact
       rescue DockerRegistry::Exception
         raise "Failed to search in #{@remote}"
       end

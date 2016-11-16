@@ -193,7 +193,8 @@ module Rebuild
       end
     end
 
-    def initialize
+    def initialize(cfg = Config.new)
+      @cfg = cfg
       check_connectivity
       refresh!
       yield( self ) if block_given?
@@ -416,9 +417,28 @@ module Rebuild
       FileUtils::rm_f( tarfile_name )
     end
 
+    def registry
+      @reg ||= Registry.new( @cfg.remote! )
+      @reg
+    end
+
     public
 
     attr_reader :all, :modified
+
+    def self.published_env_name( name, tag = "" )
+      "#{ENV_NAME_PREFIX}#{name}" + \
+      (tag.empty? ? "" : "#{NAME_TAG_SEPARATOR}#{tag}")
+    end
+
+    def self.demungle_published_name( name )
+      if m = name.match(/^#{ENV_NAME_PREFIX}(.*)#{NAME_TAG_SEPARATOR}(.*)/)
+        return m.captures
+      else
+        rbld_log.warn "Failed to demungle #{name}"
+        return [nil, nil]
+      end
+    end
 
     def remove!(fullname)
       raise "Environment is modified, commit or checkout first" \
@@ -561,6 +581,11 @@ module Rebuild
         rbld_print.trace( msg )
         raise "Failed to create #{fullname}"
       end
+    end
+
+    def search(name, tag)
+      rbld_print.progress "Searching in #{@cfg.remote!}..."
+      registry.search( name, tag )
     end
   end
 end
