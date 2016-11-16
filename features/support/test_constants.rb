@@ -4,6 +4,6 @@ module RebuildTestConstants
   end
 
   def registry_image_name
-    "registry:0.9.1"
+    "registry:2.5.1"
   end
 end

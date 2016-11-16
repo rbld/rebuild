@@ -1,9 +1,18 @@
 require 'singleton'
+require 'docker_registry2'
 
 class BaseTestRegistry
   REGISTRY_BASE="rbld_populated_test_registry"
   REGISTRY_HOST="127.0.0.1"
   private_constant :REGISTRY_BASE, :REGISTRY_HOST
+
+  private
+
+  def registry_connect!
+    DockerRegistry.connect("http://#{REGISTRY_HOST}:#{@registry_port}")
+  end
+
+  public
 
   def initialize
     @registry_port=0
@@ -56,8 +65,7 @@ class BaseTestRegistry
       run_registry_container
 
       Retriable.retriable intervals: Array.new(20, 1) do
-          %x{docker search '#{REGISTRY_HOST}:#{@registry_port}/*' 2>&1}
-          fail "Failed to connect to created registry" unless $?.success?
+          registry_connect!
       end
 
     end
@@ -73,9 +81,7 @@ class BaseTestRegistry
   end
 
   def empty?
-    list = %x{docker search --no-trunc '#{REGISTRY_HOST}:#{@registry_port}/'}
-    fail "Failed to search in registry #{REGISTRY_HOST}:#{@registry_port}" unless $?.success?
-    return list.lines.count == 1
+    registry_connect!.search.empty?
   end
 
   def use
