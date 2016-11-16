@@ -25,6 +25,7 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_commands.rb \
                lib/rbld_envmgr.rb   \
                lib/rbld_config.rb   \
+               lib/rbld_registry.rb \
                lib/rbld_list.rb     \
                lib/rbld_status.rb   \
                lib/rbld_rm.rb       \
