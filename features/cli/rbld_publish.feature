@@ -12,7 +12,7 @@ Feature: rbld publish
     Given I successfully request help for rbld publish
     Then help output should contain:
       """
-      Publish environment at remote registry
+      Publish environment on remote registry
       """
 
   Scenario: no remote registry configured
@@ -41,7 +41,7 @@ Feature: rbld publish
     When I run `rbld publish test-env1:v001`
     Then it should fail with:
       """
-      ERROR: Failed to publish at
+      ERROR: Failed to access the registry at
       """
 
   @slow

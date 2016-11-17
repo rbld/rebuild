@@ -28,5 +28,25 @@ module Rebuild
         raise "Failed to search in #{@remote}"
       end
     end
+
+    def publish(env)
+      name = EnvManager.published_env_name( env.name, env.tag )
+      tag = Environment::INITIAL_TAG_NAME
+      name = "#{@remote}/#{name}"
+      fullname = Environment::build_full_name( name, tag )
+
+      img = env.api_obj
+      img.tag( :repo => name, :tag => tag )
+
+      begin
+        img.push(nil, :repo_tag => fullname) do |log|
+          progress = JSON.parse(log)["progress"]
+          rbld_print.inplace_trace(progress) if progress
+        end
+      ensure
+        img.remove( :name => fullname )
+      end
+
+    end
   end
 end

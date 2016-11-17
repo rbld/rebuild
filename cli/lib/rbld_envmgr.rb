@@ -587,5 +587,30 @@ module Rebuild
       rbld_print.progress "Searching in #{@cfg.remote!}..."
       registry.search( name, tag )
     end
+
+    def publish(fullname, name, tag)
+      raise "Environment is modified, commit or checkout first" \
+        if @modified.include? fullname
+
+      if idx = @all.index( fullname )
+        rbld_print.progress "Checking for collisions..."
+
+        raise "Environment #{Environment.build_full_name( name, tag )} " \
+              "already published" \
+              unless registry.search( name, tag ).empty?
+
+         rbld_print.progress "Publishing on #{@cfg.remote!}..."
+
+         begin
+           registry.publish( @all[idx] )
+           rbld_print.progress "Successfully published #{fullname}"
+         rescue => msg
+           rbld_print.error msg
+           raise "Failed to publish on #{@cfg.remote!}"
+         end
+      else
+        raise "Unknown environment #{fullname}"
+      end
+    end
   end
 end
