@@ -4,10 +4,8 @@ Feature: rbld deploy
 
   Scenario: deploy help succeeds and usage is printed
     Given I successfully request help for rbld deploy
-    Then help output should contain:
-    """
-    Deploy environment from remote registry
-    """
+    And help output should contain "rbld deploy [OPTIONS] [ENVIRONMENT[:TAG]]"
+    Then help output should contain "Deploy environment from remote registry"
 
   Scenario: no remote registry configured
     Given remote registry is not configured
