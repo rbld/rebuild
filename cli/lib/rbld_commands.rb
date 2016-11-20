@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative 'rbld_envmgr'
-
 module Rebuild
   class CommandError < RuntimeError
     def initialize(errcode)

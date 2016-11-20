@@ -20,19 +20,20 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_envmgr.rb   \
                lib/rbld_config.rb   \
                lib/rbld_registry.rb \
-               lib/rbld_list.rb     \
-               lib/rbld_status.rb   \
-               lib/rbld_rm.rb       \
-               lib/rbld_save.rb     \
-               lib/rbld_load.rb     \
-               lib/rbld_checkout.rb \
-               lib/rbld_run.rb      \
-               lib/rbld_commit.rb   \
-               lib/rbld_modify.rb   \
-               lib/rbld_create.rb   \
-               lib/rbld_search.rb   \
-               lib/rbld_publish.rb  \
-               lib/rbld_deploy.rb
+
+COMMANDS = lib/commands/rbld_list.rb     \
+           lib/commands/rbld_status.rb   \
+           lib/commands/rbld_rm.rb       \
+           lib/commands/rbld_save.rb     \
+           lib/commands/rbld_load.rb     \
+           lib/commands/rbld_checkout.rb \
+           lib/commands/rbld_run.rb      \
+           lib/commands/rbld_commit.rb   \
+           lib/commands/rbld_modify.rb   \
+           lib/commands/rbld_create.rb   \
+           lib/commands/rbld_search.rb   \
+           lib/commands/rbld_publish.rb  \
+           lib/commands/rbld_deploy.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 
@@ -52,11 +53,13 @@ install:
 	$(Q)install -vt $(config_dir) $(CONFIG)
 	$(Q)install -vd $(lib_dir)
 	$(Q)install -vt $(lib_dir) $(RUBY_MODULES)
-	$(Q)install -vd $(lib_dir)/bootstrap
-	$(Q)install -vt $(lib_dir)/bootstrap $(HELPERS)
+	$(Q)install -vd $(lib_dir)bootstrap
+	$(Q)install -vt $(lib_dir)bootstrap $(HELPERS)
+	$(Q)install -vd $(lib_dir)commands
+	$(Q)install -vt $(lib_dir)commands $(COMMANDS)
 
 uninstall:
-	$(Q)cd $(prefix) && rm -vf $(EXEC_FILES) $(CONFIG) $(HELPERS) $(RUBY_MODULES)
+	$(Q)cd $(prefix) && rm -vf $(EXEC_FILES) $(CONFIG) $(COMMANDS) $(RUBY_MODULES)
 
 dist:
 	$(Q)tar --transform "s|^|rebuild-v$(VERSION)/|" \

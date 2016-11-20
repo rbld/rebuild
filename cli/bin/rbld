@@ -1,22 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'pp'
-require_relative '../lib/rbld_log'
-require_relative '../lib/rbld_print'
-require_relative '../lib/rbld_commands'
-require_relative '../lib/rbld_list'
-require_relative '../lib/rbld_status'
-require_relative '../lib/rbld_rm'
-require_relative '../lib/rbld_save'
-require_relative '../lib/rbld_load'
-require_relative '../lib/rbld_checkout'
-require_relative '../lib/rbld_run'
-require_relative '../lib/rbld_commit'
-require_relative '../lib/rbld_modify'
-require_relative '../lib/rbld_create'
-require_relative '../lib/rbld_search'
-require_relative '../lib/rbld_publish'
-require_relative '../lib/rbld_deploy'
+require 'require_all'
+
+require_rel '../lib'
+require_rel '../lib/commands'
 
 begin
 

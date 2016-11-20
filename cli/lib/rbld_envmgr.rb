@@ -3,7 +3,6 @@
 require 'docker'
 require 'etc'
 require 'thread'
-require_relative 'rbld_print'
 
 module Rebuild
   class Environment

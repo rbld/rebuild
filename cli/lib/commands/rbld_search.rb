@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require_relative 'rbld_registry'
-require_relative 'rbld_config'
-
 module Rebuild
   class RbldSearchCommand < Command
     def initialize
