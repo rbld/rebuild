@@ -1,7 +1,6 @@
 prefix=/usr/local/
 bin_dir=$(prefix)bin/
 lib_dir=$(prefix)lib/
-libexec_dir=$(prefix)libexec/
 config_dir=$(prefix)etc/
 
 VERSION=0.01
@@ -9,8 +8,6 @@ VERSION=0.01
 Q=@
 
 EXEC_FILES = bin/rbld
-
-COMMANDS = libexec/re-build-globals
 
 HELPERS = lib/bootstrap/re-build-entry-point     \
           lib/bootstrap/re-build-env-prepare     \
@@ -42,7 +39,6 @@ TESTS = tests/hello/hello.c tests/hello/Makefile
 CONFIG = etc/rebuild.conf
 
 DIST_FILES = $(EXEC_FILES)      \
-             $(COMMANDS)        \
              $(CONFIG)          \
              $(HELPERS)         \
              $(RUBY_MODULES)    \
@@ -52,8 +48,6 @@ DIST_FILES = $(EXEC_FILES)      \
 install:
 	$(Q)install -vd $(bin_dir)
 	$(Q)install -vt $(bin_dir) $(EXEC_FILES)
-	$(Q)install -vd $(libexec_dir)
-	$(Q)install -vt $(libexec_dir) $(COMMANDS)
 	$(Q)install -vd $(config_dir)
 	$(Q)install -vt $(config_dir) $(CONFIG)
 	$(Q)install -vd $(lib_dir)
@@ -62,7 +56,7 @@ install:
 	$(Q)install -vt $(lib_dir)/bootstrap $(HELPERS)
 
 uninstall:
-	$(Q)cd $(prefix) && rm -vf $(EXEC_FILES) $(COMMANDS) $(CONFIG) $(HELPERS) $(RUBY_MODULES)
+	$(Q)cd $(prefix) && rm -vf $(EXEC_FILES) $(CONFIG) $(HELPERS) $(RUBY_MODULES)
 
 dist:
 	$(Q)tar --transform "s|^|rebuild-v$(VERSION)/|" \
