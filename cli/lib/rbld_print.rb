@@ -38,7 +38,8 @@ module Rebuild
       end
 
       def self.inplace_trace(msg)
-        raw_trace(msg[0...IO.console.winsize[1]] + "\r")
+        raw_trace( msg[0...IO.console.winsize[1]] + "\r" ) \
+          if STDOUT.tty?
       end
 
       def self.progress_start(msg)
