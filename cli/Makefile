@@ -10,8 +10,7 @@ Q=@
 
 EXEC_FILES = bin/rbld
 
-COMMANDS = libexec/re-build-cmd-deploy    \
-           libexec/re-build-globals
+COMMANDS = libexec/re-build-globals
 
 HELPERS = lib/bootstrap/re-build-entry-point     \
           lib/bootstrap/re-build-env-prepare     \
@@ -35,7 +34,8 @@ RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_modify.rb   \
                lib/rbld_create.rb   \
                lib/rbld_search.rb   \
-               lib/rbld_publish.rb
+               lib/rbld_publish.rb  \
+               lib/rbld_deploy.rb
 
 TESTS = tests/hello/hello.c tests/hello/Makefile
 

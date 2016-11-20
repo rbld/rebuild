@@ -106,6 +106,10 @@ module Rebuild
       end
     end
 
+    def self.internal_env_name_only( name )
+      "#{ENV_NAME_PREFIX}#{name}"
+    end
+
     def self.internal_env_name( env_or_name, tag = nil )
       if env_or_name.respond_to?( :name ) \
         && env_or_name.respond_to?( :tag )
@@ -595,8 +599,7 @@ module Rebuild
       if idx = @all.index( fullname )
         rbld_print.progress "Checking for collisions..."
 
-        raise "Environment #{Environment.build_full_name( name, tag )} " \
-              "already published" \
+        raise "Environment #{fullname} already published" \
               unless registry.search( name, tag ).empty?
 
          rbld_print.progress "Publishing on #{@cfg.remote!}..."
@@ -610,6 +613,25 @@ module Rebuild
          end
       else
         raise "Unknown environment #{fullname}"
+      end
+    end
+
+    def deploy!(fullname, name, tag)
+      raise "Environment #{fullname} already exists" \
+        if @all.include? fullname
+
+      raise "Environment #{fullname} does not exist in the registry" \
+        if registry.search( name, tag ).empty?
+
+      rbld_print.progress "Deploying from #{@cfg.remote!}..."
+      begin
+       new_img = registry.deploy( name, tag )
+       new_img_name = self.class.internal_env_name( name, tag )
+       add_environment( new_img_name, new_img )
+       rbld_print.progress "Successfully deployed #{fullname}"
+      rescue => msg
+       rbld_print.error msg
+       raise "Failed to deploy from #{@cfg.remote!}"
       end
     end
   end

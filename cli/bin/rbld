@@ -16,6 +16,7 @@ require_relative '../lib/rbld_modify'
 require_relative '../lib/rbld_create'
 require_relative '../lib/rbld_search'
 require_relative '../lib/rbld_publish'
+require_relative '../lib/rbld_deploy'
 
 begin
 

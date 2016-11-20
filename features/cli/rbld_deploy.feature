@@ -20,7 +20,7 @@ Feature: rbld deploy
       When I run `rbld deploy some-env:some-tag`
       Then it should fail with:
         """
-        ERROR: Failed to access the registry
+        ERROR: Failed to access the registry at
         """
 
     Scenario Outline: deploy environment that does not exist in the registry

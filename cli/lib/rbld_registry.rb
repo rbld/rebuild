@@ -48,5 +48,24 @@ module Rebuild
       end
 
     end
+
+    def deploy(name, tag)
+      int_name = EnvManager.internal_env_name_only( name )
+      int_tag = tag
+      name = EnvManager.published_env_name( name, tag )
+      tag = Environment::INITIAL_TAG_NAME
+      name = "#{@remote}/#{name}"
+      fullname = Environment::build_full_name( name, tag )
+
+      begin
+        img = Docker::Image.create(:fromImage => fullname) do |log|
+          progress = JSON.parse(log)["progress"]
+          rbld_print.inplace_trace(progress) if progress
+        end
+        img.tag( :repo => int_name, :tag => int_tag )
+      ensure
+        img.remove( :name => fullname )
+      end
+    end
   end
 end
