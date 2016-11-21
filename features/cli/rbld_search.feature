@@ -22,7 +22,7 @@ Feature: rbld search
     When I run `rbld search`
     Then it should fail with:
       """
-      ERROR: Failed to access the registry at
+      ERROR: Failed to access registry at
       """
 
   Scenario Outline: search matching functionality

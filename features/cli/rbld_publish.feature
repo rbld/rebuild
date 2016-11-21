@@ -41,7 +41,7 @@ Feature: rbld publish
     When I run `rbld publish test-env1:v001`
     Then it should fail with:
       """
-      ERROR: Failed to access the registry at
+      ERROR: Failed to access registry at
       """
 
   @slow

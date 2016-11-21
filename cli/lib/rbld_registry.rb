@@ -1,69 +1,135 @@
 #!/usr/bin/env ruby
 
 require 'docker_registry2'
+require_relative 'rbld_log'
 
 module Rebuild
-  class Registry
-    def initialize(remote)
-      @remote = remote
-      begin
+
+  module Registry
+
+    class RbldError < RuntimeError
+      def initialize(pfx, msg)
+        if pfx.to_s.empty?
+          super( msg )
+        else
+          super( msg.to_s.empty? ? "#{pfx}" : "#{pfx}: #{msg}" )
+        end
+      end
+
+      def self.inherited( child_class )
+        child_class.class_eval( "def initialize(msg); super( nil, msg ); end" )
+      end
+
+      def self.msg_prefix(pfx)
+        class_eval( "def initialize(msg); super( \"#{pfx}\", msg ); end" )
+      end
+    end
+
+    class EntryNameParsingError < RbldError
+      msg_prefix "Internal registry name parsing failed"
+    end
+
+    class FullImageName
+      def initialize(repo, tag)
+        @repo = repo
+        @tag = tag
+        @full = "#{repo}:#{tag}"
+      end
+
+      def to_s
+        @full
+      end
+
+      attr_reader :repo, :tag, :full
+    end
+
+    class Entry
+      NAME_PFX = 're-build-env-'
+      TAG_PFX = '-rebuild-tag-'
+      private_constant :NAME_PFX, :TAG_PFX
+
+      def initialize(name = nil, tag = nil, remote = nil)
+        @name, @tag, @remote = name, tag, remote
+
+        @url = FullImageName.new( "#{@remote}/#{NAME_PFX}#{@name}#{TAG_PFX}#{@tag}", \
+                                  'initial' )
+
+        @wildcard = "#{NAME_PFX}#{@name}" + \
+                    ( @tag.to_s.empty? ? '' : "#{TAG_PFX}#{@tag}" )
+      end
+
+      def self.by_internal_name( int_name )
+        m = int_name.match(/^#{NAME_PFX}(.*)#{TAG_PFX}(.*)/)
+        raise EntryNameParsingError, int_name unless m
+        new( *m.captures )
+      end
+
+      attr_reader :name, :tag, :url, :wildcard
+    end
+
+    class APIConnectionError < RbldError;
+    end
+
+    class API
+      def initialize(remote, api_accessor = DockerRegistry)
+        @remote = remote
         rbld_log.info( "Connecting to registry #{@remote}" )
-        @api = DockerRegistry.connect("http://#{@remote}")
-      rescue StandardError
-        raise "Failed to access the registry at #{@remote}"
+        begin
+          @api = api_accessor.connect("http://#{@remote}")
+        rescue StandardError
+          raise APIConnectionError, "Failed to access registry at #{@remote}"
+        end
       end
-    end
 
-    def search(name, tag)
-      wildcard = EnvManager.published_env_name( name, tag )
-      rbld_log.info( "Searching for #{wildcard} (#{name}, #{tag})" )
-      begin
-        @api.search(wildcard).map do |n|
-          rbld_log.debug( "Found #{n}" )
-          name, tag = EnvManager.demungle_published_name( n )
-          (name && tag) ? Environment.build_full_name(name, tag) : nil
+      def search(name = nil, tag = nil)
+        wildcard = Entry.new( name, tag, @remote ).wildcard
+        rbld_log.info( "Searching for #{wildcard}" )
+        @api.search( wildcard ).map do |internal_name|
+          rbld_log.debug( "Found #{internal_name}" )
+          parse_entry( internal_name )
         end.compact
-      rescue DockerRegistry::Exception
-        raise "Failed to search in #{@remote}"
-      end
-    end
-
-    def publish(env)
-      name = EnvManager.published_env_name( env.name, env.tag )
-      tag = Environment::INITIAL_TAG_NAME
-      name = "#{@remote}/#{name}"
-      fullname = Environment::build_full_name( name, tag )
-
-      img = env.api_obj
-      img.tag( :repo => name, :tag => tag )
-
-      begin
-        img.push(nil, :repo_tag => fullname) do |log|
-          progress = JSON.parse(log)["progress"]
-          rbld_print.inplace_trace(progress) if progress
-        end
-      ensure
-        img.remove( :name => fullname )
       end
 
-    end
+      def publish(name, tag, api_obj)
+        url = Entry.new( name, tag, @remote ).url
 
-    def deploy(name, tag)
-      int_name = EnvManager.internal_env_name_only( name )
-      int_tag = tag
-      name = EnvManager.published_env_name( name, tag )
-      tag = Environment::INITIAL_TAG_NAME
-      name = "#{@remote}/#{name}"
-      fullname = Environment::build_full_name( name, tag )
+        api_obj.tag( repo: url.repo, tag: url.tag )
 
-      begin
-        img = Docker::Image.create(:fromImage => fullname) do |log|
-          progress = JSON.parse(log)["progress"]
-          rbld_print.inplace_trace(progress) if progress
+        begin
+          rbld_log.info( "Pushing #{url.full}" )
+          api_obj.push(nil, :repo_tag => url.full) do |log|
+            progress = JSON.parse(log)["progress"]
+            rbld_print.inplace_trace(progress) if progress
+          end
+        ensure
+          api_obj.remove( :name => url.full )
         end
-        img.tag( :repo => int_name, :tag => int_tag )
-      ensure
-        img.remove( :name => fullname )
+      end
+
+      def deploy(name, tag, api_class = Docker::Image)
+        url = Entry.new( name, tag, @remote ).url
+
+        begin
+          rbld_log.info( "Pulling #{url.full}" )
+          img = api_class.create(:fromImage => url.full) do |log|
+            progress = JSON.parse(log)["progress"]
+            rbld_print.inplace_trace(progress) if progress
+          end
+          yield img
+        ensure
+          img.remove( :name => url.full ) if img
+        end
+      end
+
+      private
+
+      def parse_entry(internal_name)
+        begin
+          Entry.by_internal_name( internal_name )
+        rescue EntryNameParsingError => msg
+          rbld_log.warn( msg )
+          return nil
+        end
       end
     end
   end

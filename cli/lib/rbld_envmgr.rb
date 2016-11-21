@@ -421,27 +421,13 @@ module Rebuild
     end
 
     def registry
-      @reg ||= Registry.new( @cfg.remote! )
+      @reg ||= Registry::API.new( @cfg.remote! )
       @reg
     end
 
     public
 
     attr_reader :all, :modified
-
-    def self.published_env_name( name, tag = "" )
-      "#{ENV_NAME_PREFIX}#{name}" + \
-      (tag.empty? ? "" : "#{NAME_TAG_SEPARATOR}#{tag}")
-    end
-
-    def self.demungle_published_name( name )
-      if m = name.match(/^#{ENV_NAME_PREFIX}(.*)#{NAME_TAG_SEPARATOR}(.*)/)
-        return m.captures
-      else
-        rbld_log.warn "Failed to demungle #{name}"
-        return [nil, nil]
-      end
-    end
 
     def remove!(fullname)
       raise "Environment is modified, commit or checkout first" \
@@ -588,7 +574,15 @@ module Rebuild
 
     def search(name, tag)
       rbld_print.progress "Searching in #{@cfg.remote!}..."
-      registry.search( name, tag )
+
+      begin
+        registry.search( name, tag ).map do |e|
+          Environment.build_full_name( e.name, e.tag )
+        end
+      rescue => msg
+        rbld_print.error msg
+        raise "Failed to search in #{@cfg.remote!}"
+      end
     end
 
     def publish(fullname, name, tag)
@@ -604,7 +598,7 @@ module Rebuild
          rbld_print.progress "Publishing on #{@cfg.remote!}..."
 
          begin
-           registry.publish( @all[idx] )
+           registry.publish( name, tag, @all[idx].api_obj )
            rbld_print.progress "Successfully published #{fullname}"
          rescue => msg
            rbld_print.error msg
@@ -624,9 +618,12 @@ module Rebuild
 
       rbld_print.progress "Deploying from #{@cfg.remote!}..."
       begin
-       new_img = registry.deploy( name, tag )
-       new_img_name = self.class.internal_env_name( name, tag )
-       add_environment( new_img_name, new_img )
+       registry.deploy( name, tag ) do |img|
+         img.tag( :repo => self.class.internal_env_name_only( name ),
+                  :tag => tag )
+         add_environment( self.class.internal_env_name( name, tag ),
+                          img )
+       end
        rbld_print.progress "Successfully deployed #{fullname}"
       rescue => msg
        rbld_print.error msg
