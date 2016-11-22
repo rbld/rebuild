@@ -9,6 +9,7 @@ begin
       --format pretty
       --strict
       #{ENV['fast'] == '1' ? "-t ~@slow" : ""}
+      #{ENV['slow'] == '1' ? "-t @slow" : ""}
       #{ENV['installed'] == '1' ? "-p installed" : ""}
     }
   end
@@ -19,6 +20,11 @@ begin
 
   Cucumber::Rake::Task.new(:fasttest) do |t|
     ENV['fast'] = '1'
+    t.cucumber_opts = cucumber_opts
+  end
+
+  Cucumber::Rake::Task.new(:slowtest) do |t|
+    ENV['slow'] = '1'
     t.cucumber_opts = cucumber_opts
   end
 
