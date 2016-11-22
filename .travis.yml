@@ -31,4 +31,4 @@ before_install:
   - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine='1.9.1*'
 
 install: ./tools/travis-install.sh
-script: bundle exec rake test
+script: bundle exec rake spec test
