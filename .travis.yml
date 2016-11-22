@@ -9,14 +9,17 @@ matrix:
     - rvm: 2.1.8
       env: installed=1 fast=1
       services: docker
+    - rvm: 2.2.4
+      env: installed=1 fast=1
+      services: docker
     - rvm: 2.3.0
       env: installed=1 fast=1
       services: docker
     - rvm: 2.2.4
-      env: installed=1
+      env: installed=1 slow=1
       services: docker
     - rvm: 2.2.4
-      env: installed=0
+      env: installed=0 slow=1
       services: docker
 
 notifications:
