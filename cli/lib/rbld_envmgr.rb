@@ -196,8 +196,20 @@ module Rebuild
       end
     end
 
+    def tweak_excon
+      # docker-api use Excon to issue HTTP requests
+      # and default Excon timeouts which are 60 seconds
+      # apply to all docker-api actions.
+      # Some long-running actions like image build may
+      # take more than 1 minute so timeout needs to be
+      # increased
+      Excon.defaults[:write_timeout] = 600
+      Excon.defaults[:read_timeout] = 600
+    end
+
     def initialize(cfg = Config.new)
       @cfg = cfg
+      tweak_excon
       check_connectivity
       refresh!
       yield( self ) if block_given?
