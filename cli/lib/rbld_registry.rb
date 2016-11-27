@@ -2,30 +2,12 @@
 
 require 'docker_registry2'
 require_relative 'rbld_log'
+require_relative 'rbld_utils'
 
 module Rebuild
-
   module Registry
 
-    class RbldError < RuntimeError
-      def initialize(pfx, msg)
-        if pfx.to_s.empty?
-          super( msg )
-        else
-          super( msg.to_s.empty? ? "#{pfx}" : "#{pfx}: #{msg}" )
-        end
-      end
-
-      def self.inherited( child_class )
-        child_class.class_eval( "def initialize(msg); super( nil, msg ); end" )
-      end
-
-      def self.msg_prefix(pfx)
-        class_eval( "def initialize(msg); super( \"#{pfx}\", msg ); end" )
-      end
-    end
-
-    class EntryNameParsingError < RbldError
+    class EntryNameParsingError < Rebuild::Utils::Error
       msg_prefix "Internal registry name parsing failed"
     end
 
@@ -67,7 +49,7 @@ module Rebuild
       attr_reader :name, :tag, :url, :wildcard
     end
 
-    class APIConnectionError < RbldError;
+    class APIConnectionError < Rebuild::Utils::Error;
     end
 
     class API

@@ -1,22 +1,15 @@
 require_relative '../../cli/lib/rbld_registry.rb'
+require_relative 'rbld_utils_shared_spec'
 
 module Rebuild
   module Registry
-
-    describe RbldError do
-      it 'should join message with prefix' do
-        expect { raise RbldError.new( 'pfx', 'msg' ) }.to raise_error('pfx: msg')
-      end
-    end
 
     {
       EntryNameParsingError => 'Internal registry name parsing failed',
       APIConnectionError    => nil
     }.each do |klass, prefix|
       describe klass do
-        it 'should derive from RbldError' do
-          expect(klass).to be < RbldError
-        end
+        it_behaves_like 'it derives from Rebuild::Utils::Error'
 
         it 'should join given message with customized prefix' do
           message = prefix.to_s.empty? ? 'msg' : "#{prefix}: msg"
