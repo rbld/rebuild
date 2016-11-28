@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 module Rebuild
   class RbldModifyCommand < Command
     def initialize

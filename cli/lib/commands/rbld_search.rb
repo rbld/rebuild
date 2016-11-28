@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 module Rebuild
   class RbldSearchCommand < Command
     def initialize

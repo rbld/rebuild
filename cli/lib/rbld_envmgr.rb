@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'docker'
 require 'etc'
 require 'thread'

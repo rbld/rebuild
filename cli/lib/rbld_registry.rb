@@ -1,5 +1,3 @@
-#!/usr/bin/env ruby
-
 require 'docker_registry2'
 require_relative 'rbld_log'
 require_relative 'rbld_utils'
