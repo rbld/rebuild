@@ -1,4 +1,4 @@
-require_relative '../../cli/lib/rbld_registry.rb'
+require_relative '../../cli/lib/rbld_registry'
 require_relative 'rbld_utils_shared_spec'
 
 module Rebuild
