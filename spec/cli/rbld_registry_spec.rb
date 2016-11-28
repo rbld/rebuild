@@ -1,5 +1,5 @@
 require_relative '../../cli/lib/rbld_registry'
-require_relative 'rbld_utils_shared_spec'
+require_relative 'rbld_utils_shared'
 
 module Rebuild
   module Registry

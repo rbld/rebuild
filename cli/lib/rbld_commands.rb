@@ -1,10 +1,74 @@
-module Rebuild
-  class CommandError < RuntimeError
+require_relative 'rbld_utils'
+
+module Rebuild::CLI
+  class CommandError < Rebuild::Utils::Error
     def initialize(errcode)
       @code = errcode
     end
 
     attr_reader :code
+  end
+
+  class EnvironmentNameEmpty < Rebuild::Utils::Error
+    msg_prefix 'Environment name not specified'
+  end
+
+  class EnvironmentNameWithoutTagExpected < Rebuild::Utils::Error
+    msg_prefix 'Environment tag must not be specified'
+  end
+
+  class EnvironmentNameError < Rebuild::Utils::Error
+    msg_format 'Invalid %s, it may contain a-z, A-Z, 0-9, - and _ characters only'
+  end
+
+  class Environment
+    def initialize(cli_param, opts = {})
+      deduce_name_tag( cli_param, opts )
+      validate_name_tag(opts)
+      @full = "#{@name}:#{@tag}"
+    end
+
+    def self.validate_component( name, value )
+      raise EnvironmentNameError, "#{name} (#{value})" \
+        unless value.match( /^[[:alnum:]\_\-]*$/ )
+    end
+
+    def to_s
+      @full
+    end
+
+    attr_reader :name, :tag, :full
+
+    private
+
+    def parse_name_tag(cli_param, opts)
+      if opts[:allow_empty] && (!cli_param || cli_param.empty?)
+        @name, @tag = '', ''
+      elsif !cli_param || cli_param.empty?
+        raise EnvironmentNameEmpty
+      else
+        @name, @tag = cli_param.match( /^([^:]*):?(.*)/ ).captures
+        @tag = '' if @name.empty?
+      end
+    end
+
+    def deduce_name_tag(cli_param, opts)
+      parse_name_tag( cli_param, opts )
+
+      raise EnvironmentNameWithoutTagExpected \
+        if opts[:force_no_tag] && !@tag.empty?
+
+      @tag = 'initial' if @tag.empty? && !opts[:allow_empty]
+    end
+
+    def validate_name_tag(opts)
+      raise EnvironmentNameEmpty if @name.empty? && !opts[:allow_empty]
+      self.class.validate_component( "environment name", @name ) unless @name.empty?
+      self.class.validate_component( "environment tag", @tag ) unless @tag.empty?
+    end
+  end
+
+  class HandlerClassNameError < Rebuild::Utils::Error
   end
 
   class Commands
@@ -32,7 +96,7 @@ module Rebuild
 
     def self.register_handler_class(klass)
       unless deduce_cmd_name( klass )
-        raise LoadError.new("Failed to bind command handler class #{klass}")
+        raise HandlerClassNameError, "#{klass.name}"
       end
 
       @handler_classes << klass
@@ -84,44 +148,21 @@ module Rebuild
     end
 
     def print_env_list(retriever, prefix = '')
-      print_names( EnvManager.new.send( retriever ), prefix )
+      print_names( Rebuild::EnvManager.new.send( retriever ), prefix )
     end
 
     def self.run_prints( retriever, prefix = '' )
-      code = %Q{
+      class_eval %Q{
         def run(parameters)
           print_env_list( \"#{retriever}\".to_sym, \"#{prefix}\" )
         end
       }
-      class_eval( code )
-    end
-
-    def with_target_name(parameter)
-      raise "Environment name not specified" if !parameter
-      name, tag = Environment.deduce_name_tag( parameter )
-      yield Environment.build_full_name( name, tag ), name, tag
-    end
-
-    def with_target_name_initial_tag(parameter)
-      raise "Environment name not specified" if !parameter
-      name, tag = Environment.parse_name_tag( parameter )
-      raise "Environment name not specified" if name.empty?
-      raise "Environment tag must not be specified" unless tag.empty?
-      tag = Environment::INITIAL_TAG_NAME
-      yield Environment.build_full_name( name, tag ), name, tag
-    end
-
-    def with_target_name_tag(parameter)
-      yield parameter ? Environment.parse_name_tag( parameter )
-                      : ["", ""]
     end
 
     def get_cmdline_tail(parameters)
       parameters.shift if parameters[0] == '--'
       parameters
     end
-
-    public
 
     def format_usage_text
       text = ""
@@ -136,6 +177,8 @@ module Rebuild
       end
       text
     end
+
+    public
 
     def usage
       puts <<END_USAGE

@@ -1,4 +1,4 @@
-module Rebuild
+module Rebuild::CLI
   class RbldLoadCommand < Command
     private
 
@@ -14,7 +14,7 @@ module Rebuild
     end
 
     def run(parameters)
-      EnvManager.new do |mgr|
+      Rebuild::EnvManager.new do |mgr|
         file = parameters[0]
         raise "File name must be specified" if !file
         raise "File #{file} does not exist" if !File::exist?(file)

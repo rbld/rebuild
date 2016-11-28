@@ -1,4 +1,4 @@
-module Rebuild
+module Rebuild::CLI
   class RbldModifyCommand < Command
     def initialize
       @usage = [
@@ -13,12 +13,11 @@ module Rebuild
     end
 
     def run(parameters)
-      EnvManager.new do |mgr|
-        with_target_name( parameters.shift ) do |fullname|
-          cmd = get_cmdline_tail( parameters )
-          rbld_log.info("Going to modify \"#{fullname}\" with \"#{cmd}\"")
-          mgr.modify!( fullname, cmd )
-        end
+      Rebuild::EnvManager.new do |mgr|
+        env = Environment.new( parameters.shift )
+        cmd = get_cmdline_tail( parameters )
+        rbld_log.info("Going to modify \"#{env}\" with \"#{cmd}\"")
+        mgr.modify!( env.full, cmd )
       end
     end
   end

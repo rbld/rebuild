@@ -1,9 +1,9 @@
-module Rebuild
+module Rebuild::CLI
   class RbldSaveCommand < Command
     private
 
-    def default_file(name, tag)
-      "#{name}-#{tag}.rbld"
+    def default_file(env)
+      "#{env.name}-#{env.tag}.rbld"
     end
 
     public
@@ -14,13 +14,12 @@ module Rebuild
     end
 
     def run(parameters)
-      EnvManager.new do |mgr|
+      Rebuild::EnvManager.new do |mgr|
         env, file = parameters
-        with_target_name( env ) do |fullname, name, tag|
-          file = default_file( name, tag ) if !file or file.empty?
-          rbld_log.info("Going to save #{fullname} to #{file}")
-          mgr.save(fullname, file)
-        end
+        env = Environment.new( env )
+        file = default_file( env ) if !file or file.empty?
+        rbld_log.info("Going to save #{env} to #{file}")
+        mgr.save(env.full, file)
       end
     end
   end

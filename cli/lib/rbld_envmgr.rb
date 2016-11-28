@@ -9,41 +9,8 @@ module Rebuild
     private_constant :ENV_NAME_SEPARATOR
     INITIAL_TAG_NAME = 'initial'
 
-    private
-
-    def self.validate_param( name, value )
-      raise "Invalid #{name} (#{value}), " \
-            "it may contain a-z, A-Z, 0-9, - and " \
-            "_ characters only" \
-            unless value.match( /^[[:alnum:]\_\-]*$/ )
-    end
-
-    public
-
     def initialize(name, tag, api_obj)
       @name, @tag, @api_obj = name, tag, api_obj
-    end
-
-    def self.parse_name_tag(fullname)
-      name, tag = fullname.match( /^([^:]*):?(.*)/ ).captures
-
-      raise "Environment name not specified" if name.empty?
-      validate_param( "environment name", name )
-      validate_param( "environment tag", tag )
-
-      [name, tag]
-    end
-
-    def self.validate_tag(tag_name, tag)
-      validate_param( tag_name, tag )
-    end
-
-    def self.deduce_name_tag(fullname)
-      name, tag = parse_name_tag( fullname )
-      if tag.empty?
-        tag = INITIAL_TAG_NAME
-      end
-      [name, tag]
     end
 
     def self.build_full_name(name, tag)
@@ -146,7 +113,7 @@ module Rebuild
       system( cmdline )
       errcode = $?.exitstatus
       rbld_log.info( "External command returned with code #{errcode}" )
-      raise CommandError, errcode if errcode != 0
+      raise Rebuild::CLI::CommandError, errcode if errcode != 0
     end
 
     def self.internal_rerun_env_name(name, tag)

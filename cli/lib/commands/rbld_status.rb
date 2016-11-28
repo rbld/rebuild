@@ -1,4 +1,4 @@
-module Rebuild
+module Rebuild::CLI
   class RbldStatusCommand < Command
     def initialize
       @usage = "status [OPTIONS]"

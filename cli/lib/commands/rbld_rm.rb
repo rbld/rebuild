@@ -1,4 +1,4 @@
-module Rebuild
+module Rebuild::CLI
   class RbldRmCommand < Command
     def initialize
       @usage = "rm [OPTIONS] [ENVIRONMENT[:TAG]]"
@@ -6,11 +6,10 @@ module Rebuild
     end
 
     def run(parameters)
-      EnvManager.new do |mgr|
-        with_target_name( parameters[0] ) do |fullname|
-          rbld_log.info("Going to remove #{fullname}")
-          mgr.remove!( fullname )
-        end
+      Rebuild::EnvManager.new do |mgr|
+        env = Environment.new( parameters[0] )
+        rbld_log.info("Going to remove #{env}")
+        mgr.remove!( env.full )
       end
     end
   end

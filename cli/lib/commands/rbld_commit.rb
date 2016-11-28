@@ -1,6 +1,6 @@
 require 'getoptlong'
 
-module Rebuild
+module Rebuild::CLI
   class RbldCommitCommand < Command
     def initialize
       @usage = "commit [OPTIONS] [ENVIRONMENT[:TAG]]"
@@ -20,7 +20,7 @@ module Rebuild
         end
 
         raise "New tag not specified" unless tag
-        Environment.validate_tag( 'new tag', tag )
+        Environment.validate_component( 'new tag', tag )
         return tag, ARGV
       end
     end
@@ -28,11 +28,10 @@ module Rebuild
     def run(parameters)
       new_tag, parameters = parse_opts( parameters )
 
-      EnvManager.new do |mgr|
-        with_target_name( parameters[0] ) do |fullname, name, tag|
-          rbld_log.info("Going to commit #{fullname}")
-          mgr.commit!(fullname, name, tag, new_tag)
-        end
+      Rebuild::EnvManager.new do |mgr|
+        env = Environment.new( parameters[0] )
+        rbld_log.info("Going to commit #{env}")
+        mgr.commit!(env.full, env.name, env.tag, new_tag)
       end
     end
   end

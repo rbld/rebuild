@@ -1,4 +1,4 @@
-module Rebuild
+module Rebuild::CLI
   class RbldSearchCommand < Command
     def initialize
       @usage = "search [OPTIONS] [NAME[:TAG]|PREFIX]"
@@ -6,11 +6,9 @@ module Rebuild
     end
 
     def run(parameters)
-      EnvManager.new do |mgr|
-        with_target_name_tag( parameters[0] ) do |name, tag|
-          tag = "" if name.empty?
-          print_names( mgr.search( name, tag ) )
-        end
+      Rebuild::EnvManager.new do |mgr|
+        env = Environment.new(parameters[0], allow_empty: true)
+        print_names( mgr.search( env.name, env.tag ) )
       end
     end
   end

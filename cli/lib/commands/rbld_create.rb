@@ -1,6 +1,6 @@
 require 'getoptlong'
 
-module Rebuild
+module Rebuild::CLI
   class RbldCreateCommand < Command
     def initialize
       @usage = "create [OPTIONS] [ENVIRONMENT]"
@@ -41,11 +41,10 @@ module Rebuild
     def run(parameters)
       base, basefile, parameters = parse_opts( parameters )
 
-      EnvManager.new do |mgr|
-        with_target_name_initial_tag( parameters[0] ) do |fullname, name, tag|
-          rbld_log.info("Going to create #{fullname} from #{base || basefile}")
-          mgr.create!(base, basefile, fullname, name, tag)
-        end
+      Rebuild::EnvManager.new do |mgr|
+        env = Environment.new( parameters[0], force_no_tag: true )
+        rbld_log.info("Going to create #{env} from #{base || basefile}")
+        mgr.create!(base, basefile, env.full, env.name, env.tag)
       end
     end
   end
