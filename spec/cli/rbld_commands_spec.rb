@@ -4,14 +4,6 @@ require_relative 'rbld_utils_shared'
 module Rebuild
   module CLI
 
-    describe CommandError do
-      it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-      it 'knows error code' do
-        expect(CommandError.new(1000).code).to be == 1000
-      end
-    end
-
     describe EnvironmentNameError do
       it_behaves_like 'it derives from Rebuild::Utils::Error'
 
@@ -32,8 +24,13 @@ module Rebuild
 
     describe Environment do
       shared_examples 'it fetches its name' do
-        it 'fetches its name' do
+        it 'and stores it' do
           expect(obj.name).to be == 'env'
+        end
+      end
+      shared_examples 'it fetches its tag' do
+        it 'and stores it' do
+          expect(obj.tag).to be == 'v001'
         end
       end
 
@@ -41,10 +38,7 @@ module Rebuild
         let(:obj) { Environment.new('env:v001') }
 
         it_behaves_like 'it fetches its name'
-
-        it 'fetches its tag' do
-          expect(obj.tag).to be == 'v001'
-        end
+        it_behaves_like 'it fetches its tag'
 
         it 'knows its full name' do
           expect(obj.full).to be == 'env:v001'
@@ -110,6 +104,12 @@ module Rebuild
             expect([obj.name, obj.tag]).to be == ['', '']
           end
         end
+      end
+
+      context 'when parsed name is given' do
+        let(:obj) { Environment.new(OpenStruct.new(name: 'env', tag: 'v001')) }
+        it_behaves_like 'it fetches its name'
+        it_behaves_like 'it fetches its tag'
       end
 
       context 'on construction' do

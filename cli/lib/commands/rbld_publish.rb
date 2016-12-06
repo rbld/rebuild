@@ -6,11 +6,10 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters[0] )
-        rbld_log.info("Going to publish \"#{env}\"")
-        mgr.publish( env.full, env.name, env.tag )
-      end
+      env = Environment.new( parameters[0] )
+      rbld_log.info("Going to publish \"#{env}\"")
+      engine_api.publish( env )
+      rbld_print.progress "Successfully published #{env}\n"
     end
   end
 end

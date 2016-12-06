@@ -13,12 +13,10 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters.shift )
-        cmd = get_cmdline_tail( parameters )
-        rbld_log.info("Going to modify \"#{env}\" with \"#{cmd}\"")
-        mgr.modify!( env.full, cmd )
-      end
+      env = Environment.new( parameters.shift )
+      cmd = get_cmdline_tail( parameters )
+      rbld_log.info("Going to modify \"#{env}\" with \"#{cmd}\"")
+      engine_api.modify!( env, cmd )
     end
   end
 end

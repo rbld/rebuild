@@ -29,7 +29,7 @@ begin
   Rebuild::CLI::Commands.run( ARGV[0], ARGV.drop(1) )
   exit 0
 
-rescue Rebuild::CLI::CommandError => error
+rescue Rebuild::Engine::EnvironmentExitCode => error
   exit error.code
 
 rescue RuntimeError => msg

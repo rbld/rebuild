@@ -5,6 +5,8 @@ module Rebuild::CLI
       @description = "List modified environments"
     end
 
-    run_prints :modified, "modified: "
+    def run(parameters)
+      print_names( engine_api.environments.select( &:modified? ), 'modified: ' )
+    end
   end
 end

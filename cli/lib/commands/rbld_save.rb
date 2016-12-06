@@ -14,13 +14,15 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env, file = parameters
-        env = Environment.new( env )
-        file = default_file( env ) if !file or file.empty?
-        rbld_log.info("Going to save #{env} to #{file}")
-        mgr.save(env.full, file)
-      end
+      env, file = parameters
+      env = Environment.new( env )
+      file = default_file( env ) if !file or file.empty?
+      rbld_log.info("Going to save #{env} to #{file}")
+
+      warn_if_modified( env, 'saving' )
+      engine_api.save(env, file)
+
+      rbld_print.progress "Successfully saved environment #{env} to #{file}\n"
     end
   end
 end

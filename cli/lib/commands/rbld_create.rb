@@ -41,11 +41,10 @@ module Rebuild::CLI
     def run(parameters)
       base, basefile, parameters = parse_opts( parameters )
 
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters[0], force_no_tag: true )
-        rbld_log.info("Going to create #{env} from #{base || basefile}")
-        mgr.create!(base, basefile, env.full, env.name, env.tag)
-      end
+      env = Environment.new( parameters[0], force_no_tag: true )
+      rbld_log.info("Going to create #{env} from #{base || basefile}")
+      engine_api.create!( base, basefile, env )
+      rbld_print.progress "Successfully created #{env.full}"
     end
   end
 end

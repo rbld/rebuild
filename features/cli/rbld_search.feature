@@ -20,10 +20,8 @@ Feature: rbld search
   Scenario: remote registry is not accessible
     Given remote registry is not accessible
     When I run `rbld search`
-    Then it should fail with:
-      """
-      ERROR: Failed to access registry at
-      """
+    Then it should fail with "Failed to access registry at"
+    And the output should contain "ERROR: Failed to search in"
 
   Scenario Outline: search matching functionality
     Given my rebuild registry is <registry contents>

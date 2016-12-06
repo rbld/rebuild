@@ -4,38 +4,12 @@ require_relative 'rbld_utils_shared'
 module Rebuild
   module Registry
 
-    {
-      EntryNameParsingError => 'Internal registry name parsing failed',
-      APIConnectionError    => nil
-    }.each do |klass, prefix|
-      describe klass do
-        it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-        it 'should join given message with customized prefix' do
-          message = prefix.to_s.empty? ? 'msg' : "#{prefix}: msg"
-          expect { raise klass, 'msg' }.to raise_error(message)
-        end
-      end
+    describe EntryNameParsingError do
+      it_behaves_like 'rebuild error class', 'Internal registry name parsing failed'
     end
 
-    describe FullImageName do
-      let(:obj) { FullImageName.new('repo', 'tag') }
-
-      it 'should know its repo' do
-        expect(obj.repo).to be == 'repo'
-      end
-
-      it 'should know its tag' do
-        expect(obj.tag).to be == 'tag'
-      end
-
-      it 'should build full name from repo and tag' do
-        expect(obj.full).to be == 'repo:tag'
-      end
-
-      it 'should provide full name as object string representation' do
-        expect(obj.to_s).to be == 'repo:tag'
-      end
+    describe APIConnectionError do
+      it_behaves_like 'rebuild error class'
     end
 
     describe Entry do

@@ -5,6 +5,8 @@ module Rebuild::CLI
       @description = "List local environments"
     end
 
-    run_prints :all
+    def run(parameters)
+      print_names( engine_api.environments )
+    end
   end
 end

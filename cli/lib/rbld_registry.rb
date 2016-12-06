@@ -9,20 +9,6 @@ module Rebuild
       msg_prefix "Internal registry name parsing failed"
     end
 
-    class FullImageName
-      def initialize(repo, tag)
-        @repo = repo
-        @tag = tag
-        @full = "#{repo}:#{tag}"
-      end
-
-      def to_s
-        @full
-      end
-
-      attr_reader :repo, :tag, :full
-    end
-
     class Entry
       NAME_PFX = 're-build-env-'
       TAG_PFX = '-rebuild-tag-'
@@ -31,8 +17,8 @@ module Rebuild
       def initialize(name = nil, tag = nil, remote = nil)
         @name, @tag, @remote = name, tag, remote
 
-        @url = FullImageName.new( "#{@remote}/#{NAME_PFX}#{@name}#{TAG_PFX}#{@tag}", \
-                                  'initial' )
+        @url = Rebuild::Utils::FullImageName.new( "#{@remote}/#{NAME_PFX}#{@name}#{TAG_PFX}#{@tag}", \
+                                                  'initial' )
 
         @wildcard = "#{NAME_PFX}#{@name}" + \
                     ( @tag.to_s.empty? ? '' : "#{TAG_PFX}#{@tag}" )

@@ -6,10 +6,8 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new(parameters[0], allow_empty: true)
-        print_names( mgr.search( env.name, env.tag ) )
-      end
+      env = Environment.new(parameters[0], allow_empty: true)
+      print_names( engine_api.search( env ) )
     end
   end
 end

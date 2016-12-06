@@ -27,5 +27,28 @@ module Rebuild
       end
     end
 
+    describe FullImageName do
+      let(:obj) { FullImageName.new('repo', 'tag') }
+
+      it 'should know its repo' do
+        expect(obj.repo).to be == 'repo'
+      end
+
+      it 'also returns repo when asked for name' do
+        expect(obj.name).to be == obj.repo
+      end
+
+      it 'should know its tag' do
+        expect(obj.tag).to be == 'tag'
+      end
+
+      it 'should build full name from repo and tag' do
+        expect(obj.full).to be == 'repo:tag'
+      end
+
+      it 'should provide full name as object string representation' do
+        expect(obj.to_s).to be == 'repo:tag'
+      end
+    end
   end
 end

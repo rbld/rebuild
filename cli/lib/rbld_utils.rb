@@ -6,7 +6,11 @@ module Rebuild
         if not pfx.to_s.empty?
           super( msg.to_s.empty? ? pfx : "#{pfx}: #{msg}" )
         elsif not fmt.to_s.empty?
-          super( sprintf( fmt, msg ) )
+          if msg.kind_of?(Array)
+            super( sprintf( fmt, *msg ) )
+          elsif
+            super( sprintf( fmt, msg ) )
+          end
         else
           super( msg )
         end
@@ -23,6 +27,21 @@ module Rebuild
       def self.msg_format(fmt)
         class_eval( "def initialize(msg); super( nil, \"#{fmt}\", msg ); end" )
       end
+    end
+
+    class FullImageName
+      def initialize(repo, tag)
+        @repo = repo
+        @tag = tag
+        @full = "#{repo}:#{tag}"
+      end
+
+      def to_s
+        @full
+      end
+
+      attr_reader :repo, :tag, :full
+      alias_method :name, :repo
     end
 
   end

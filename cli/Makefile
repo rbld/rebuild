@@ -17,7 +17,7 @@ HELPERS = lib/bootstrap/re-build-entry-point     \
 RUBY_MODULES = lib/rbld_log.rb      \
                lib/rbld_print.rb    \
                lib/rbld_commands.rb \
-               lib/rbld_envmgr.rb   \
+               lib/rbld_engine.rb   \
                lib/rbld_config.rb   \
                lib/rbld_registry.rb \
                lib/rbld_utils.rb

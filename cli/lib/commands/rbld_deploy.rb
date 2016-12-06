@@ -6,12 +6,11 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters[0] )
-        cmd = get_cmdline_tail( parameters )
-        rbld_log.info("Going to deploy \"#{env}\"")
-        mgr.deploy!( env.full, env.name, env.tag )
-      end
+      env = Environment.new( parameters[0] )
+      cmd = get_cmdline_tail( parameters )
+      rbld_log.info("Going to deploy \"#{env}\"")
+      engine_api.deploy!( env )
+      rbld_print.progress "Successfully deployed #{env}\n"
     end
   end
 end

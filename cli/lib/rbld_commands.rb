@@ -1,14 +1,6 @@
 require_relative 'rbld_utils'
 
 module Rebuild::CLI
-  class CommandError < Rebuild::Utils::Error
-    def initialize(errcode)
-      @code = errcode
-    end
-
-    attr_reader :code
-  end
-
   class EnvironmentNameEmpty < Rebuild::Utils::Error
     msg_prefix 'Environment name not specified'
   end
@@ -22,9 +14,13 @@ module Rebuild::CLI
   end
 
   class Environment
-    def initialize(cli_param, opts = {})
-      deduce_name_tag( cli_param, opts )
-      validate_name_tag(opts)
+    def initialize(env, opts = {})
+      if env.respond_to?( :name ) && env.respond_to?( :tag )
+        @name, @tag = env.name, env.tag
+      else
+        deduce_name_tag( env, opts )
+        validate_name_tag(opts)
+      end
       @full = "#{@name}:#{@tag}"
     end
 
@@ -141,22 +137,20 @@ module Rebuild::CLI
     end
 
     def print_names(names, prefix = '')
-      strings = names.map { |n| n.to_s }
+      strings = names.map { |n| Environment.new(n).full }
       puts
       strings.sort.each { |s| puts "    #{prefix}#{s}"}
       puts
     end
 
-    def print_env_list(retriever, prefix = '')
-      print_names( Rebuild::EnvManager.new.send( retriever ), prefix )
+    def engine_api
+      @engine_api ||= Rebuild::Engine::API.new
+      @engine_api
     end
 
-    def self.run_prints( retriever, prefix = '' )
-      class_eval %Q{
-        def run(parameters)
-          print_env_list( \"#{retriever}\".to_sym, \"#{prefix}\" )
-        end
-      }
+    def warn_if_modified(env, action)
+      rbld_print.warning "Environment is modified, #{action} original version" \
+        if engine_api.environments.select( &:modified? ).include?( env )
     end
 
     def get_cmdline_tail(parameters)

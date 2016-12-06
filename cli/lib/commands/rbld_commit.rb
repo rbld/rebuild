@@ -28,11 +28,9 @@ module Rebuild::CLI
     def run(parameters)
       new_tag, parameters = parse_opts( parameters )
 
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters[0] )
-        rbld_log.info("Going to commit #{env}")
-        mgr.commit!(env.full, env.name, env.tag, new_tag)
-      end
+      env = Environment.new( parameters[0] )
+      rbld_log.info("Going to commit #{env}")
+      engine_api.commit!(env, new_tag)
     end
   end
 end

@@ -6,11 +6,9 @@ module Rebuild::CLI
     end
 
     def run(parameters)
-      Rebuild::EnvManager.new do |mgr|
-        env = Environment.new( parameters[0] )
-        rbld_log.info("Going to checkout #{env}")
-        mgr.checkout!(env.full, env.name, env.tag)
-      end
+      env = Environment.new( parameters[0] )
+      rbld_log.info("Going to checkout #{env}")
+      engine_api.checkout!( env )
     end
   end
 end
