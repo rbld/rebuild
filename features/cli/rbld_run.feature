@@ -93,10 +93,10 @@ Feature: rbld run
       """
 
   Scenario Outline: rbld run propagates exit code
-    When I run `rbld run test-env:v001 -- exit <internal status>`
-    Then the exit status should be <external status>
+    When I run `rbld run test-env:v001 -- exit <status>`
+    Then the exit status should be <status>
 
     Examples:
-      | internal status | external status |
-      |  0              | 0               |
-      |  5              | 5               |
+      | status |
+      |  0     |
+      |  5     |

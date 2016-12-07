@@ -73,13 +73,13 @@ Feature: rbld modify
       """
 
   Scenario Outline: rbld modify propagates exit code
-    When I run `rbld modify test-env:v001 -- exit <internal status>`
-    Then the exit status should be <external status>
+    When I run `rbld modify test-env:v001 -- exit <status>`
+    Then the exit status should be <status>
 
     Examples:
-      | internal status | external status |
-      |  0              | 0               |
-      |  5              | 5               |
+      | status |
+      |  0     |
+      |  5     |
 
   @slow
   Scenario: multiple emvironment modifications supported
