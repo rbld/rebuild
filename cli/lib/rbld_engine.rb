@@ -5,6 +5,8 @@ require 'forwardable'
 require_relative 'rbld_log'
 require_relative 'rbld_config'
 require_relative 'rbld_utils'
+require_relative 'rbld_print'
+require_relative 'rbld_registry'
 
 module Rebuild::Engine
   extend Rebuild::Utils::Errors

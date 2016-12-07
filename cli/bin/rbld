@@ -1,10 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'pp'
 require 'require_all'
 
-require_rel '../lib'
-require_rel '../lib/commands'
+module Rebuild
+  require_relative '../lib/rbld_commands'
+  require_rel '../lib/commands'
+end
 
 begin
 
