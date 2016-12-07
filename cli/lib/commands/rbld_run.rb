@@ -18,7 +18,7 @@ module Rebuild::CLI
       rbld_log.info("Going to run \"#{cmd}\" in \"#{env}\"")
 
       warn_if_modified( env, 'running' )
-      engine_api.run( env, cmd )
+      @errno = engine_api.run( env, cmd )
     end
   end
 end

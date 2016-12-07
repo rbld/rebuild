@@ -100,7 +100,9 @@ module Rebuild::CLI
     end
 
     def self.run(command, parameters)
-      handler!( command ).run( parameters )
+      handler = handler!( command )
+      handler.run( parameters )
+      handler.errno
     end
   end
 
@@ -166,6 +168,8 @@ module Rebuild::CLI
     end
 
     public
+
+    attr_reader :errno
 
     def usage
       puts <<END_USAGE

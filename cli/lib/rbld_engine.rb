@@ -262,14 +262,6 @@ module Rebuild::Engine
     end
   end
 
-  class EnvironmentExitCode < Rebuild::Utils::Error
-    def initialize(errcode)
-      @code = errcode
-    end
-
-    attr_reader :code
-  end
-
   rebuild_errors \
    UnsupportedDockerService: 'Unsupported docker service: %s',
    EnvironmentIsModified: 'Environment is modified, commit or checkout first',
@@ -516,6 +508,7 @@ module Rebuild::Engine
       env = existing_env( env_name )
       run_env_disposable( env, cmd )
       @cache.refresh!
+      @errno
     end
 
     def modify!(env_name, cmd)
@@ -532,6 +525,7 @@ module Rebuild::Engine
         run_env(env, cmd)
       end
       @cache.refresh!
+      @errno
     end
 
     def commit!(env_name, new_tag)
@@ -626,9 +620,8 @@ module Rebuild::Engine
     def run_external(cmdline)
       rbld_log.info("Executing external command #{cmdline}")
       system( cmdline )
-      errcode = $?.exitstatus
-      rbld_log.info( "External command returned with code #{errcode}" )
-      raise Rebuild::Engine::EnvironmentExitCode, errcode if errcode != 0
+      @errno = $?.exitstatus
+      rbld_log.info( "External command returned with code #{@errno}" )
     end
 
     def run_settings(env, cmd, opts = {})

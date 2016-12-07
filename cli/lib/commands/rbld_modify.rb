@@ -16,7 +16,7 @@ module Rebuild::CLI
       env = Environment.new( parameters.shift )
       cmd = get_cmdline_tail( parameters )
       rbld_log.info("Going to modify \"#{env}\" with \"#{cmd}\"")
-      engine_api.modify!( env, cmd )
+      @errno = engine_api.modify!( env, cmd )
     end
   end
 end

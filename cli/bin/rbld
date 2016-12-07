@@ -26,11 +26,7 @@ begin
     exit 0
   end
 
-  Rebuild::CLI::Commands.run( ARGV[0], ARGV.drop(1) )
-  exit 0
-
-rescue Rebuild::Engine::EnvironmentExitCode => error
-  exit error.code
+  exit Rebuild::CLI::Commands.run( ARGV[0], ARGV.drop(1) ) || 0
 
 rescue RuntimeError => msg
   rbld_print.error(msg)
