@@ -7,6 +7,8 @@ require_relative 'rbld_config'
 require_relative 'rbld_utils'
 
 module Rebuild::Engine
+  extend Rebuild::Utils::Errors
+
   class NamedDockerImage
     extend Forwardable
 
@@ -268,57 +270,20 @@ module Rebuild::Engine
     attr_reader :code
   end
 
-  class UnsupportedDockerService < Rebuild::Utils::Error
-    msg_prefix 'Unsupported docker service'
-  end
-
-  class EnvironmentIsModified < Rebuild::Utils::Error
-    msg_prefix 'Environment is modified, commit or checkout first'
-  end
-
-  class EnvironmentNotKnown < Rebuild::Utils::Error
-    msg_format 'Unknown environment %s'
-  end
-
-  class NoChangesToCommit < Rebuild::Utils::Error
-    msg_format 'No changes to commit for %s'
-  end
-
-  class EnvironmentLoadFailure < Rebuild::Utils::Error
-    msg_prefix 'Failed to load environment from'
-  end
-
-  class EnvironmentSaveFailure < Rebuild::Utils::Error
-    msg_format 'Failed to save environment %s to %s'
-  end
-
-  class EnvironmentDeploymentFailure < Rebuild::Utils::Error
-    msg_prefix 'Failed to deploy from'
-  end
-
-  class EnvironmentAlreadyExists < Rebuild::Utils::Error
-    msg_format 'Environment %s already exists'
-  end
-
-  class EnvironmentNotFoundInTheRegistry < Rebuild::Utils::Error
-    msg_format 'Environment %s does not exist in the registry'
-  end
-
-  class RegistrySearchFailed < Rebuild::Utils::Error
-    msg_format 'Failed to search in %s'
-  end
-
-  class EnvironmentPublishCollision < Rebuild::Utils::Error
-    msg_format 'Environment %s already published'
-  end
-
-  class EnvironmentPublishFailure < Rebuild::Utils::Error
-    msg_prefix 'Failed to publish on'
-  end
-
-  class EnvironmentCreateFailure < Rebuild::Utils::Error
-    msg_format 'Failed to create %s'
-  end
+  rebuild_errors \
+   UnsupportedDockerService: 'Unsupported docker service: %s',
+   EnvironmentIsModified: 'Environment is modified, commit or checkout first',
+   EnvironmentNotKnown: 'Unknown environment %s',
+   NoChangesToCommit: 'No changes to commit for %s',
+   EnvironmentLoadFailure: 'Failed to load environment from %s',
+   EnvironmentSaveFailure: 'Failed to save environment %s to %s',
+   EnvironmentDeploymentFailure: 'Failed to deploy from %s',
+   EnvironmentAlreadyExists: 'Environment %s already exists',
+   EnvironmentNotFoundInTheRegistry: 'Environment %s does not exist in the registry',
+   RegistrySearchFailed: 'Failed to search in %s',
+   EnvironmentPublishCollision: 'Environment %s already published',
+   EnvironmentPublishFailure: 'Failed to publish on %s',
+   EnvironmentCreateFailure: 'Failed to create %s'
 
   class EnvironmentFile
     def initialize(filename, docker_api = Docker)

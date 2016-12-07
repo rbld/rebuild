@@ -4,23 +4,14 @@ require_relative 'rbld_utils_shared'
 module Rebuild
   module CLI
 
-    describe EnvironmentNameError do
-      it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-      it 'provides user friendly error message' do
-        expect { raise EnvironmentNameError, 'param_name' }.to \
-          raise_error("Invalid param_name, it may contain a-z, A-Z, 0-9, - and _ characters only")
-      end
-    end
-
-    describe EnvironmentNameEmpty do
-      it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-      it 'provides user friendly error message' do
-        expect { raise EnvironmentNameEmpty }.to \
-          raise_error("Environment name not specified")
-      end
-    end
+    [EnvironmentNameEmpty,
+     EnvironmentNameWithoutTagExpected,
+     EnvironmentNameError,
+     HandlerClassNameError].each do |c|
+       describe c do
+         include_examples 'rebuild error class'
+       end
+     end
 
     describe Environment do
       shared_examples 'it fetches its name' do
@@ -141,15 +132,6 @@ module Rebuild
           expect{ Environment.validate_component('new tag', 'valid-tag') }.to_not \
             raise_error
         end
-      end
-    end
-
-    describe HandlerClassNameError do
-      it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-      it 'holds name of problematic handler class' do
-        expect { raise HandlerClassNameError, 'class_name' }.to \
-          raise_error("class_name")
       end
     end
 

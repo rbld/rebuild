@@ -4,10 +4,11 @@ require_relative 'rbld_utils'
 
 module Rebuild
   module Registry
+    extend Rebuild::Utils::Errors
 
-    class EntryNameParsingError < Rebuild::Utils::Error
-      msg_prefix "Internal registry name parsing failed"
-    end
+    rebuild_errors \
+      EntryNameParsingError: 'Internal registry name parsing failed: %s',
+      APIConnectionError: 'Failed to access registry at %s'
 
     class Entry
       NAME_PFX = 're-build-env-'
@@ -33,9 +34,6 @@ module Rebuild
       attr_reader :name, :tag, :url, :wildcard
     end
 
-    class APIConnectionError < Rebuild::Utils::Error;
-    end
-
     class API
       def initialize(remote, api_accessor = DockerRegistry)
         @remote = remote
@@ -43,7 +41,7 @@ module Rebuild
         begin
           @api = api_accessor.connect("http://#{@remote}")
         rescue StandardError
-          raise APIConnectionError, "Failed to access registry at #{@remote}"
+          raise APIConnectionError, @remote
         end
       end
 

@@ -1,17 +1,13 @@
 require_relative 'rbld_utils'
 
 module Rebuild::CLI
-  class EnvironmentNameEmpty < Rebuild::Utils::Error
-    msg_prefix 'Environment name not specified'
-  end
+  extend Rebuild::Utils::Errors
 
-  class EnvironmentNameWithoutTagExpected < Rebuild::Utils::Error
-    msg_prefix 'Environment tag must not be specified'
-  end
-
-  class EnvironmentNameError < Rebuild::Utils::Error
-    msg_format 'Invalid %s, it may contain a-z, A-Z, 0-9, - and _ characters only'
-  end
+  rebuild_errors \
+    EnvironmentNameEmpty: 'Environment name not specified',
+    EnvironmentNameWithoutTagExpected: 'Environment tag must not be specified',
+    EnvironmentNameError: 'Invalid %s, it may contain a-z, A-Z, 0-9, - and _ characters only',
+    HandlerClassNameError: '%s'
 
   class Environment
     def initialize(env, opts = {})
@@ -64,9 +60,6 @@ module Rebuild::CLI
     end
   end
 
-  class HandlerClassNameError < Rebuild::Utils::Error
-  end
-
   class Commands
     extend Enumerable
 
@@ -92,7 +85,7 @@ module Rebuild::CLI
 
     def self.register_handler_class(klass)
       unless deduce_cmd_name( klass )
-        raise HandlerClassNameError, "#{klass.name}"
+        raise HandlerClassNameError, klass.name
       end
 
       @handler_classes << klass

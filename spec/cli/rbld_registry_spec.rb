@@ -4,13 +4,12 @@ require_relative 'rbld_utils_shared'
 module Rebuild
   module Registry
 
-    describe EntryNameParsingError do
-      it_behaves_like 'rebuild error class', 'Internal registry name parsing failed'
-    end
-
-    describe APIConnectionError do
-      it_behaves_like 'rebuild error class'
-    end
+    [EntryNameParsingError,
+     APIConnectionError].each do |c|
+       describe c do
+         include_examples 'rebuild error class'
+       end
+     end
 
     describe Entry do
       context 'created by name and tag' do

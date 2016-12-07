@@ -3,13 +3,23 @@ require_relative 'rbld_utils_shared'
 
 module Rebuild::Engine
 
-  describe EnvironmentExitCode do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'knows error code' do
-      expect(EnvironmentExitCode.new(1000).code).to be == 1000
-    end
-  end
+  [UnsupportedDockerService,
+   EnvironmentIsModified,
+   EnvironmentNotKnown,
+   NoChangesToCommit,
+   EnvironmentLoadFailure,
+   EnvironmentSaveFailure,
+   EnvironmentDeploymentFailure,
+   EnvironmentAlreadyExists,
+   EnvironmentNotFoundInTheRegistry,
+   RegistrySearchFailed,
+   EnvironmentPublishCollision,
+   EnvironmentPublishFailure,
+   EnvironmentCreateFailure].each do |c|
+     describe c do
+       include_examples 'rebuild error class'
+     end
+   end
 
   describe NamedDockerImage do
     let(:api_obj) { instance_double(Docker::Image) }
@@ -258,98 +268,6 @@ module Rebuild::Engine
           and_return(OpenStruct.new(info: {}))
         @obj.refresh!
       end.to change{@obj.count}.from(2).to(0)
-    end
-  end
-
-  describe UnsupportedDockerService do
-    it_behaves_like 'rebuild error class', 'Unsupported docker service'
-  end
-
-  describe EnvironmentIsModified do
-    it_behaves_like 'rebuild error class', 'Environment is modified, commit or checkout first'
-  end
-
-  describe EnvironmentNotKnown do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentNotKnown, 'param_name' }.to \
-        raise_error('Unknown environment param_name')
-    end
-  end
-
-  describe NoChangesToCommit do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise NoChangesToCommit, 'param_name' }.to \
-        raise_error('No changes to commit for param_name')
-    end
-  end
-
-  describe EnvironmentDeploymentFailure do
-    it_behaves_like 'rebuild error class', 'Failed to deploy from'
-  end
-
-  describe EnvironmentAlreadyExists do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentAlreadyExists, 'param_name' }.to \
-        raise_error('Environment param_name already exists')
-    end
-  end
-
-  describe EnvironmentNotFoundInTheRegistry do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentNotFoundInTheRegistry, 'param_name' }.to \
-        raise_error('Environment param_name does not exist in the registry')
-    end
-  end
-
-  describe EnvironmentPublishCollision do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentPublishCollision, 'param_name' }.to \
-        raise_error('Environment param_name already published')
-    end
-  end
-
-  describe EnvironmentLoadFailure do
-    it_behaves_like 'rebuild error class', 'Failed to load environment from'
-  end
-
-  describe EnvironmentPublishFailure do
-    it_behaves_like 'rebuild error class', 'Failed to publish on'
-  end
-
-  describe EnvironmentCreateFailure do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentCreateFailure, 'param_name' }.to \
-        raise_error('Failed to create param_name')
-    end
-  end
-
-  describe EnvironmentSaveFailure do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise EnvironmentSaveFailure, ['param1', 'param2'] }.to \
-        raise_error('Failed to save environment param1 to param2')
-    end
-  end
-
-  describe RegistrySearchFailed do
-    it_behaves_like 'it derives from Rebuild::Utils::Error'
-
-    it 'provides user friendly error message' do
-      expect { raise RegistrySearchFailed, 'param1' }.to \
-        raise_error('Failed to search in param1')
     end
   end
 
