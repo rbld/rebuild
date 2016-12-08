@@ -37,9 +37,16 @@ configure_sudo()
     echo "ALL ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers
 }
 
-if ! has_app sudo; then
-    # Download may fail unpredictably so we try a few times
-    dep_install sudo || dep_install sudo || dep_install sudo
-fi
+try_install_sudo()
+{
+  if ! has_app sudo; then
+    dep_install sudo
+  fi
+
+  return $(has_app sudo)
+}
+
+# Download may fail unpredictably so we try a few times
+try_install_sudo || try_install_sudo || try_install_sudo
 
 configure_sudo
