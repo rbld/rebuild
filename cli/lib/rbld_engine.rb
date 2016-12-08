@@ -420,7 +420,7 @@ module Rebuild::Engine
               sync && \
               /rebuild/re-build-env-prepare
               ENTRYPOINT ["/rebuild/re-build-entry-point"]
-            }
+            }.squeeze(' ')
     end
 
     private_class_method :new
