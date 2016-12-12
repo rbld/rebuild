@@ -3,5 +3,13 @@
 set -e
 set -x
 
-bundle install --without development
-sudo make -C cli install
+rm -f *.gem
+
+if [ "x${installed}" == "x1" ]; then
+  gem build rbld.gemspec
+  gem install ./rbld*.gem
+fi
+
+if [ "x${gem_sanity}" != "x1" ]; then
+  bundle install --with="development test"
+fi
