@@ -3,19 +3,13 @@ class RebuildConfFile
     require 'ptools'
     require 'pathname'
 
-    rbld_path = File.which("rbld")
-    fail 'Failed to find rbld executable' if rbld_path.to_s.empty?
-
-    @path_name = Pathname(rbld_path).dirname().to_path() + "/../etc/rebuild.conf"
+    @path_name = File.join( Dir.home, '.rbld', 'rebuild.conf' )
   end
 
   attr_reader :path_name
 
   def fill(content)
-    %x(sudo tee #{path_name}<<END
-#{content}
-END)
-    fail "Configuration file #{path_name} population failed" unless $?.success?
+    open(@path_name, 'w') { |f| f.write(content) }
   end
 
   def set_registry(url)

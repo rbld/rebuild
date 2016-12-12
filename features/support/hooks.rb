@@ -1,13 +1,11 @@
 Before do
   cfg_file=rebuild_conf.path_name
   cfg_file_backup=cfg_file + ".backup"
-  %x(sudo cp -p #{cfg_file} #{cfg_file_backup})
-  fail "Failed to backup config file #{cfg_file} -> #{cfg_file_backup}" unless $?.success?
+  FileUtils.cp(cfg_file, cfg_file_backup) if File.exist?(cfg_file)
 end
 
 After do
   cfg_file=rebuild_conf.path_name
   cfg_file_backup=cfg_file + ".backup"
-  %x(sudo mv #{cfg_file_backup} #{cfg_file})
-  fail "Failed to restore config file #{cfg_file_backup} -> #{cfg_file}" unless $?.success?
+  FileUtils.mv(cfg_file_backup, cfg_file) if File.exist?(cfg_file_backup)
 end

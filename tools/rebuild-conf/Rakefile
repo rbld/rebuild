@@ -1,0 +1,19 @@
+CONF_DIR = File.join( Dir.home, '.rbld' )
+RBLD_CONF = File.expand_path( 'rebuild.conf', CONF_DIR )
+
+CONF_CONTENTS = <<TEXT
+#REMOTE_NAME=origin
+#REMOTE_origin="10.0.110.110:5000"
+TEXT
+
+task default: [RBLD_CONF]
+
+file RBLD_CONF do
+  FileUtils.mkdir_p( CONF_DIR )
+
+  unless File.exist?( RBLD_CONF )
+    open(RBLD_CONF, 'w') do |f|
+      f.write CONF_CONTENTS
+    end
+  end
+end
