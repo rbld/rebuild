@@ -1,39 +1,28 @@
+os: linux
 sudo: required
 language: ruby
+services: docker
+
+rvm:
+  - 2.0.0
+  - 2.1.8
+  - 2.2.4
+  - 2.3.0
+
+env:
+  #Fast tests for installed gem
+  - installed=1 fast=1 docker_ver=1.9
+  - installed=1 fast=1 docker_ver=1.10
+  - installed=1 fast=1 docker_ver=1.11
+  - installed=1 fast=1 docker_ver=1.12.3
+  #Sanity tests on gem without development dependencies
+  - installed=1 gem_sanity=1 docker_ver=1.9
 
 matrix:
   include:
-    #Run sanity tests on gem without development dependencies
-    - rvm: 2.2.4
-      env: installed=1 gem_sanity=1 docker_ver=1.12.3
-      services: docker
     #Run fast tests on working copy
     - rvm: 2.2.4
       env: installed=0 fast=1 docker_ver=1.12.3
-      services: docker
-    #Run fast tests for installed gem on different ruby
-    #versions and the latest docker
-    - rvm: 2.0.0
-      env: installed=1 fast=1 docker_ver=1.12.3
-      services: docker
-    - rvm: 2.1.8
-      env: installed=1 fast=1 docker_ver=1.12.3
-      services: docker
-    - rvm: 2.2.4
-      env: installed=1 fast=1 docker_ver=1.12.3
-      services: docker
-    - rvm: 2.3.0
-      env: installed=1 fast=1 docker_ver=1.12.3
-      services: docker
-    #Run fast tests for installed gem on older docker versions
-    - rvm: 2.2.4
-      env: installed=1 fast=1 docker_ver=1.9
-      services: docker
-    - rvm: 2.2.4
-      env: installed=1 fast=1 docker_ver=1.10
-      services: docker
-    - rvm: 2.2.4
-      env: installed=1 fast=1 docker_ver=1.11
       services: docker
     #Run long running tests for installed gem on
     #one specific docker/ruby version pair
