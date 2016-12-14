@@ -24,11 +24,11 @@ module Rebuild
         end
 
         it 'should provide wildcard for searches' do
-          expect(obj.wildcard).to be == 're-build-env-name-rebuild-tag-tag'
+          expect(obj.wildcard).to be == 'rbe-name-rt-tag'
         end
 
         it 'should provide url repo for pulls and pushes' do
-          expect(obj.url.repo).to be == 'remote/re-build-env-name-rebuild-tag-tag'
+          expect(obj.url.repo).to be == 'remote/rbe-name-rt-tag'
         end
 
         it 'should provide url tag for pulls and pushes' do
@@ -37,7 +37,7 @@ module Rebuild
       end
 
       context 'created by internal name' do
-        let(:obj) { Entry.by_internal_name( 're-build-env-name-rebuild-tag-tag' ) }
+        let(:obj) { Entry.by_internal_name( 'rbe-name-rt-tag' ) }
 
         it 'should have correct name' do
           expect(obj.name).to be == 'name'
@@ -57,19 +57,19 @@ module Rebuild
 
       context 'created by name without tag' do
         it 'should return name-only wildcard' do
-          expect(Entry.new( 'name' ).wildcard).to be == 're-build-env-name'
+          expect(Entry.new( 'name' ).wildcard).to be == 'rbe-name'
         end
       end
 
       context 'created by empty name without tag' do
         it 'should return global wildcard' do
-          expect(Entry.new( '' ).wildcard).to be == 're-build-env-'
+          expect(Entry.new( '' ).wildcard).to be == 'rbe-'
         end
       end
 
       context 'created without name and tag' do
         it 'should return global wildcard' do
-          expect(Entry.new.wildcard).to be == 're-build-env-'
+          expect(Entry.new.wildcard).to be == 'rbe-'
         end
       end
     end
@@ -101,14 +101,14 @@ module Rebuild
 
         it 'should search registry when requested' do
           expect(@reg_obj).to \
-            receive(:search).with('re-build-env-name-rebuild-tag-tag').and_return([])
+            receive(:search).with('rbe-name-rt-tag').and_return([])
           @api_obj.search('name', 'tag')
         end
 
         it 'should return search results' do
           allow(@reg_obj).to \
-            receive(:search).and_return(['re-build-env-name1-rebuild-tag-tag1',
-                                         're-build-env-name2-rebuild-tag-tag2'])
+            receive(:search).and_return(['rbe-name1-rt-tag1',
+                                         'rbe-name2-rt-tag2'])
           res = @api_obj.search()
           expect([res.size,
                   [res[0].name, res[0].tag],

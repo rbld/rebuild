@@ -11,8 +11,8 @@ module Rebuild
       APIConnectionError: 'Failed to access registry at %s'
 
     class Entry
-      NAME_PFX = 're-build-env-'
-      TAG_PFX = '-rebuild-tag-'
+      NAME_PFX = 'rbe-'
+      TAG_PFX = '-rt-'
       private_constant :NAME_PFX, :TAG_PFX
 
       def initialize(name = nil, tag = nil, remote = nil)

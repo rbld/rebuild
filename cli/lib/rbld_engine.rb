@@ -100,11 +100,11 @@ module Rebuild::Engine
     end
 
     def identity
-      Rebuild::Utils::FullImageName.new("re-build-env-#{@env.name}", @env.tag)
+      Rebuild::Utils::FullImageName.new("rbe-#{@env.name}", @env.tag)
     end
 
     def rerun
-      "re-build-rerun-#{@env.name}-rebuild-tag-#{@env.tag}:initial"
+      "rbr-#{@env.name}-rt-#{@env.tag}:initial"
     end
 
     def running
@@ -126,13 +126,13 @@ module Rebuild::Engine
     private
 
     def container_name(type)
-      "re-build-env-#{type.to_s}-#{@env.name}-rebuild-tag-#{@env.tag}"
+      "rbe-#{type.to_s.chars.first}-#{@env.name}-rt-#{@env.tag}"
     end
   end
 
   class Environment
     def self.from_image(img_name, api_obj)
-      if match = img_name.match(/^re-build-env-(.*):(.*)/)
+      if match = img_name.match(/^rbe-(.*):(.*)/)
         new( *match.captures, NamedDockerImage.new( img_name, api_obj ) )
       else
         nil
@@ -145,7 +145,7 @@ module Rebuild::Engine
     end
 
     def attach_rerun_image(img_name, api_obj)
-      match = img_name.match(/^re-build-rerun-(.*)-rebuild-tag-(.*):initial/)
+      match = img_name.match(/^rbr-(.*)-rt-(.*):initial/)
       if my_object?( match )
         @rerun_img = NamedDockerImage.new( img_name, api_obj )
         true
@@ -183,7 +183,7 @@ module Rebuild::Engine
     end
 
     def try_attach_container(type, cont_name, api_obj)
-      match = cont_name.match(/^\/re-build-env-#{type.to_s}-(.*)-rebuild-tag-(.*)/)
+      match = cont_name.match(/^\/rbe-#{type.to_s.chars.first}-(.*)-rt-(.*)/)
       if my_object?( match )
         @cont[type] = NamedDockerContainer.new( cont_name, api_obj )
         true

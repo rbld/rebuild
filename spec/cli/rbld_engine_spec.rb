@@ -58,19 +58,19 @@ module Rebuild::Engine
     let(:obj) { NameFactory.new(env) }
 
     it 'knows how to build environment identity' do
-      expect(obj.identity.to_s).to be == 're-build-env-env:tag'
+      expect(obj.identity.to_s).to be == 'rbe-env:tag'
     end
 
     it 'knows how to call intermediate image for environment modification' do
-      expect(obj.rerun).to be == 're-build-rerun-env-rebuild-tag-tag:initial'
+      expect(obj.rerun).to be == 'rbr-env-rt-tag:initial'
     end
 
     it 'knows how container with running environment is called' do
-      expect(obj.running).to be == 're-build-env-running-env-rebuild-tag-tag'
+      expect(obj.running).to be == 'rbe-r-env-rt-tag'
     end
 
     it 'knows how container with environment modifications called' do
-      expect(obj.modified).to be == 're-build-env-dirty-env-rebuild-tag-tag'
+      expect(obj.modified).to be == 'rbe-d-env-rt-tag'
     end
 
     it 'knows host name for running environment' do
@@ -88,7 +88,7 @@ module Rebuild::Engine
     end
 
     it 'may be created for images that follow naming convention of rebuild' do
-      expect(Environment.from_image('re-build-env-name:tag', nil)).not_to be_nil
+      expect(Environment.from_image('rbe-name:tag', nil)).not_to be_nil
     end
 
     it 'may not be created for other images' do
@@ -96,13 +96,13 @@ module Rebuild::Engine
     end
 
     it 'knows if it is modified' do
-      obj = Environment.from_image('re-build-env-name:tag', nil)
-      expect { obj.attach_container('/re-build-env-dirty-name-rebuild-tag-tag', Object.new) }.to \
+      obj = Environment.from_image('rbe-name:tag', nil)
+      expect { obj.attach_container('/rbe-d-name-rt-tag', Object.new) }.to \
         change { obj.modified? }.from(false).to(true)
     end
 
     context 'when created' do
-      let(:obj) { Environment.from_image('re-build-env-name:tag', nil) }
+      let(:obj) { Environment.from_image('rbe-name:tag', nil) }
 
       it 'knows its name' do
         expect(obj.name).to be == 'name'
@@ -145,19 +145,19 @@ module Rebuild::Engine
 
       context 'attachment of container object' do
         it 'is allowed when name and tag match pattern for modified environment' do
-          expect(obj.attach_container('/re-build-env-dirty-name-rebuild-tag-tag', nil)).to be true
+          expect(obj.attach_container('/rbe-d-name-rt-tag', nil)).to be true
         end
 
         it 'is allowed when name and tag match pattern for running environment' do
-          expect(obj.attach_container('/re-build-env-running-name-rebuild-tag-tag', nil)).to be true
+          expect(obj.attach_container('/rbe-r-name-rt-tag', nil)).to be true
         end
 
         it 'is not allowed when name does not match' do
-          expect(obj.attach_container('/re-build-env-dirty-name1-rebuild-tag-tag', nil)).to be false
+          expect(obj.attach_container('/rbe-d-name1-rt-tag', nil)).to be false
         end
 
         it 'is not allowed when tag does not match' do
-          expect(obj.attach_container('/re-build-env-dirty-name-rebuild-tag-tag1', nil)).to be false
+          expect(obj.attach_container('/rbe-d-name-rt-tag1', nil)).to be false
         end
 
         it 'is not allowed when container name does not follow naming convention of rebuild' do
@@ -167,15 +167,15 @@ module Rebuild::Engine
 
       context 'attachment of re-run image' do
         it 'is allowed when name and tag match' do
-          expect(obj.attach_rerun_image('re-build-rerun-name-rebuild-tag-tag:initial', nil)).to be true
+          expect(obj.attach_rerun_image('rbr-name-rt-tag:initial', nil)).to be true
         end
 
         it 'is not allowed when name does not match' do
-          expect(obj.attach_rerun_image('re-build-rerun-name1-rebuild-tag-tag:initial', nil)).to be false
+          expect(obj.attach_rerun_image('rbr-name1-rt-tag:initial', nil)).to be false
         end
 
         it 'is not allowed when tag does not match' do
-          expect(obj.attach_rerun_image('re-build-rerun-name-rebuild-tag-tag1:initial', nil)).to be false
+          expect(obj.attach_rerun_image('rbr-name-rt-tag1:initial', nil)).to be false
         end
 
         it 'is not allowed when container name does not follow naming convention of rebuild' do
@@ -191,16 +191,16 @@ module Rebuild::Engine
       stub_const("Rebuild::Engine::MockedDocker::Container", class_double(Docker::Container))
 
       @images = [
-        OpenStruct.new(info: {'RepoTags' => ['re-build-env-name1:tag1',
-                                             're-build-rerun-name1-rebuild-tag-tag1:initial']}),
+        OpenStruct.new(info: {'RepoTags' => ['rbe-name1:tag1',
+                                             'rbr-name1-rt-tag1:initial']}),
         OpenStruct.new(info: {'RepoTags' => ['non-rebuild2']}),
-        OpenStruct.new(info: {'RepoTags' => ['re-build-env-name3:tag3']}),
+        OpenStruct.new(info: {'RepoTags' => ['rbe-name3:tag3']}),
         OpenStruct.new(info: {'RepoTags' => ['non-rebuild4',
-                                             're-build-rerun-nameX-rebuild-tag-tagX:initial']})
+                                             'rbr-nameX-rt-tagX:initial']})
       ]
 
       @containers = [
-        OpenStruct.new(info: {'Names' => ['/re-build-env-dirty-name1-rebuild-tag-tag1']}),
+        OpenStruct.new(info: {'Names' => ['/rbe-d-name1-rt-tag1']}),
         OpenStruct.new(info: {'Names' => ['/non-rebuild2']})
       ]
 
