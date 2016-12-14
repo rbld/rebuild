@@ -62,7 +62,7 @@ module Rebuild::Engine
     end
 
     it 'knows how to call intermediate image for environment modification' do
-      expect(obj.rerun).to be == 'rbr-env-rt-tag:initial'
+      expect(obj.rerun.to_s).to be == 'rbr-env-rt-tag:initial'
     end
 
     it 'knows how container with running environment is called' do

@@ -88,7 +88,8 @@ module Rebuild::Engine
     end
 
     def commit_opts(img_name)
-      {repo: img_name,
+      {repo: img_name.repo,
+       tag: img_name.tag,
        changes: ["LABEL re-build-environment=true",
                  "ENTRYPOINT [\"/rebuild/re-build-entry-point\"]"]}
     end
@@ -104,7 +105,7 @@ module Rebuild::Engine
     end
 
     def rerun
-      "rbr-#{@env.name}-rt-#{@env.tag}:initial"
+      Rebuild::Utils::FullImageName.new("rbr-#{@env.name}-rt-#{@env.tag}", 'initial')
     end
 
     def running
