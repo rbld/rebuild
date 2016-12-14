@@ -5,6 +5,8 @@
 See project WiKi at GitHub: https://github.com/daynix/rebuild/wiki
 and Living Documentation at RelishApp: http://www.relishapp.com/daynix/rebuild
 
+Rebuild CLI gem is available at https://rubygems.org/gems/rbld
+
 # Running tests
 
 rebuild test suite is based on cucumber/aruba:
