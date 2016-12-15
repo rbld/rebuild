@@ -1,0 +1,7 @@
+*                                          text=auto
+*.sh                                       text eol=lf
+cli/lib/bootstrap/re-build-bootstrap-utils text eol=lf
+cli/lib/bootstrap/re-build-entry-point     text eol=lf
+cli/lib/bootstrap/re-build-env-prepare     text eol=lf
+cli/lib/bootstrap/rebuild.rc               text eol=lf
+
