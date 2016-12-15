@@ -2,6 +2,7 @@ require 'docker'
 require 'etc'
 require 'thread'
 require 'forwardable'
+require 'os'
 require_relative 'rbld_log'
 require_relative 'rbld_config'
 require_relative 'rbld_utils'
@@ -434,6 +435,7 @@ module Rebuild::Engine
       @docker_api, @cfg = docker_api, cfg
 
       tweak_excon
+      tweak_docker_url
       check_connectivity
       @cache = PresentEnvironments.new
     end
@@ -608,6 +610,12 @@ module Rebuild::Engine
       # increased
       Excon.defaults[:write_timeout] = 600
       Excon.defaults[:read_timeout] = 600
+    end
+
+    def tweak_docker_url
+      # Default unix pipe does not work with Docker for Windows
+      # Use TCP connection instead
+      Docker.url = 'tcp://127.0.0.1:2375' if OS.windows?
     end
 
     def check_connectivity
