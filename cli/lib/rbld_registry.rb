@@ -62,8 +62,7 @@ module Rebuild
         begin
           rbld_log.info( "Pushing #{url.full}" )
           api_obj.push(nil, :repo_tag => url.full) do |log|
-            progress = JSON.parse(log)["progress"]
-            rbld_print.inplace_trace(progress) if progress
+            trace_progress( log )
           end
         ensure
           api_obj.remove( :name => url.full )
@@ -76,8 +75,7 @@ module Rebuild
         begin
           rbld_log.info( "Pulling #{url.full}" )
           img = api_class.create(:fromImage => url.full) do |log|
-            progress = JSON.parse(log)["progress"]
-            rbld_print.inplace_trace(progress) if progress
+            trace_progress( log )
           end
           yield img
         ensure
@@ -86,6 +84,14 @@ module Rebuild
       end
 
       private
+
+      def trace_progress(log_item)
+        begin
+          line = JSON.parse( log_item )["progress"]
+          rbld_print.inplace_trace( line ) if line
+        rescue
+        end
+      end
 
       def parse_entry(internal_name)
         begin
