@@ -4,28 +4,35 @@ begin
   require 'cucumber'
   require 'cucumber/rake/task'
 
-  def cucumber_opts
+  def cucumber_opts(cfg)
     %{
       --format pretty
       --strict
-      #{ENV['fast'] == '1' ? "-t ~@slow" : ""}
-      #{ENV['slow'] == '1' ? "-t @slow" : ""}
-      #{ENV['installed'] == '1' ? "-p installed" : ""}
+      #{cfg.include?(:fast) ? "-t ~@slow" : ""}
+      #{cfg.include?(:slow) ? "-t @slow" : ""}
+      #{cfg.include?(:installed) ? "-p installed" : ""}
     }
   end
 
   Cucumber::Rake::Task.new(:test) do |t|
-    t.cucumber_opts = cucumber_opts
+    t.cucumber_opts = cucumber_opts []
+  end
+
+  Cucumber::Rake::Task.new(:citest) do |t|
+    cfg = []
+    cfg << :fast if ENV['fast'] == '1'
+    cfg << :slow if ENV['slow'] == '1'
+    cfg << :installed if ENV['installed'] == '1'
+
+    t.cucumber_opts = cucumber_opts cfg
   end
 
   Cucumber::Rake::Task.new(:fasttest) do |t|
-    ENV['fast'] = '1'
-    t.cucumber_opts = cucumber_opts
+    t.cucumber_opts = cucumber_opts [:fast]
   end
 
   Cucumber::Rake::Task.new(:slowtest) do |t|
-    ENV['slow'] = '1'
-    t.cucumber_opts = cucumber_opts
+    t.cucumber_opts = cucumber_opts [:slow]
   end
 
 rescue LoadError

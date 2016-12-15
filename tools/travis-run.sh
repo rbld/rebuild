@@ -4,7 +4,7 @@ set -e
 set -x
 
 if [ "x${gem_sanity}" != "x1" ]; then
-  rake spec test
+  rake spec citest
 else
   rbld help
   rbld help list
