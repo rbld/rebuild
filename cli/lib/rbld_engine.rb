@@ -638,6 +638,14 @@ module Rebuild::Engine
       rbld_log.info( "External command returned with code #{@errno}" )
     end
 
+    def run_user_group_name
+      if group_info = Etc.getgrgid(Process.gid)
+        group_info[:name]
+      else
+        Etc.getlogin
+      end
+    end
+
     def trace_run_settings
       if ENV['RBLD_BOOTSTRAP_TRACE'] && ENV['RBLD_BOOTSTRAP_TRACE'] == '1'
         '-e REBUILD_TRACE=1'
@@ -652,7 +660,7 @@ module Rebuild::Engine
            -e REBUILD_USER_ID=#{Process.uid}                          \
            -e REBUILD_GROUP_ID=#{Process.gid}                         \
            -e REBUILD_USER_NAME=#{Etc.getlogin}                       \
-           -e REBUILD_GROUP_NAME=#{Etc.getgrgid(Process.gid)[:name]}  \
+           -e REBUILD_GROUP_NAME=#{run_user_group_name}               \
            -e REBUILD_USER_HOME=#{Dir.home}                           \
            -e REBUILD_PWD=#{Dir.pwd}                                  \
            --security-opt label:disable                               \
