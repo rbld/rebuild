@@ -428,6 +428,45 @@ module Rebuild::Engine
     private_class_method :new
   end
 
+  class RunSettings
+    def initialize
+      @group_name = get_group_name
+      @user_name = Etc.getlogin
+      @home = get_home
+      @pwd = get_pwd
+      @uid = get_uid
+      @gid = get_gid
+    end
+
+    attr_reader :group_name, :home, :pwd, :user_name, :uid, :gid
+
+    private
+
+    def get_group_name
+      if group_info = Etc.getgrgid(Process.gid)
+        group_info[:name]
+      else
+        Etc.getlogin
+      end
+    end
+
+    def get_home
+      OS.windows? ? "/home/#{Etc.getlogin}" : Dir.home
+    end
+
+    def get_pwd
+      Dir.pwd.sub(Dir.home, home)
+    end
+
+    def get_uid
+      OS.windows? ? 1000 : Process.uid
+    end
+
+    def get_gid
+      OS.windows? ? 1000 : Process.gid
+    end
+  end
+
   class API
     extend Forwardable
 
@@ -655,19 +694,20 @@ module Rebuild::Engine
     end
 
     def run_settings(env, cmd, opts = {})
-       %Q{ -i #{STDIN.tty? ? '-t' : ''}                               \
-           -v #{Dir.home}:#{Dir.home}                                 \
-           -e REBUILD_USER_ID=#{Process.uid}                          \
-           -e REBUILD_GROUP_ID=#{Process.gid}                         \
-           -e REBUILD_USER_NAME=#{Etc.getlogin}                       \
-           -e REBUILD_GROUP_NAME=#{run_user_group_name}               \
-           -e REBUILD_USER_HOME=#{Dir.home}                           \
-           -e REBUILD_PWD=#{Dir.pwd}                                  \
-           --security-opt label:disable                               \
-           #{trace_run_settings}                                      \
-           #{opts[:rerun] ? env.rerun_img.id : env.img.id}            \
-           "#{cmd.join(' ')}"                                         \
-       }
+      rs = RunSettings.new
+      %Q{ -i #{STDIN.tty? ? '-t' : ''}                      \
+          -v #{Dir.home}:#{rs.home}                         \
+          -e REBUILD_USER_ID=#{rs.uid}                      \
+          -e REBUILD_GROUP_ID=#{rs.gid}                     \
+          -e REBUILD_USER_NAME=#{rs.user_name}              \
+          -e REBUILD_GROUP_NAME=#{rs.group_name}            \
+          -e REBUILD_USER_HOME=#{rs.home}                   \
+          -e REBUILD_PWD=#{rs.pwd}                          \
+          --security-opt label:disable                      \
+          #{trace_run_settings}                             \
+          #{opts[:rerun] ? env.rerun_img.id : env.img.id}   \
+          "#{cmd.join(' ')}"                                \
+      }
     end
 
     def run_env_disposable(env, cmd)
