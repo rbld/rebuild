@@ -28,3 +28,8 @@ delete_user()
     exit 1
   fi
 }
+
+if test "x${REBUILD_TRACE}" == "x1"; then
+  set -x
+  echo Bootstrap tracing enabled
+fi

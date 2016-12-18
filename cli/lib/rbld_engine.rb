@@ -638,6 +638,14 @@ module Rebuild::Engine
       rbld_log.info( "External command returned with code #{@errno}" )
     end
 
+    def trace_run_settings
+      if ENV['RBLD_BOOTSTRAP_TRACE'] && ENV['RBLD_BOOTSTRAP_TRACE'] == '1'
+        '-e REBUILD_TRACE=1'
+      else
+        ''
+      end
+    end
+
     def run_settings(env, cmd, opts = {})
        %Q{ -i #{STDIN.tty? ? '-t' : ''}                               \
            -v #{Dir.home}:#{Dir.home}                                 \
@@ -648,6 +656,7 @@ module Rebuild::Engine
            -e REBUILD_USER_HOME=#{Dir.home}                           \
            -e REBUILD_PWD=#{Dir.pwd}                                  \
            --security-opt label:disable                               \
+           #{trace_run_settings}                                      \
            #{opts[:rerun] ? env.rerun_img.id : env.img.id}            \
            "#{cmd.join(' ')}"                                         \
        }

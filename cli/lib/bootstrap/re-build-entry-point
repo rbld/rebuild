@@ -16,9 +16,9 @@ rebuild_banner()
 
 setup_users()
 {
-  delete_user $REBUILD_USER_NAME
-  delete_group $REBUILD_USER_NAME
-  delete_group $REBUILD_GROUP_NAME
+  delete_user $REBUILD_USER_NAME 2>$DEBUG_OUTPUT
+  delete_group $REBUILD_USER_NAME 2>$DEBUG_OUTPUT
+  delete_group $REBUILD_GROUP_NAME 2>$DEBUG_OUTPUT
 
   if has_app useradd; then
 
@@ -52,7 +52,7 @@ sudo_params()
   echo "-n -H -E -g $REBUILD_GROUP_NAME -u $REBUILD_USER_NAME"
 }
 
-setup_users 2>$DEBUG_OUTPUT
+setup_users
 
 cd $REBUILD_PWD
 

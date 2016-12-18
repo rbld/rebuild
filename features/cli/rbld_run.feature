@@ -100,3 +100,14 @@ Feature: rbld run
       | status |
       |  0     |
       |  5     |
+
+  Scenario: bootstrap tracing is disabled by default
+    When I run `rbld run test-env:v001 -- echo Hi`
+    Then the output should not contain "Bootstrap tracing enabled"
+
+  Scenario: bootstrap tracing is enabled by RBLD_BOOTSTRAP_TRACE environment variable
+    Given I set the environment variables to:
+      | variable             | value |
+      | RBLD_BOOTSTRAP_TRACE | 1     |
+    When I run `rbld run test-env:v001 -- echo Hi`
+    Then the output should contain "Bootstrap tracing enabled"
