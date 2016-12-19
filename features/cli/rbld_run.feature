@@ -73,14 +73,11 @@ Feature: rbld run
   Scenario: warning printed when running modified environment
     Given environment test-env:v001 is modified
     When I run `rbld run test-env:v001 -- echo Hello world!`
-    Then it should pass with exactly:
-      """
-      WARNING: Environment is modified, running original version
-      >>> rebuild env test-env-v001
-      >>> echo Hello world!
-      Hello world!
-      <<< rebuild env test-env-v001
-      """
+    Then the output should contain "WARNING: Environment is modified, running original version"
+    And the output should contain ">>> rebuild env test-env-v001"
+    And the output should contain ">>> echo Hello world!"
+    And the output should contain "Hello world!"
+    And the output should contain "<<< rebuild env test-env-v001"
 
   Scenario: hostname of environment set to the environment name
     When I run `rbld run test-env:v001 -- hostname`
