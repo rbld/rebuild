@@ -2,7 +2,7 @@ Feature: rbld help
   As a CLI user
   I want to be able to obtain usage info with rbld help
 
-  Scenario Outline: rbld help suceeds and header is printed
+  Scenario Outline: rbld help succeeds and header is printed
     Given I run `<command>`
     Then it should pass with:
     """
