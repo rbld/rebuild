@@ -311,6 +311,7 @@ module Rebuild::Engine
     def with_gzip_writer
       begin
         File.open(@filename, 'w') do |f|
+          f.binmode
           gz = Zlib::GzipWriter.new(f)
           begin
             yield gz
