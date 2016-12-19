@@ -44,7 +44,6 @@ Feature: rbld publish
       ERROR: Failed to access registry at
       """
 
-  @slow
   Scenario Outline: publish a new environment
     Given my rebuild registry is empty
     When I run `rbld publish <environment name>`
@@ -68,7 +67,6 @@ Feature: rbld publish
       ERROR: Environment is modified, commit or checkout first
       """
 
-  @slow
   Scenario: publish environment which is already published
     Given my rebuild registry contains environment test-env1:v001
     When I run `rbld publish test-env1:v001`

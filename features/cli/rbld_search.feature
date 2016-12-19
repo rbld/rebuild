@@ -39,7 +39,6 @@ Feature: rbld search
       | registry contents                | wildcard       | should or should not contain | text           |
       | empty                            |                | should not contain           | test-env       |
 
-    @slow
     Examples: Populated registry
 
       We expect that following environments are published:

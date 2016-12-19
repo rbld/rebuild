@@ -36,7 +36,6 @@ Feature: rbld deploy
       | nonexisting         | nonexisting:initial   |
       | nonexisting:sometag | nonexisting:sometag   |
 
-  @slow
   Scenario: deploy a new environment
     Given my rebuild registry contains environment test-env1:v001
     And non-existing environment test-env1:v001
