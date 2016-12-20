@@ -29,10 +29,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'retriable', '~> 2.1', '>= 2.1.0'
   s.add_development_dependency 'rspec', '~> 3.5', '>= 3.5.0'
 
-  s.files            = (`git ls-files -- cli/lib` +
-                        `git ls-files -- cli/bin`).split("\n")
+  lib_files = `git ls-files -- cli/lib`.split("\n")
+  bin_files = ['cli/bin/rbld']
 
-  s.executables      = `git ls-files -- cli/bin`.split("\n").map{ |f| File.basename(f) }
+  s.files            = lib_files + bin_files
+  s.executables      = bin_files.map{ |f| File.basename(f) }
   s.require_path     = 'cli/lib'
   s.bindir           = 'cli/bin'
 
