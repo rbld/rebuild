@@ -54,7 +54,7 @@ sudo_params()
 
 setup_users
 
-cd $REBUILD_PWD
+cd $REBUILD_PWD 2>/dev/null
 
 . /rebuild/rebuild.rc
 
