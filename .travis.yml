@@ -14,7 +14,7 @@ env:
   - installed=1 fast=1 docker_ver=1.9
   - installed=1 fast=1 docker_ver=1.10
   - installed=1 fast=1 docker_ver=1.11
-  - installed=1 fast=1 docker_ver=1.12.3
+  - installed=1 fast=1 docker_ver=1.12
   #Sanity tests on gem without development dependencies
   - installed=1 gem_sanity=1 docker_ver=1.9
 
@@ -22,12 +22,12 @@ matrix:
   include:
     #Run fast tests on working copy
     - rvm: 2.2.4
-      env: installed=0 fast=1 docker_ver=1.12.3
+      env: installed=0 fast=1 docker_ver=1.12
       services: docker
     #Run long running tests for installed gem on
     #one specific docker/ruby version pair
     - rvm: 2.2.4
-      env: installed=1 slow=1 docker_ver=1.12.3
+      env: installed=1 slow=1 docker_ver=1.12
       services: docker
 
 notifications:
