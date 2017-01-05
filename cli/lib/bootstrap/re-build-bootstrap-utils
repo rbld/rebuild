@@ -29,7 +29,7 @@ delete_user()
   fi
 }
 
-if test "x${REBUILD_TRACE}" == "x1"; then
+if test "x${REBUILD_TRACE}" = "x1"; then
   set -x
   echo Bootstrap tracing enabled
 fi

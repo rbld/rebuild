@@ -15,6 +15,7 @@ Feature: various base images
     And the output should contain ">>> set"
     And the output should match /HOSTNAME='?test-env-base-initial'?/
     And the output should contain "<<< rebuild env test-env-base-initial"
+    And the stderr should contain exactly ""
     And the exit status should be 0
     When I run `rbld run test-env-base -- exit 5`
     Then the exit status should be 5
