@@ -7,7 +7,6 @@ module Rebuild::CLI
 
     def run(parameters)
       env = Environment.new( parameters[0] )
-      cmd = get_cmdline_tail( parameters )
       rbld_log.info("Going to deploy \"#{env}\"")
       engine_api.deploy!( env )
       rbld_print.progress "Successfully deployed #{env}\n"
