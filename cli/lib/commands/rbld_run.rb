@@ -1,5 +1,8 @@
 module Rebuild::CLI
   class RbldRunCommand < Command
+
+    include RunOptions
+
     def initialize
       @usage = [
                 { :syntax => "run [OPTIONS] [ENVIRONMENT[:TAG]]",
@@ -10,15 +13,17 @@ module Rebuild::CLI
                                   "specified environment" }
                ]
       @description = "Run command in a local environment"
+      @options = [["-p, --privileged", "Run environment with superuser privileges"]]
     end
 
     def run(parameters)
+      runopts, parameters = parse_opts( parameters )
       env = Environment.new( parameters.shift )
       cmd = get_cmdline_tail( parameters )
       rbld_log.info("Going to run \"#{cmd}\" in \"#{env}\"")
 
       warn_if_modified( env, 'running' )
-      @errno = engine_api.run( env, cmd )
+      @errno = engine_api.run( env, cmd, runopts )
     end
   end
 end

@@ -14,6 +14,7 @@ Feature: rbld run
     And help output should contain "rbld run [OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS"
     And help output should contain "Scripting mode: runs COMMANDS in the specified environment"
     And help output should contain "Run command in a local environment"
+    And help output should match "-p, --privileged.*Run environment with superuser privileges"
     And help output should match "-h, --help.*Print usage"
 
   Scenario Outline: error printed for non-existing environments
@@ -108,3 +109,18 @@ Feature: rbld run
       | RBLD_BOOTSTRAP_TRACE | 1     |
     When I run `rbld run test-env:v001 -- echo Hi`
     Then the output should contain "Bootstrap tracing enabled"
+
+  Scenario: environments do not have superuser privileges by default
+    Given a file named "test.ko" with "DUMMY"
+    When I run `rbld run test-env -- sudo insmod test.ko`
+    Then it should fail with "Operation not permitted"
+
+  Scenario Outline: environments may be run with superuser priviledges
+    Given a file named "test.ko" with "DUMMY"
+    When I run `rbld run <privileged flag> test-env -- sudo insmod test.ko`
+    Then it should fail with "invalid module format"
+
+    Examples:
+      | privileged flag |
+      | --privileged    |
+      | -p              |

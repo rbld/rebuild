@@ -185,6 +185,23 @@ END_USAGE
     end
   end
 
+  module RunOptions
+    def parse_opts(parameters)
+      replace_argv( parameters ) do
+        opts = GetoptLong.new([ '--privileged', '-p', GetoptLong::NO_ARGUMENT ])
+        runopts = {}
+        opts.each do |opt, arg|
+          case opt
+          when '--privileged'
+              runopts[:privileged] = true
+          end
+        end
+
+        return runopts, ARGV
+      end
+    end
+  end
+
   class Main
 
     def self.usage

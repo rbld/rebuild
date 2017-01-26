@@ -549,25 +549,25 @@ module Rebuild::Engine
       end
     end
 
-    def run(env_name, cmd)
+    def run(env_name, cmd, runopts = {})
       env = existing_env( env_name )
-      run_env_disposable( env, cmd )
+      run_env_disposable( env, cmd, runopts )
       @cache.refresh!
       @errno
     end
 
-    def modify!(env_name, cmd)
+    def modify!(env_name, cmd, runopts = {})
       env = existing_env( env_name )
 
       rbld_print.progress_start 'Initializing environment'
 
       if env.modified?
         rbld_log.info("Running container #{env.modification_container}")
-        rerun_modification_cont(env, cmd)
+        rerun_modification_cont(env, cmd, runopts)
       else
         rbld_log.info("Running environment #{env.img}")
         rbld_print.progress_end
-        run_env(env, cmd)
+        run_env(env, cmd, runopts)
       end
       @cache.refresh!
       @errno
@@ -706,23 +706,23 @@ module Rebuild::Engine
           -e REBUILD_PWD=#{rs.pwd}                          \
           --security-opt label:disable                      \
           #{trace_run_settings}                             \
+          #{opts[:privileged] ? "--privileged" : ""}        \
           #{opts[:rerun] ? env.rerun_img.id : env.img.id}   \
           "#{cmd.join(' ')}"                                \
       }
     end
 
-    def run_env_disposable(env, cmd)
+    def run_env_disposable(env, cmd, runopts)
       env.execution_container.remove! if env.execution_container
       names = NameFactory.new(env)
 
       cmdline = %Q{
-        docker run                           \
-             --rm                            \
-             --name #{names.running}         \
-             --hostname #{names.hostname}    \
-             #{run_settings( env, cmd )}     \
+        docker run                                    \
+             --rm                                     \
+             --name #{names.running}                  \
+             --hostname #{names.hostname}             \
+             #{run_settings( env, cmd, runopts )}     \
       }
-
       run_external( cmdline )
     end
 
@@ -739,7 +739,7 @@ module Rebuild::Engine
       run_external( cmdline )
     end
 
-    def rerun_modification_cont(env, cmd)
+    def rerun_modification_cont(env, cmd, opts = {})
       rbld_print.progress_tick
 
       names = NameFactory.new( env )
@@ -754,7 +754,7 @@ module Rebuild::Engine
 
       @cache.refresh!
 
-      run_env( @cache.get(env), cmd, rerun: true )
+      run_env( @cache.get(env), cmd, opts.merge(rerun: true) )
     end
 
     def existing_env(name)
