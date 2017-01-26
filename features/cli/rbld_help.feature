@@ -38,6 +38,7 @@ Feature: rbld help
       save
       search
       status
+      version
     """
 
     Examples:

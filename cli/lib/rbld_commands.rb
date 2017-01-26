@@ -1,5 +1,6 @@
 require_relative 'rbld_log'
 require_relative 'rbld_utils'
+require_relative 'rbld_verinfo'
 require_relative 'rbld_engine'
 
 module Rebuild::CLI

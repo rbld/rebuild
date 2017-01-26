@@ -7,6 +7,7 @@ if [ "x${gem_sanity}" != "x1" ]; then
   rake spec citest
 else
   rbld help
+  rbld version
   rbld help list
   rbld list
 fi

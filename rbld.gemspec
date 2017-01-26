@@ -31,8 +31,14 @@ Gem::Specification.new do |s|
 
   lib_files = `git ls-files -- cli/lib`.split("\n")
   bin_files = ['cli/bin/rbld']
+  ver_path = 'cli/lib/data/'
+  ver_file = ver_path + 'version'
 
-  s.files            = lib_files + bin_files
+  FileUtils.rm_rf(ver_path)
+  FileUtils.mkdir_p(ver_path)
+  File.write(ver_file, s.version)
+
+  s.files            = lib_files + bin_files + [ ver_file ]
   s.executables      = bin_files.map{ |f| File.basename(f) }
   s.require_path     = 'cli/lib'
   s.bindir           = 'cli/bin'
