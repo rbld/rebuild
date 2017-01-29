@@ -13,7 +13,7 @@ module Rebuild::CLI
                                   "specified environment" }
                ]
       @description = "Run command in a local environment"
-      @options = [["-p, --privileged", "Run environment with superuser privileges"]]
+      @options = opts_text
     end
 
     def run(parameters)

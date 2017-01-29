@@ -186,6 +186,10 @@ END_USAGE
   end
 
   module RunOptions
+    def opts_text
+      [["-p, --privileged", "Run environment with superuser privileges"]]
+    end
+
     def parse_opts(parameters)
       replace_argv( parameters ) do
         opts = GetoptLong.new([ '--privileged', '-p', GetoptLong::NO_ARGUMENT ])
