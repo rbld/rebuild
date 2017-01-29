@@ -1,7 +1,7 @@
 require 'singleton'
 require 'docker_registry2'
 
-class BaseTestRegistry
+class BaseDockerRegistry
   REGISTRY_BASE="rbld_populated_test_registry"
   REGISTRY_HOST="127.0.0.1"
   private_constant :REGISTRY_BASE, :REGISTRY_HOST
@@ -89,7 +89,7 @@ class BaseTestRegistry
   end
 end
 
-class UnaccessibleTestRegistry
+class UnaccessibleDockerRegistry
   include Singleton
 
   def use
@@ -97,22 +97,22 @@ class UnaccessibleTestRegistry
   end
 end
 
-class PopulatedTestRegistry < BaseTestRegistry
+class PopulatedDockerRegistry < BaseDockerRegistry
   include Singleton
 
   def initialize
     super
-    at_exit { PopulatedTestRegistry.instance.kill_registry }
+    at_exit { PopulatedDockerRegistry.instance.kill_registry }
     populate_registry()
   end
 end
 
-class EmptyTestRegistry < BaseTestRegistry
+class EmptyDockerRegistry < BaseDockerRegistry
   include Singleton
 
   def initialize
     super
-    at_exit { EmptyTestRegistry.instance.kill_registry }
+    at_exit { EmptyDockerRegistry.instance.kill_registry }
   end
 
   def use

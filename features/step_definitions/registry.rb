@@ -1,7 +1,7 @@
 Around do |scenario, block|
-  registries = [{ :empty        => EmptyTestRegistry,
-                  :populated    => PopulatedTestRegistry,
-                  :unaccessible => UnaccessibleTestRegistry }]
+  registries = [{ :empty        => EmptyDockerRegistry,
+                  :populated    => PopulatedDockerRegistry,
+                  :unaccessible => UnaccessibleDockerRegistry }]
 
   registries.each do |registry|
     @registry = registry
