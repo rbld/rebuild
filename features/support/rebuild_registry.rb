@@ -89,6 +89,14 @@ class BaseTestRegistry
   end
 end
 
+class UnaccessibleTestRegistry
+  include Singleton
+
+  def use
+    RebuildConfFile.new.set_registry("127.0.0.1:65536")
+  end
+end
+
 class PopulatedTestRegistry < BaseTestRegistry
   include Singleton
 
