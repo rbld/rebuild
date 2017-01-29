@@ -15,15 +15,15 @@ Feature: rbld deploy
       ERROR: Remote not defined
       """
 
-    Scenario: remote registry is not accessible
-      Given remote registry is not accessible
-      When I run `rbld deploy some-env:some-tag`
-      Then it should fail with:
-        """
-        ERROR: Failed to access registry at
-        """
+  Scenario: remote registry is not accessible
+    Given remote registry is not accessible
+    When I run `rbld deploy some-env:some-tag`
+    Then it should fail with:
+      """
+      ERROR: Failed to access registry at
+      """
 
-    Scenario Outline: deploy environment that does not exist in the registry
+  Scenario Outline: deploy environment that does not exist in the registry
     Given my rebuild registry is empty
     When I run `rbld deploy <environment name>`
     Then it should fail with:
