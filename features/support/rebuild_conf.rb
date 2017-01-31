@@ -14,10 +14,11 @@ class RebuildConfFile
     open(@path_name, 'w') { |f| f.write(content) }
   end
 
-  def set_registry(url)
+  def set_registry(type, path)
     fill %Q{
         REMOTE_NAME=origin
-        REMOTE_origin="#{url}"
+        REMOTE_TYPE_origin="#{type}"
+        REMOTE_origin="#{path}"
       }
   end
 end

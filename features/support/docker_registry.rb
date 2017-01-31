@@ -30,7 +30,7 @@ class BaseDockerRegistry
 
   def create_registry
     run_registry()
-    @rebuild_conf.set_registry("#{REGISTRY_HOST}:#{@registry_port}")
+    @rebuild_conf.set_registry(:docker, "#{REGISTRY_HOST}:#{@registry_port}")
   end
 
   def run_registry_container
@@ -85,7 +85,7 @@ class BaseDockerRegistry
   end
 
   def use
-    @rebuild_conf.set_registry("#{REGISTRY_HOST}:#{@registry_port}")
+    @rebuild_conf.set_registry(:docker, "#{REGISTRY_HOST}:#{@registry_port}")
   end
 end
 
@@ -93,7 +93,7 @@ class UnaccessibleDockerRegistry
   include Singleton
 
   def use
-    RebuildConfFile.new.set_registry("127.0.0.1:65536")
+    RebuildConfFile.new.set_registry(:docker, "127.0.0.1:65536")
   end
 end
 
