@@ -501,13 +501,13 @@ module Rebuild::Engine
     end
 
     def search(env_name)
-      rbld_print.progress "Searching in #{@cfg.remote!}..."
+      rbld_print.progress "Searching in #{@cfg.remote!.path}..."
 
       begin
         registry.search( env_name.name, env_name.tag )
       rescue => msg
         rbld_print.trace( msg )
-        raise RegistrySearchFailed, @cfg.remote!
+        raise RegistrySearchFailed, @cfg.remote!.path
       end
     end
 
@@ -517,7 +517,7 @@ module Rebuild::Engine
       raise EnvironmentNotFoundInTheRegistry, env_name.full \
         if registry.search( env_name.name, env_name.tag ).empty?
 
-      rbld_print.progress "Deploying from #{@cfg.remote!}..."
+      rbld_print.progress "Deploying from #{@cfg.remote!.path}..."
 
       begin
        registry.deploy( env_name.name, env_name.tag ) do |img|
@@ -526,7 +526,7 @@ module Rebuild::Engine
        end
       rescue => msg
        rbld_print.trace( msg )
-       raise EnvironmentDeploymentFailure, @cfg.remote!
+       raise EnvironmentDeploymentFailure, @cfg.remote!.path
       end
 
       @cache.refresh!
@@ -541,11 +541,11 @@ module Rebuild::Engine
          unless registry.search( env_name.name, env_name.tag ).empty?
 
       begin
-        rbld_print.progress "Publishing on #{@cfg.remote!}..."
+        rbld_print.progress "Publishing on #{@cfg.remote!.path}..."
         registry.publish( env.name, env.tag, env.img.api_obj )
       rescue => msg
         rbld_print.trace( msg )
-        raise EnvironmentPublishFailure, @cfg.remote!
+        raise EnvironmentPublishFailure, @cfg.remote!.path
       end
     end
 
@@ -667,7 +667,7 @@ module Rebuild::Engine
     end
 
     def registry
-      @registry ||= Rebuild::Registry::API.new( @cfg.remote! )
+      @registry ||= Rebuild::Registry::API.new( @cfg.remote!.path )
       @registry
     end
 
