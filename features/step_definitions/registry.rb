@@ -1,5 +1,8 @@
+require 'colorize'
+
 Around do |scenario, block|
-  registries = [{ :empty        => EmptyDockerRegistry,
+  registries = [{ :type         => :docker,
+                  :empty        => EmptyDockerRegistry,
                   :populated    => PopulatedDockerRegistry,
                   :unaccessible => UnaccessibleDockerRegistry }]
 
@@ -7,6 +10,12 @@ Around do |scenario, block|
     @registry = registry
     block.call
     break unless @test_all_registries
+  end
+end
+
+After do |scenario|
+  if scenario.failed? && @test_all_registries
+    puts "== Failed with #{@registry[:type]} registry ==".red
   end
 end
 
