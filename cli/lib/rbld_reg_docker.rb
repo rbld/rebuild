@@ -4,6 +4,7 @@ require_relative 'rbld_utils'
 
 module Rebuild
   module Registry
+  module Docker
     extend Rebuild::Utils::Errors
 
     rebuild_errors \
@@ -69,7 +70,7 @@ module Rebuild
         end
       end
 
-      def deploy(name, tag, api_class = Docker::Image)
+      def deploy(name, tag, api_class = ::Docker::Image)
         url = Entry.new( name, tag, @remote ).url
 
         begin
@@ -102,5 +103,6 @@ module Rebuild
         end
       end
     end
+  end
   end
 end

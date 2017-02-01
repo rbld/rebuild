@@ -7,7 +7,7 @@ require_relative 'rbld_log'
 require_relative 'rbld_config'
 require_relative 'rbld_utils'
 require_relative 'rbld_print'
-require_relative 'rbld_registry'
+require_relative 'rbld_reg_docker'
 require_relative 'rbld_fileops'
 
 module Rebuild::Engine
@@ -611,7 +611,7 @@ module Rebuild::Engine
     end
 
     def registry
-      @registry ||= Rebuild::Registry::API.new( @cfg.remote!.path )
+      @registry ||= Rebuild::Registry::Docker::API.new( @cfg.remote!.path )
     end
 
     def run_external(cmdline)

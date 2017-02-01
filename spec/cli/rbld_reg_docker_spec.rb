@@ -1,8 +1,9 @@
-require_relative '../../cli/lib/rbld_registry'
+require_relative '../../cli/lib/rbld_reg_docker'
 require_relative 'rbld_utils_shared'
 
 module Rebuild
   module Registry
+  module Docker
 
     [EntryNameParsingError,
      APIConnectionError].each do |c|
@@ -181,7 +182,7 @@ module Rebuild
         before :each do
           reg_class = class_double('DockerRegistry')
           expect(reg_class).to receive(:connect).and_return(nil)
-          @rbld_reg_obj = Rebuild::Registry::API.new( 'reg_url', reg_class )
+          @rbld_reg_obj = Rebuild::Registry::Docker::API.new( 'reg_url', reg_class )
           @api_obj = class_double('Docker::Image')
           @img_obj = instance_double('Docker::Image')
         end
@@ -220,5 +221,6 @@ module Rebuild
 
       end
     end
+  end
   end
 end
