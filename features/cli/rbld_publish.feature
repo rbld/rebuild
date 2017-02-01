@@ -38,6 +38,11 @@ Feature: rbld publish
       ERROR: Failed to access registry at
       """
 
+  Scenario: remote registry type in not known
+    Given remote registry type is "__DUMMY__"
+    When I run `rbld publish test-env1:v001`
+    Then it should fail with "ERROR: Remote type __DUMMY__ is unknown"
+
   Scenario Outline: publish a new environment
     Given existing environment <full environment name>
     And my rebuild registry is empty

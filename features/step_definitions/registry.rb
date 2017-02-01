@@ -53,3 +53,11 @@ Given /^my rebuild registry contains (environment #{ENV_NAME_REGEX})$/ do |env|
   env.ensure_not_modified
   env.ensure_published
 end
+
+Given(/^remote registry type is "([^"]*)"$/) do |type|
+  rebuild_conf.fill %Q{
+    REMOTE_NAME=origin
+    REMOTE_TYPE_origin="#{type}"
+    REMOTE_origin="__#{type}__path__"
+  }
+end

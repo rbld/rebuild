@@ -17,6 +17,12 @@ Feature: rbld search
       ERROR: Remote not defined
       """
 
+  Scenario: remote registry type in not known
+    Given remote registry type is "__DUMMY__"
+    When I run `rbld search some-env`
+    Then the output should contain "Remote type __DUMMY__ is unknown"
+    And it should fail with "ERROR: Failed to search in "
+
   Scenario: remote registry is not accessible
     Given remote registry is not accessible
     When I run `rbld search`
