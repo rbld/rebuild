@@ -1,4 +1,4 @@
-require_relative '../../cli/lib/rbld_registry'
+require_relative '../../cli/lib/rbld_utils'
 
 module Rebuild
   module Utils
