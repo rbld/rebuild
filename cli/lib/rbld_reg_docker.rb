@@ -55,8 +55,9 @@ module Rebuild
         end.compact
       end
 
-      def publish(name, tag, api_obj)
+      def publish(name, tag, img)
         url = Entry.new( name, tag, @remote ).url
+        api_obj = img.api_obj
 
         api_obj.tag( repo: url.repo, tag: url.tag )
 

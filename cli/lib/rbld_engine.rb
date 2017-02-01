@@ -8,6 +8,7 @@ require_relative 'rbld_config'
 require_relative 'rbld_utils'
 require_relative 'rbld_print'
 require_relative 'rbld_reg_docker'
+require_relative 'rbld_reg_fs'
 require_relative 'rbld_fileops'
 
 module Rebuild::Engine
@@ -486,7 +487,7 @@ module Rebuild::Engine
 
       begin
         rbld_print.progress "Publishing on #{@cfg.remote!.path}..."
-        registry.publish( env.name, env.tag, env.img.api_obj )
+        registry.publish( env.name, env.tag, env.img )
       rescue => msg
         rbld_print.trace( msg )
         raise EnvironmentPublishFailure, @cfg.remote!.path
@@ -611,7 +612,18 @@ module Rebuild::Engine
     end
 
     def registry
-      @registry ||= Rebuild::Registry::Docker::API.new( @cfg.remote!.path )
+      return @registry if @registry
+
+      case @cfg.remote!.type
+      when 'docker'
+        reg_module = Rebuild::Registry::Docker
+      when 'rebuild'
+        reg_module = Rebuild::Registry::FS
+      else
+        raise "Remote type #{@cfg.remote!.type} is unknown"
+      end
+
+      @registry = reg_module::API.new( @cfg.remote!.path )
     end
 
     def run_external(cmdline)

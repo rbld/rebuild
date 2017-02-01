@@ -6,7 +6,7 @@ class BaseFSRegistry
   def recreate_registry
     FileUtils.rm_rf(@registry_path)
     FileUtils.mkdir_p(@registry_path)
-    @rebuild_conf.set_registry(:fs,  @registry_path)
+    @rebuild_conf.set_registry(:rebuild,  @registry_path)
   end
 
   public
@@ -27,7 +27,7 @@ class BaseFSRegistry
   end
 
   def use
-    @rebuild_conf.set_registry(:fs,  @registry_path)
+    @rebuild_conf.set_registry(:rebuild,  @registry_path)
   end
 end
 
@@ -35,7 +35,7 @@ class UnaccessibleFSRegistry
   include Singleton
 
   def use
-    RebuildConfFile.new.set_registry(:fs, '/non/existing/path')
+    RebuildConfFile.new.set_registry(:rebuild, '/non/existing/path')
   end
 end
 

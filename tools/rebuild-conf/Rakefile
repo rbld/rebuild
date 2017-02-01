@@ -2,8 +2,19 @@ CONF_DIR = File.join( Dir.home, '.rbld' )
 RBLD_CONF = File.expand_path( 'rebuild.conf', CONF_DIR )
 
 CONF_CONTENTS = <<TEXT
+#This is a sample config file for Rebuild
+#Uncomment and adjust following lines
+#according to your registry configuration
+
+#For Docker registries
 #REMOTE_NAME=origin
+#REMOTE_TYPE_origin="docker"
 #REMOTE_origin="10.0.110.110:5000"
+
+#For native Rebuild registry
+#REMOTE_NAME=origin
+#REMOTE_TYPE_origin="rebuild"
+#REMOTE_origin="/mnt/rbld_regsitry_root"
 TEXT
 
 task default: [RBLD_CONF]

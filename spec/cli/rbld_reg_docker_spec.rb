@@ -129,48 +129,55 @@ module Rebuild
         let(:url) { Entry.new( 'name', 'tag', 'reg_url' ).url }
         let(:rbld_reg_obj) { API.new( 'reg_url',
                              class_double('DockerRegistry').as_null_object ) }
+        let(:img) { instance_double('Rebuild::Engine::NamedDockerImage') }
 
         it 'should tag, push and untag underlying docker image on publish' do
           api_obj = instance_double('Docker::Image').as_null_object
+          allow(img).to receive(:api_obj).and_return(api_obj)
 
           expect(api_obj).to receive(:tag).ordered
           expect(api_obj).to receive(:push).ordered
           expect(api_obj).to receive(:remove).ordered
 
-          rbld_reg_obj.publish('name', 'tag', api_obj)
+          rbld_reg_obj.publish('name', 'tag', img)
         end
 
         it 'should tag docker image on publish' do
           api_null_obj = instance_double('Docker::Image').as_null_object
+          allow(img).to receive(:api_obj).and_return(api_null_obj)
           expect(api_null_obj).to receive(:tag).with(repo: url.repo, tag: url.tag)
-          rbld_reg_obj.publish('name', 'tag', api_null_obj)
+          rbld_reg_obj.publish('name', 'tag', img)
         end
 
         it 'should push docker image on publish' do
           api_null_obj = instance_double('Docker::Image').as_null_object
+          allow(img).to receive(:api_obj).and_return(api_null_obj)
           expect(api_null_obj).to receive(:push).with(nil, repo_tag: url.full)
-          rbld_reg_obj.publish('name', 'tag', api_null_obj)
+          rbld_reg_obj.publish('name', 'tag', img)
         end
 
         it 'should untag docker image on publish' do
           api_null_obj = instance_double('Docker::Image').as_null_object
+          allow(img).to receive(:api_obj).and_return(api_null_obj)
           expect(api_null_obj).to receive(:remove).with(name: url.full)
-          rbld_reg_obj.publish('name', 'tag', api_null_obj)
+          rbld_reg_obj.publish('name', 'tag', img)
         end
 
         it 'should clean temporary tag on push failure' do
           api_null_obj = instance_double('Docker::Image').as_null_object
+          allow(img).to receive(:api_obj).and_return(api_null_obj)
           allow(api_null_obj).to receive(:push).and_raise(StandardError)
           expect(api_null_obj).to receive(:remove).with(name: url.full)
-          expect{ rbld_reg_obj.publish('name', 'tag', api_null_obj) }.to \
+          expect{ rbld_reg_obj.publish('name', 'tag', img) }.to \
             raise_error(StandardError)
         end
 
         it 'should not clean temporary tag on pre-push failure' do
           api_obj = instance_double('Docker::Image')
+          allow(img).to receive(:api_obj).and_return(api_obj)
           allow(api_obj).to receive(:tag).and_raise(StandardError)
           expect(api_obj).not_to receive(:remove)
-          expect{ rbld_reg_obj.publish('name', 'tag', api_obj) }.to \
+          expect{ rbld_reg_obj.publish('name', 'tag', img) }.to \
             raise_exception(StandardError)
         end
 
