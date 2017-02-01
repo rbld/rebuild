@@ -668,7 +668,6 @@ module Rebuild::Engine
 
     def registry
       @registry ||= Rebuild::Registry::API.new( @cfg.remote!.path )
-      @registry
     end
 
     def run_external(cmdline)
