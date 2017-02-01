@@ -4,7 +4,11 @@ Around do |scenario, block|
   registries = [{ :type         => :docker,
                   :empty        => EmptyDockerRegistry,
                   :populated    => PopulatedDockerRegistry,
-                  :unaccessible => UnaccessibleDockerRegistry }]
+                  :unaccessible => UnaccessibleDockerRegistry },
+                { :type         => :FS,
+                  :empty        => EmptyFSRegistry,
+                  :populated    => PopulatedFSRegistry,
+                  :unaccessible => UnaccessibleFSRegistry }]
 
   registries.each do |registry|
     @registry = registry
