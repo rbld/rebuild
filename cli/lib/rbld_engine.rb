@@ -8,6 +8,7 @@ require_relative 'rbld_config'
 require_relative 'rbld_utils'
 require_relative 'rbld_print'
 require_relative 'rbld_registry'
+require_relative 'rbld_fileops'
 
 module Rebuild::Engine
   extend Rebuild::Utils::Errors
@@ -271,8 +272,6 @@ module Rebuild::Engine
    EnvironmentIsModified: 'Environment is modified, commit or checkout first',
    EnvironmentNotKnown: 'Unknown environment %s',
    NoChangesToCommit: 'No changes to commit for %s',
-   EnvironmentLoadFailure: 'Failed to load environment from %s',
-   EnvironmentSaveFailure: 'Failed to save environment %s to %s',
    EnvironmentDeploymentFailure: 'Failed to deploy from %s',
    EnvironmentAlreadyExists: 'Environment %s already exists',
    EnvironmentNotFoundInTheRegistry: 'Environment %s does not exist in the registry',
@@ -280,61 +279,6 @@ module Rebuild::Engine
    EnvironmentPublishCollision: 'Environment %s already published',
    EnvironmentPublishFailure: 'Failed to publish on %s',
    EnvironmentCreateFailure: 'Failed to create %s'
-
-  class EnvironmentFile
-    def initialize(filename, docker_api = Docker)
-      @filename, @docker_api = filename, docker_api
-    end
-
-    def load!
-      begin
-        with_gzip_reader { |gz| Docker::Image.load(gz) }
-      rescue => msg
-        rbld_print.trace( msg )
-        raise EnvironmentLoadFailure, @filename
-      end
-    end
-
-    def save!(name, identity)
-      begin
-        with_gzip_writer do |gz|
-          Docker::Image.save_stream( identity ) { |chunk| gz.write chunk }
-        end
-      rescue => msg
-        rbld_print.trace( msg )
-        raise EnvironmentSaveFailure, [name, @filename]
-      end
-    end
-
-    private
-
-    def with_gzip_writer
-      begin
-        File.open(@filename, 'w') do |f|
-          f.binmode
-          gz = Zlib::GzipWriter.new(f)
-          begin
-            yield gz
-          ensure
-            gz.close
-          end
-        end
-      rescue
-        FileUtils::safe_unlink( @filename )
-        raise
-      end
-    end
-
-    def with_gzip_reader
-      Zlib::GzipReader.open( @filename ) do |gz|
-        begin
-          yield gz
-        ensure
-          gz.close
-        end
-      end
-    end
-  end
 
   class DockerContext
     def self.from_file(file)
