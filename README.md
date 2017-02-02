@@ -6,7 +6,9 @@
 * Project WiKi at GitHub: https://github.com/rbld/rebuild/wiki
 * Living Documentation at RelishApp: http://www.relishapp.com/rbld/rebuild
 
-Rebuild CLI gem is available at https://rubygems.org/gems/rbld
+# Rebuild CLI gem
+
+* Available at RubyGems: https://rubygems.org/gems/rbld
 
 # Running tests
 
