@@ -18,9 +18,6 @@ rebuild test suite is based on cucumber/aruba:
   * `cucmber -p installed` to run tests using installed binaries
   * `cucumber -t ~@slow` to exclude slow tests
 
-# Living Documentation by Relish:
-
-
 ---
 
     Rebuild is licensed under the Apache License, Version 2.0.
