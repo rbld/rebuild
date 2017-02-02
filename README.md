@@ -3,8 +3,8 @@
 
 # Project documentation
 
-See project WiKi at GitHub: https://github.com/daynix/rebuild/wiki
-and Living Documentation at RelishApp: http://www.relishapp.com/daynix/rebuild
+* Project WiKi at GitHub: https://github.com/rbld/rebuild/wiki
+* Living Documentation at RelishApp: http://www.relishapp.com/rbld/rebuild
 
 Rebuild CLI gem is available at https://rubygems.org/gems/rbld
 
