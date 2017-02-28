@@ -5,6 +5,10 @@ require_relative 'rbld_utils'
 module Rebuild
   module Registry
   module Docker
+    extend Rebuild::Utils::Errors
+
+    rebuild_error RegistryOperationError: nil
+
     module EnvironmentImage
       def self.publish(img, target_url)
         api_obj = img.api_obj
@@ -14,7 +18,7 @@ module Rebuild
         begin
           rbld_log.info( "Pushing #{target_url.full}" )
           api_obj.push(nil, :repo_tag => target_url.full) do |log|
-            trace_progress( log )
+            process_log( log )
           end
         ensure
           api_obj.remove( :name => target_url.full )
@@ -25,7 +29,7 @@ module Rebuild
         begin
           rbld_log.info( "Pulling #{source_url.full}" )
           img = api_class.create(:fromImage => source_url.full) do |log|
-            trace_progress( log )
+            process_log( log )
           end
           yield img
         ensure
@@ -35,12 +39,22 @@ module Rebuild
 
       private
 
-      def self.trace_progress(log_item)
+      def self.process_log(log_item)
         begin
-          line = JSON.parse( log_item )["progress"]
-          rbld_print.inplace_trace( line ) if line
+          json = JSON.parse( log_item )
         rescue
+        else
+          trace_progress( json['progress'] )
+          raise_error( json['errorDetail'] )
         end
+      end
+
+      def self.trace_progress(line)
+        rbld_print.inplace_trace( line ) if line
+      end
+
+      def self.raise_error(line)
+        raise RegistryOperationError, line['message'] if line
       end
 
     end
