@@ -9,7 +9,7 @@ class BaseDockerRegistry
   private
 
   def registry_connect!
-    DockerRegistry.connect("http://#{REGISTRY_HOST}:#{@registry_port}")
+    DockerRegistry2.connect("http://#{REGISTRY_HOST}:#{@registry_port}")
   end
 
   public

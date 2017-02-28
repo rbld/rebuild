@@ -36,7 +36,7 @@ module Rebuild
     end
 
     class API
-      def initialize(remote, api_accessor = DockerRegistry)
+      def initialize(remote, api_accessor = DockerRegistry2)
         @remote = remote
         rbld_log.info( "Connecting to registry #{@remote}" )
         begin

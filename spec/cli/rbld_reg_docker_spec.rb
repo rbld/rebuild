@@ -77,7 +77,7 @@ module Rebuild
 
     describe API do
       describe '#new' do
-        let(:reg_class) { class_double('DockerRegistry') }
+        let(:reg_class) { class_double('DockerRegistry2') }
 
         it 'should connect to registry on construction' do
           expect(reg_class).to receive(:connect).with('http://reg_url')
@@ -86,7 +86,7 @@ module Rebuild
 
         it 'should raise an exception on construction when registry is unaccessible' do
           allow(reg_class).to \
-            receive(:connect).and_raise(DockerRegistry::RegistryUnknownException)
+            receive(:connect).and_raise(DockerRegistry2::RegistryUnknownException)
           expect { API.new( 'reg_url', @reg_class ) }.to \
             raise_exception( APIConnectionError, 'Failed to access registry at reg_url' )
         end
@@ -94,8 +94,8 @@ module Rebuild
 
       describe '#search' do
         before :each do
-          reg_class = class_double('DockerRegistry')
-          @reg_obj = instance_double('DockerRegistry::Registry')
+          reg_class = class_double('DockerRegistry2')
+          @reg_obj = instance_double('DockerRegistry2::Registry')
           allow(reg_class).to receive(:connect).and_return(@reg_obj)
           @api_obj = API.new( 'reg_url', reg_class )
         end
@@ -128,7 +128,7 @@ module Rebuild
       describe '#publish' do
         let(:url) { Entry.new( 'name', 'tag', 'reg_url' ).url }
         let(:rbld_reg_obj) { API.new( 'reg_url',
-                             class_double('DockerRegistry').as_null_object ) }
+                             class_double('DockerRegistry2').as_null_object ) }
         let(:img) { instance_double('Rebuild::Engine::NamedDockerImage') }
 
         it 'should tag, push and untag underlying docker image on publish' do
@@ -187,7 +187,7 @@ module Rebuild
         let(:url) { Entry.new( 'name', 'tag', 'reg_url' ).url }
 
         before :each do
-          reg_class = class_double('DockerRegistry')
+          reg_class = class_double('DockerRegistry2')
           expect(reg_class).to receive(:connect).and_return(nil)
           @rbld_reg_obj = Rebuild::Registry::Docker::API.new( 'reg_url', reg_class )
           @api_obj = class_double('Docker::Image')
