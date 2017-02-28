@@ -1,6 +1,7 @@
 require 'docker_registry2'
 require_relative 'rbld_log'
 require_relative 'rbld_utils'
+require_relative 'rbld_dockerops'
 
 module Rebuild
   module Registry
@@ -57,32 +58,12 @@ module Rebuild
 
       def publish(name, tag, img)
         url = Entry.new( name, tag, @remote ).url
-        api_obj = img.api_obj
-
-        api_obj.tag( repo: url.repo, tag: url.tag )
-
-        begin
-          rbld_log.info( "Pushing #{url.full}" )
-          api_obj.push(nil, :repo_tag => url.full) do |log|
-            trace_progress( log )
-          end
-        ensure
-          api_obj.remove( :name => url.full )
-        end
+        EnvironmentImage.publish( img, url )
       end
 
       def deploy(name, tag, api_class = ::Docker::Image)
         url = Entry.new( name, tag, @remote ).url
-
-        begin
-          rbld_log.info( "Pulling #{url.full}" )
-          img = api_class.create(:fromImage => url.full) do |log|
-            trace_progress( log )
-          end
-          yield img
-        ensure
-          img.remove( :name => url.full ) if img
-        end
+        EnvironmentImage.deploy( url, api_class ) { |img| yield img }
       end
 
       private
