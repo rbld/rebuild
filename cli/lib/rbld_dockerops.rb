@@ -40,16 +40,28 @@ module Rebuild
         end
       end
 
+      def get_credential(name, is_secret = false)
+        print "#{name}: "
+        predefined = ENV["RBLD_CREDENTIAL_#{name.upcase}"]
+        if predefined
+          puts "<environment>"
+          predefined
+        else
+          is_secret ? gets_password : STDIN.gets.chomp
+        end
+      end
+
+      def get_secret_credential(name)
+        get_credential( name, true )
+      end
+
       def do_login
         puts
         puts "Login required"
         puts
-        print "Username: "
-        user = STDIN.gets.chomp
-        print "Email: "
-        email = STDIN.gets.chomp
-        print "Password: "
-        pwd = gets_password
+        user = get_credential('Username')
+        email = get_credential('Email')
+        pwd = get_secret_credential('Password')
         @api_module.creds = { 'username' => user,
                               'password' => pwd,
                               'email' => email }
