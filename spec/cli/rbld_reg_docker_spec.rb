@@ -192,6 +192,8 @@ module Rebuild
           @rbld_reg_obj = Rebuild::Registry::Docker::API.new( 'reg_url', reg_class )
           @api_obj = class_double('Docker::Image')
           @img_obj = instance_double('Docker::Image')
+          @api_module = class_double('Docker')
+          @api_module::Image = @api_obj
         end
 
         it 'should pull corresponding docker image on deploy' do
@@ -200,20 +202,20 @@ module Rebuild
             with(fromImage: url.full).
             and_return(@img_obj.as_null_object)
 
-          @rbld_reg_obj.deploy('name', 'tag', @api_obj) {}
+          @rbld_reg_obj.deploy('name', 'tag', @api_module) {}
         end
 
         it 'should delete remote tag from the pulled image' do
           allow(@api_obj).to receive(:create).and_return(@img_obj)
           expect(@img_obj).to receive(:remove).with(name: url.full)
 
-          @rbld_reg_obj.deploy('name', 'tag', @api_obj) {}
+          @rbld_reg_obj.deploy('name', 'tag', @api_module) {}
         end
 
         it 'should yield pulled image to the caller' do
           allow(@api_obj).to receive(:create).and_return(@img_obj.as_null_object)
 
-          @rbld_reg_obj.deploy('name', 'tag', @api_obj) do |img|
+          @rbld_reg_obj.deploy('name', 'tag', @api_module) do |img|
             expect(img).to be_eql @img_obj.as_null_object
           end
         end
@@ -222,7 +224,7 @@ module Rebuild
           allow(@api_obj).to receive(:create).and_return(@img_obj)
           expect(@img_obj).to receive(:remove).with(name: url.full)
 
-          expect{@rbld_reg_obj.deploy('name', 'tag', @api_obj) { raise StandardError }}.to \
+          expect{@rbld_reg_obj.deploy('name', 'tag', @api_module) { raise StandardError }}.to \
             raise_exception(StandardError)
         end
 

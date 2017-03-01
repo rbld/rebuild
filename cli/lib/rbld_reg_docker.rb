@@ -58,12 +58,12 @@ module Rebuild
 
       def publish(name, tag, img)
         url = Entry.new( name, tag, @remote ).url
-        EnvironmentImage.publish( img, url )
+        EnvironmentImage.new.publish( img, url )
       end
 
-      def deploy(name, tag, api_class = ::Docker::Image)
+      def deploy(name, tag, api_module = ::Docker)
         url = Entry.new( name, tag, @remote ).url
-        EnvironmentImage.deploy( url, api_class ) { |img| yield img }
+        EnvironmentImage.new(api_module).deploy( url ) { |img| yield img }
       end
 
       private
