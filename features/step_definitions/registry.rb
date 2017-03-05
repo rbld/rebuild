@@ -8,7 +8,11 @@ Around do |scenario, block|
                 { :type         => :FS,
                   :empty        => EmptyFSRegistry,
                   :populated    => PopulatedFSRegistry,
-                  :unaccessible => UnaccessibleFSRegistry }]
+                  :unaccessible => UnaccessibleFSRegistry },
+                { :type         => :dockerhub,
+                  :empty        => EmptyDockerHubRegistry,
+                  :populated    => PopulatedDockerHubRegistry,
+                  :unaccessible => UnaccessibleDockerHubRegistry }]
 
   registries.each do |registry|
     @registry = registry
@@ -33,7 +37,9 @@ end
 
 Given /^remote registry is not accessible$/ do
   @test_all_registries = true
-  @registry[:unaccessible].instance.use()
+  @registry[:unaccessible].instance.use() do |var, val|
+    set_environment_variable(var, val)
+  end
 end
 
 Given /^my rebuild registry is populated with test environments$/ do

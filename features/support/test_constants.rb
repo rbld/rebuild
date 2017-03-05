@@ -15,4 +15,8 @@ module RebuildTestConstants
     end
     @fs_reg_location
   end
+
+  def dockerhub_namespace
+    'rebuildci'
+  end
 end

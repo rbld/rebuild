@@ -43,7 +43,7 @@ module Rebuild
       expect{ @remote.validate! }.to raise_error('Remote location not defined')
     end
 
-    ['docker', 'rebuild'].each do |t|
+    ['docker', 'rebuild', 'dockerhub'].each do |t|
       it "is valid for remote of type #{t}" do
         @cfg['REMOTE_TYPE_origin'] = t
         @remote = Remote.new(@cfg)
