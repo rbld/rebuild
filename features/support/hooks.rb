@@ -14,3 +14,14 @@ After do
   cfg_file_backup=cfg_file + ".backup"
   FileUtils.mv(cfg_file_backup, cfg_file) if File.exist?(cfg_file_backup)
 end
+
+After do |scenario|
+  if scenario.failed?
+    STDERR.puts
+    STDERR.puts "=== Last command output =="
+    STDERR.puts last_command_started.output
+    STDERR.puts "==="
+    STDERR.puts "=== Last command exit status #{last_command_started.exit_status} ==="
+    STDERR.puts
+  end
+end
