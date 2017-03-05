@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'colorize', '~> 0.8.1'
   s.add_runtime_dependency 'logger-better', '~> 0.2.1'
   s.add_runtime_dependency 'docker-api', '~> 1.32', '>= 1.32.1'
+  s.add_runtime_dependency 'docker_registry', '~> 0.0.3'
   s.add_runtime_dependency 'docker_registry2', '~> 0.4.0'
   s.add_runtime_dependency 'parseconfig', '~> 1.0', '>= 1.0.8'
   s.add_runtime_dependency 'require_all', '~> 1.3', '>= 1.3.3'

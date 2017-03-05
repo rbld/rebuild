@@ -8,6 +8,7 @@ require_relative 'rbld_config'
 require_relative 'rbld_utils'
 require_relative 'rbld_print'
 require_relative 'rbld_reg_docker'
+require_relative 'rbld_reg_dockerhub'
 require_relative 'rbld_reg_fs'
 require_relative 'rbld_fileops'
 
@@ -617,6 +618,8 @@ module Rebuild::Engine
       case @cfg.remote!.type
       when 'docker'
         reg_module = Rebuild::Registry::Docker
+      when 'dockerhub'
+        reg_module = Rebuild::Registry::DockerHub
       when 'rebuild'
         reg_module = Rebuild::Registry::FS
       else
