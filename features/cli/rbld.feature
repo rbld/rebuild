@@ -52,3 +52,7 @@ Feature: rbld
     When I run `rbld`
     Then the output should not contain "INFO: ARGV:"
     And a file "rbld.log" should contain "INFO: ARGV:"
+
+  Scenario: stack backtrace is not printed on incorrect command line
+    When I run `rbld run --wrong-opt`
+    Then the output should not contain "<main>"

@@ -29,7 +29,7 @@ begin
 
   exit Rebuild::CLI::Commands.run( ARGV[0], ARGV.drop(1) ) || 0
 
-rescue RuntimeError => msg
-  rbld_print.error(msg)
+rescue StandardError => e
+  rbld_print.error(e.message)
   exit 1
 end
