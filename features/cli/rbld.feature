@@ -56,3 +56,10 @@ Feature: rbld
   Scenario: stack backtrace is not printed on incorrect command line
     When I run `rbld run --wrong-opt`
     Then the output should not contain "<main>"
+
+  Scenario: stack backtrace of exceptions is logged as FATAL
+    Given I set the environment variables to:
+      | variable       | value |
+      | RBLD_LOG_LEVEL | fatal |
+    When I run `rbld run --wrong-opt`
+    Then the output should match /FATAL.+rbld.+<main>/

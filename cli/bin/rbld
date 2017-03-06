@@ -31,5 +31,6 @@ begin
 
 rescue StandardError => e
   rbld_print.error(e.message)
+  e.backtrace.each { |l| rbld_log.fatal(l) }
   exit 1
 end
