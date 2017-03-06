@@ -1,29 +1,8 @@
 require 'colorize'
 
-Around do |scenario, block|
-  registries = [{ :type         => :docker,
-                  :empty        => EmptyDockerRegistry,
-                  :populated    => PopulatedDockerRegistry,
-                  :unaccessible => UnaccessibleDockerRegistry },
-                { :type         => :FS,
-                  :empty        => EmptyFSRegistry,
-                  :populated    => PopulatedFSRegistry,
-                  :unaccessible => UnaccessibleFSRegistry },
-                { :type         => :dockerhub,
-                  :empty        => EmptyDockerHubRegistry,
-                  :populated    => PopulatedDockerHubRegistry,
-                  :unaccessible => UnaccessibleDockerHubRegistry }]
-
-  registries.each do |registry|
-    @registry = registry
-    block.call
-    break unless @test_all_registries
-  end
-end
-
-After do |scenario|
-  if scenario.failed? && @test_all_registries
-    puts "== Failed with #{@registry[:type]} registry ==".red
+After('@with-registry') do |scenario|
+  if scenario.failed?
+    STDERR.puts "== Failed with #{registry_type} registry ==".red
   end
 end
 
@@ -36,25 +15,21 @@ Given /^remote registry is not configured$/ do
 end
 
 Given /^remote registry is not accessible$/ do
-  @test_all_registries = true
-  @registry[:unaccessible].instance.use() do |var, val|
+  registry_classes[:unaccessible].instance.use() do |var, val|
     set_environment_variable(var, val)
   end
 end
 
 Given /^my rebuild registry is populated with test environments$/ do
-  @test_all_registries = true
-  @registry[:populated].instance.use()
+  registry_classes[:populated].instance.use()
 end
 
 Given /^my rebuild registry is empty$/ do
-  @test_all_registries = true
-  @registry[:empty].instance.use()
+  registry_classes[:empty].instance.use()
 end
 
 Given /^my rebuild registry contains (environment #{ENV_NAME_REGEX})$/ do |env|
-  @test_all_registries = true
-  @registry[:empty].instance.use()
+  registry_classes[:empty].instance.use()
   env.ensure_exists
   env.ensure_not_modified
   env.ensure_published

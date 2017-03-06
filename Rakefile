@@ -5,11 +5,17 @@ begin
   require 'cucumber/rake/task'
 
   def cucumber_opts(cfg)
+
+    FileUtils.mkdir_p('tmp')
+
     %{
-      --format pretty
+      --format pretty --format rerun --out tmp/last_failed_list.txt
       --strict
+      #{cfg.include?(:rerun) ? "@tmp/list_to_rerun.txt" : ""}
       #{cfg.include?(:fast) ? "-t ~@slow" : ""}
       #{cfg.include?(:slow) ? "-t @slow" : ""}
+      #{cfg.include?(:local) ? "-t ~@with-registry" : ""}
+      #{cfg.include?(:remote) ? "-t @with-registry" : ""}
       #{cfg.include?(:installed) ? "-p installed" : ""}
     }
   end
@@ -20,8 +26,16 @@ begin
 
   Cucumber::Rake::Task.new(:citest) do |t|
     cfg = []
-    cfg << :fast if ENV['fast'] == '1'
-    cfg << :slow if ENV['slow'] == '1'
+
+    if ENV['rerun'] == '1'
+      cfg << :rerun
+    else
+      cfg << :fast if ENV['fast'] == '1'
+      cfg << :slow if ENV['slow'] == '1'
+      cfg << :local if ENV['local'] == '1'
+      cfg << :remote if ENV['remote'] == '1'
+    end
+
     cfg << :installed if ENV['installed'] == '1'
 
     t.cucumber_opts = cucumber_opts cfg

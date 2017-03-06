@@ -1,3 +1,4 @@
+@with-registry
 Feature: rbld publish
   As a CLI user
   I want to be able to publish environments with rbld publish

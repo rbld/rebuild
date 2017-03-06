@@ -1,3 +1,4 @@
+@with-registry
 Feature: rbld search
   As a CLI user
   I want to be able to search for published environments with rbld search

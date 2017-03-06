@@ -1,3 +1,4 @@
+@with-registry
 Feature: rbld deploy
   As a CLI user
   I want to be able to deploy environments with rbld deploy

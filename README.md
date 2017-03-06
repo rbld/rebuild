@@ -20,6 +20,12 @@ rebuild test suite is based on cucumber/aruba:
   * `cucmber -p installed` to run tests using installed binaries
   * `cucumber -t ~@slow` to exclude slow tests
 
+Use environment variable `registry_type` to control registry type used during tests:
+
+  * `registry_type=rebuild cucumber ...` to use native rebuild registry (default)
+  * `registry_type=docker cucumber ...` to use docker registry
+  * `registry_type=dockerhub cucumber ...` to use Docker Hub (Docker Hub credentials needed)
+
 ---
 
     Rebuild is licensed under the Apache License, Version 2.0.

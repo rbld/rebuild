@@ -1,3 +1,5 @@
+require 'colorize'
+
 module RebuildTestConstants
   def test_env_base
     "alpine:3.4"
@@ -18,5 +20,31 @@ module RebuildTestConstants
 
   def dockerhub_namespace
     'rebuildci'
+  end
+
+  def known_registry_classes
+    {
+      docker:     { empty:        EmptyDockerRegistry,
+                    populated:    PopulatedDockerRegistry,
+                    unaccessible: UnaccessibleDockerRegistry },
+      rebuild:    { empty:        EmptyFSRegistry,
+                    populated:    PopulatedFSRegistry,
+                    unaccessible: UnaccessibleFSRegistry },
+      dockerhub:  { empty:        EmptyDockerHubRegistry,
+                    populated:    PopulatedDockerHubRegistry,
+                    unaccessible: UnaccessibleDockerHubRegistry }
+    }
+  end
+
+  def registry_type
+    unless @reg_type
+      env = ENV['registry_type']
+      @reg_type = (env || 'rebuild').to_sym
+    end
+    @reg_type
+  end
+
+  def registry_classes
+    @reg_classes ||= known_registry_classes[registry_type]
   end
 end
