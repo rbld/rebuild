@@ -4,6 +4,7 @@ require_relative 'rbld_utils_shared'
 module Rebuild::Engine
 
   [UnsupportedDockerService,
+   InaccessibleDockerService,
    EnvironmentIsModified,
    EnvironmentNotKnown,
    NoChangesToCommit,
@@ -272,9 +273,17 @@ module Rebuild::Engine
   end
 
   describe API do
-    it 'verifies docker API functionality on creation' do
-      docker = class_double(Docker)
+    let(:docker) { class_double(Docker) }
 
+    it 'verifies docker API accessibility on creation' do
+      allow(docker).to receive(:validate_version!).
+        and_raise(Errno::ENOENT, 'msg')
+
+      expect { API.new(docker, nil) }.to \
+        raise_error(InaccessibleDockerService, 'Unable to reach the docker engine')
+    end
+
+    it 'verifies docker API version on creation' do
       allow(docker).to receive(:validate_version!).
         and_raise(Docker::Error::VersionError, 'msg')
 

@@ -271,6 +271,7 @@ module Rebuild::Engine
 
   rebuild_errors \
    UnsupportedDockerService: 'Unsupported docker service: %s',
+   InaccessibleDockerService: 'Unable to reach the docker engine',
    EnvironmentIsModified: 'Environment is modified, commit or checkout first',
    EnvironmentNotKnown: 'Unknown environment %s',
    NoChangesToCommit: 'No changes to commit for %s',
@@ -608,7 +609,11 @@ module Rebuild::Engine
       begin
         @docker_api.validate_version!
       rescue Docker::Error::VersionError => msg
+        rbld_log.fatal( msg )
         raise UnsupportedDockerService, msg
+      rescue => msg
+        rbld_log.fatal( msg )
+        raise InaccessibleDockerService
       end
     end
 
