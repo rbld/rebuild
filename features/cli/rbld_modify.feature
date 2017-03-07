@@ -54,6 +54,7 @@ Feature: rbld modify
       >>> rebuild env <environment host name>-M interactive
       >>> Press CTRL-D do leave
       Hello interactive world!
+
       <<< rebuild env <environment host name>-M
       """
     And environment <environment name> should be marked as modified

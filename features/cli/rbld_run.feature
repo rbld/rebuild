@@ -63,6 +63,7 @@ Feature: rbld run
       >>> rebuild env <environment host name> interactive
       >>> Press CTRL-D do leave
       Hello interactive world!
+
       <<< rebuild env <environment host name>
       """
 

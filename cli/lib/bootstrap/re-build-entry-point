@@ -70,6 +70,10 @@ fi
 
 RC=$?
 
+if test -z "$*"; then
+rebuild_banner ""
+fi
+
 rebuild_banner "<<< rebuild env $HOSTNAME"
 
 exit $RC
