@@ -18,6 +18,13 @@ module RebuildTestConstants
     @fs_reg_location
   end
 
+  def tests_work_dir
+    unless @work_dir
+      Aruba.configure { |c| @work_dir = c.working_directory }
+    end
+    @work_dir
+  end
+
   def dockerhub_namespace
     'rebuildci'
   end

@@ -1,5 +1,8 @@
 Given /^existing base file (.*\.tar)$/ do |basefile|
 
+  basedir = File.join( tests_work_dir, File.dirname( basefile ) )
+  FileUtils.mkdir_p( basedir )
+
   cidfile = basefile + ".cid"
 
   steps %Q{

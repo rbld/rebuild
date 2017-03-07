@@ -84,6 +84,11 @@ Feature: rbld create
       |--basefile     |
       |-f             |
 
+  Scenario: create environment from existing file outside of current directory
+    Given existing base file test_subdir/test_base_file.tar
+    When I run `rbld create --basefile test_subdir/test_base_file.tar test-env`
+    Then environment test-env should be successfully created
+
   Scenario: create environment that already exists
     Given existing environment test-env
     When I run `rbld create --base alpine:3.4 test-env`

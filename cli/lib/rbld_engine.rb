@@ -287,7 +287,7 @@ module Rebuild::Engine
     def self.from_file(file)
       base = %Q{
         FROM scratch
-        ADD #{file} /
+        ADD #{File.basename( file )} /
       }
 
       new( base, file )
