@@ -22,13 +22,13 @@ setup_users()
 
   if has_app useradd; then
 
-    groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME
+    groupadd -o -g $REBUILD_GROUP_ID $REBUILD_GROUP_NAME 2>$DEBUG_TRACE
 
     useradd -o -M                          \
             -g $REBUILD_GROUP_ID           \
             -u $REBUILD_USER_ID            \
             --home-dir $REBUILD_USER_HOME  \
-            $REBUILD_USER_NAME
+            $REBUILD_USER_NAME 2>$DEBUG_TRACE
 
   else
 

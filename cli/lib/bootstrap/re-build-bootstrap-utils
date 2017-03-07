@@ -32,4 +32,7 @@ delete_user()
 if test "x${REBUILD_TRACE}" = "x1"; then
   set -x
   echo Bootstrap tracing enabled
+  DEBUG_TRACE=/dev/tty
+else
+  DEBUG_TRACE=/dev/null
 fi
