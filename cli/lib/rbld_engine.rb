@@ -606,16 +606,15 @@ module Rebuild::Engine
     end
 
     def check_connectivity
-      begin
-        @docker_api.validate_version!
+      @docker_api.validate_version!
+
       rescue Docker::Error::VersionError => msg
         rbld_log.fatal( msg )
         raise UnsupportedDockerService, msg
       rescue => msg
         rbld_log.fatal( msg )
         raise InaccessibleDockerService
-      end
-    end
+  end
 
     def registry
       return @registry if @registry
