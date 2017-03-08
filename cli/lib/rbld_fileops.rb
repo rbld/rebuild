@@ -40,7 +40,7 @@ module Rebuild::Engine
           f.binmode
           gz = Zlib::GzipWriter.new(f)
           begin
-            yield gz
+            yield Rebuild::Utils::WithProgressBar.new( gz, :write )
           ensure
             gz.close
           end
@@ -54,7 +54,7 @@ module Rebuild::Engine
     def with_gzip_reader
       Zlib::GzipReader.open( @filename ) do |gz|
         begin
-          yield gz
+          yield Rebuild::Utils::WithProgressBar.new( gz, :read )
         ensure
           gz.close
         end
