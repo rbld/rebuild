@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'require_all', '~> 1.3', '>= 1.3.3'
   s.add_runtime_dependency 'os', '~> 0.9', '>= 0.9.6'
   s.add_runtime_dependency 'fancy_gets_ex', '~> 0.1', '>= 0.1.6'
+  s.add_runtime_dependency 'ruby-progressbar', '~> 1.8', '>= 1.8.1'
   # rake must be in runtime dependencies for proper gem installation
   # (to process tools/rebuild-conf/Rakefile)
   s.add_runtime_dependency 'rake', '~> 11.2', '>= 11.2.2' #needed for install
@@ -30,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'ptools', '~> 1.3', '>= 1.3.3'
   s.add_development_dependency 'retriable', '~> 2.1', '>= 2.1.0'
   s.add_development_dependency 'rspec', '~> 3.5', '>= 3.5.0'
+  s.add_development_dependency 'timecop', '~> 0.8', '>= 0.8.1'
 
   lib_files = `git ls-files -- cli/lib`.split("\n")
   bin_files = ['cli/bin/rbld']

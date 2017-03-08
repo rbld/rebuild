@@ -1,3 +1,4 @@
+require 'timecop'
 require_relative '../../cli/lib/rbld_utils'
 
 module Rebuild
@@ -128,6 +129,107 @@ module Rebuild
             end
           end
         end
+    end
+
+    describe StopWatch do
+
+      before(:each) do
+        Timecop.freeze
+        @timer = subject
+      end
+
+      after(:each) { Timecop.return }
+
+      describe '#time_ms' do
+        it 'returns integer number of milliseconds' do
+          expect(@timer.time_ms).to be_a_kind_of(Integer)
+        end
+
+        it 'tracks elapsed time' do
+          Timecop.freeze(1)
+          expect(@timer.time_ms).to be == 1000
+        end
+      end
+
+      describe '#restart' do
+        it 'resets elapsed time counter' do
+          Timecop.freeze(1)
+          @timer.restart
+          expect(@timer.time_ms).to be == 0
+        end
+      end
+
+    end
+
+    describe WithProgressBar do
+      let(:pbar) { class_double(ProgressBar) }
+      let(:pbar_obj) { double }
+
+      let(:target) do
+        expect(target = double).to receive(:dummy)
+        target
+      end
+
+      let(:tty) do
+        d = instance_double(STDOUT.class)
+        allow(d).to receive(:tty?).and_return(true)
+        d
+      end
+
+      let(:nontty) do
+        d = instance_double(STDOUT.class)
+        allow(d).to receive(:tty?).and_return(false)
+        d
+      end
+
+      it 'delegates all messages to target object' do
+        WithProgressBar.new(target, [], pbar, nontty).dummy('param')
+      end
+
+      it 'does not create progress bar for non-tty console' do
+        WithProgressBar.new(target, [], pbar, nontty).dummy
+      end
+
+      it 'creates progress bar for tty console' do
+        expect(pbar_obj).to receive(:increment)
+        expect(pbar).to receive(:create).and_return(pbar_obj)
+        WithProgressBar.new(target, :dummy, pbar, tty).dummy
+      end
+
+      it 'does not advance progress bar by default' do
+        expect(pbar).to receive(:create).and_return(pbar_obj)
+        WithProgressBar.new(target, [], pbar, tty).dummy
+      end
+
+      it 'advances progress bar for a given method' do
+        expect(pbar).to receive(:create).and_return(pbar_obj)
+        expect(pbar_obj).to receive(:increment)
+        WithProgressBar.new(target, :dummy, pbar, tty).dummy
+      end
+
+      it 'advances progress bar for a given set of methods' do
+        expect(pbar).to receive(:create).and_return(pbar_obj)
+        expect(pbar_obj).to receive(:increment).twice
+        expect(target).to receive(:foo)
+        Timecop.freeze do
+          obj = WithProgressBar.new(target, [:dummy, :foo], pbar, tty)
+          obj.dummy
+          Timecop.freeze(1)
+          obj.foo
+        end
+      end
+
+      it 'does not advance progress bar too fast' do
+        expect(pbar).to receive(:create).and_return(pbar_obj)
+        expect(pbar_obj).to receive(:increment).once
+        allow(target).to receive(:dummy).twice
+        Timecop.freeze do
+          obj = WithProgressBar.new(target, :dummy, pbar, tty)
+          obj.dummy
+          obj.dummy
+        end
+      end
+
     end
   end
 end

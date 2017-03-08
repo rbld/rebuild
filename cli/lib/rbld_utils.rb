@@ -1,3 +1,6 @@
+require 'delegate'
+require 'ruby-progressbar'
+
 module Rebuild
   module Utils
 
@@ -50,5 +53,60 @@ module Rebuild
 
       alias rebuild_error rebuild_errors
     end
+
+    class StopWatch
+      def restart
+        @start_time = Time.now
+      end
+
+      alias_method :initialize, :restart
+
+      def time_ms
+        (Time.now - @start_time).to_i * 1000
+      end
+    end
+
+    class WithProgressBar < SimpleDelegator
+      def initialize(target, methods = [], progressbar_class = ProgressBar, console_obj = STDOUT)
+        if console_obj.tty?
+          __init_progress__( progressbar_class, console_obj )
+          methods = [ methods ] unless methods.respond_to? :each
+          methods.each { |m| __create_hook__( m ) }
+        end
+
+        super(target)
+      end
+
+      private
+
+      def __init_progress__(progressbar_class, console_obj)
+        @__progressbar__ = progressbar_class.create(title: 'Working',
+                                                    length: 60,
+                                                    total: nil,
+                                                    output: console_obj)
+        @__stopwatch__ = StopWatch.new
+        @__first_call__ = true
+      end
+
+      def __create_hook__(name)
+        instance_eval(
+          %Q{
+              def #{name}(*args)
+                __do_tick__
+                super
+              end
+            }
+        )
+      end
+
+      def __do_tick__(*args)
+        if @__first_call__ || @__stopwatch__.time_ms >= 200
+          @__progressbar__.increment
+          @__stopwatch__.restart
+          @__first_call__ = false
+        end
+      end
+    end
+
   end
 end
