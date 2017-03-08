@@ -53,7 +53,7 @@ module Rebuild
       def deploy(name, tag, api_class = ::Docker::Image)
         reg_file = File.join( @path, name, tag ) + FILE_SFX
         rbld_log.info( "Pulling from #{@path}" )
-        ef = Rebuild::Engine::EnvironmentFile.new(reg_file).load!
+        Rebuild::Engine::EnvironmentFile.new(reg_file).load!
       end
 
     end
