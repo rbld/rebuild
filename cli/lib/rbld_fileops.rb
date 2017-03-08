@@ -15,23 +15,21 @@ module Rebuild::Engine
     end
 
     def load!
-      begin
-        with_gzip_reader { |gz| Docker::Image.load(gz) }
+      with_gzip_reader { |gz| Docker::Image.load(gz) }
+
       rescue => msg
         rbld_print.trace( msg )
         raise EnvironmentLoadFailure, @filename
-      end
     end
 
     def save!(name, identity)
-      begin
-        with_gzip_writer do |gz|
-          Docker::Image.save_stream( identity ) { |chunk| gz.write chunk }
-        end
+      with_gzip_writer do |gz|
+        Docker::Image.save_stream( identity ) { |chunk| gz.write chunk }
+      end
+
       rescue => msg
         rbld_print.trace( msg )
         raise EnvironmentSaveFailure, [name, @filename]
-      end
     end
 
     private
