@@ -34,4 +34,18 @@ else
   rbld version
   rbld help list
   rbld list
+
+  #Do basic plugins tests
+  plugin=rbld-plugin-hello
+
+  gem install $plugin
+  if test -z "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
+    exit 1
+  fi
+
+  gem uninstall $plugin
+  if test -n "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
+    exit 1
+  fi
+
 fi
