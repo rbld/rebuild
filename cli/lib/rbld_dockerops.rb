@@ -119,7 +119,7 @@ module Rebuild
         case @last_error
           when nil
             # No error
-          when /authentication required/, /unauthorized/
+          when /authentication required/, /unauthorized/, /denied/
             raise RegistryNotAuthenticatedError, @last_error
           else
             raise RegistryOperationError, @last_error
