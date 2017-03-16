@@ -8,3 +8,4 @@ rbld modify qemu-fc23 -- sudo dnf install -y make gcc gcc-c++ \
                                              findutils
 rbld commit qemu-fc23 --tag v001
 
+rbld rm qemu-fc23:initial

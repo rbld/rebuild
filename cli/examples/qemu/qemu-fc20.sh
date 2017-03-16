@@ -7,3 +7,4 @@ rbld modify qemu-fc20 -- sudo yum install -y make gcc gcc-c++ \
                                              libfdt-devel lttng-ust-devel
 rbld commit qemu-fc20 --tag v001
 
+rbld rm qemu-fc20:initial
