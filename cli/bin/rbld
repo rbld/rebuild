@@ -36,4 +36,8 @@ rescue StandardError => e
   rbld_print.error(e.message)
   e.backtrace.each { |l| rbld_log.fatal(l) }
   exit 1
+rescue SignalException => e
+  rbld_print.error("Command execution was terminated.")
+  e.backtrace.each { |l| rbld_log.fatal(l) }
+  exit 2
 end

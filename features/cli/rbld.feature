@@ -63,3 +63,15 @@ Feature: rbld
       | RBLD_LOG_LEVEL | fatal |
     When I run `rbld run --wrong-opt`
     Then the output should match /FATAL.+rbld.+<main>/
+
+  Scenario: stack backtrace is not printed on signal
+    When I send signal "INT" to rbld application
+    Then the output should not contain "<main>"
+    And the output should contain "ERROR: Command execution was terminated."
+
+  Scenario: stack backtrace of signal is logged as FATAL
+    Given I set the environment variables to:
+      | variable       | value |
+      | RBLD_LOG_LEVEL | fatal |
+    When I send signal "INT" to rbld application
+    Then the output should match /FATAL.+rbld.+<main>/

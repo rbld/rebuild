@@ -35,10 +35,22 @@ Given /^my rebuild registry contains (environment #{ENV_NAME_REGEX})$/ do |env|
   env.ensure_published
 end
 
-Given(/^remote registry type is "([^"]*)"$/) do |type|
+def fill_rebuild_conf
   rebuild_conf.fill %Q{
     REMOTE_NAME=origin
-    REMOTE_TYPE_origin="#{type}"
-    REMOTE_origin="__#{type}__path__"
+    REMOTE_TYPE_origin="#{@reg_type}"
+    REMOTE_origin="#{@reg_path}"
   }
+end
+
+Given(/^remote registry type is "([^"]*)"$/) do |type|
+  @reg_type = type
+  @reg_path ||= "__#{type}__path__"
+  fill_rebuild_conf
+end
+
+Given(/^remote registry path is "([^"]*)"$/) do |path|
+  @reg_type ||= 'rebuild'
+  @reg_path = path
+  fill_rebuild_conf
 end
