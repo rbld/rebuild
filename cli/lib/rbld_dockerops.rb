@@ -43,7 +43,7 @@ module Rebuild
       def get_credential(name, is_secret = false)
         print "#{name}: "
         predefined = ENV["RBLD_CREDENTIAL_#{name.upcase}"]
-        if predefined
+        unless predefined.to_s.empty?
           puts "<environment>"
           predefined
         else
