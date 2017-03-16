@@ -30,10 +30,9 @@ begin
     if ENV['rerun'] == '1'
       cfg << :rerun
     else
-      cfg << :fast if ENV['fast'] == '1'
-      cfg << :slow if ENV['slow'] == '1'
-      cfg << :local if ENV['local'] == '1'
-      cfg << :remote if ENV['remote'] == '1'
+      [:fast, :slow, :local, :remote].each do |opt|
+        cfg << opt if ENV[opt.to_s] == '1'
+      end
     end
 
     cfg << :installed if ENV['installed'] == '1'
