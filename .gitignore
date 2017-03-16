@@ -3,3 +3,4 @@ Gemfile.lock
 *.gem
 cli/lib/data/
 tmp/
+cli/tests/hello/hello
