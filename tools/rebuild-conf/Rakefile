@@ -15,6 +15,11 @@ CONF_CONTENTS = <<TEXT
 #REMOTE_NAME=origin
 #REMOTE_TYPE_origin="rebuild"
 #REMOTE_origin="/mnt/rbld_regsitry_root"
+
+#For Docker Hub
+REMOTE_NAME=origin
+REMOTE_TYPE_origin="dockerhub"
+REMOTE_origin="rbld/environments"
 TEXT
 
 task default: [RBLD_CONF]
