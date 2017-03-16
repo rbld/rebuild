@@ -16,6 +16,7 @@ begin
       #{cfg.include?(:slow) ? "-t @slow" : ""}
       #{cfg.include?(:local) ? "-t ~@with-registry" : ""}
       #{cfg.include?(:remote) ? "-t @with-registry" : ""}
+      #{cfg.include?(:community) ? "-t @community" : "-t ~@community"}
       #{cfg.include?(:installed) ? "-p installed" : ""}
     }
   end
@@ -30,7 +31,7 @@ begin
     if ENV['rerun'] == '1'
       cfg << :rerun
     else
-      [:fast, :slow, :local, :remote].each do |opt|
+      [:fast, :slow, :local, :remote, :community].each do |opt|
         cfg << opt if ENV[opt.to_s] == '1'
       end
     end

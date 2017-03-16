@@ -29,6 +29,11 @@ matrix:
     - rvm: 2.2.4
       env: installed=1 slow=1 docker_ver=1.12
       services: docker
+    #Run community content tests for installed gem on
+    #one specific docker/ruby version pair
+    - rvm: 2.2.4
+      env: installed=1 community=1 docker_ver=1.12
+      services: docker
 
 notifications:
   email:
