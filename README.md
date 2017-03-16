@@ -1,6 +1,65 @@
 [![Gem Version](https://img.shields.io/gem/v/rbld.svg)](https://rubygems.org/gems/rbld)
 [![Build Status](https://travis-ci.org/rbld/rebuild.svg?branch=master)](https://travis-ci.org/rbld/rebuild)
 
+# Usage
+
+#### Install rebuild CLI
+
+```bash
+gem install rbld
+```
+
+#### Search for pre-created environments on Docker Hub
+
+```bash
+rbld search
+```
+
+#### Deploy environment for Raspberry Pi
+
+```bash
+rbld deploy rpi-raspbian:v001
+```
+
+#### Build code for Raspberry Pi
+
+```bash
+cd code-location
+rbld run rpi-raspbian:v001 -- make -j8
+```
+
+#### Deploy environment for BeagleBoard-X15
+
+```bash
+rbld deploy bb-x15:16-05
+```
+
+#### Build code for BeagleBoard-X15
+
+```bash
+cd code-location
+rbld run bb-x15:16-05 -- make -j8
+```
+
+#### Create environment for Raspberry Pi
+
+```bash
+git clone git://github.com/raspberrypi/tools.git rpi-tools
+
+rbld create --base ubuntu:16.04 rpi-raspbian
+
+rbld modify rpi-raspbian:initial
+
+>> sudo apt-get update
+>> sudo apt-get install -y make
+>> TOOLCHAIN=gcc-linaro-arm-linux-gnueabihf-raspbian-x64
+>> sudo cp -r rpi-tools/arm-bcm2708/$TOOLCHAIN /
+>> echo export CC=/$TOOLCHAIN/bin/arm-linux-gnueabihf- | sudo tee -a /rebuild/rebuild.rc
+>> exit
+
+rbld commit rpi-raspbian --tag v001
+```
+
 # Project documentation
 
 * Project WiKi at GitHub: https://github.com/rbld/rebuild/wiki
