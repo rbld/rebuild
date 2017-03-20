@@ -55,6 +55,10 @@ module Rebuild
         end
       end
 
+      def search_repos
+        @index.search( @path ).map( &:name ).find_all { |n| n.start_with?("#{@path}/") }
+      end
+
       def search(name = nil, tag = nil)
         rbld_log.info( "Searching for #{name}:#{tag}" )
 
