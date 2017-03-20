@@ -16,7 +16,7 @@ module Rebuild
       def initialize(path)
         @path = path
         rbld_log.info( "Connecting to registry #{@path}" )
-        raise FSLookupError, @remote unless Dir.exists?( @path )
+        raise FSLookupError, @path unless Dir.exists?( @path )
       end
 
       def search(name = nil, tag = nil)
