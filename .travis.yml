@@ -1,47 +1,9 @@
 os: linux
-sudo: required
 language: ruby
-services: docker
-
-rvm:
-  - 2.0.0
-  - 2.1.8
-  - 2.2.4
-  - 2.3.0
-
-env:
-  #Fast tests for installed gem
-  - installed=1 fast=1 docker_ver=1.9
-  - installed=1 fast=1 docker_ver=1.10
-  - installed=1 fast=1 docker_ver=1.11
-  - installed=1 fast=1 docker_ver=1.12
-  #Sanity tests on gem without development dependencies
-  - installed=1 gem_sanity=1 docker_ver=1.9
-
-matrix:
-  include:
-    #Run fast tests on working copy
-    - rvm: 2.2.4
-      env: installed=0 fast=1 docker_ver=1.12
-      services: docker
-    #Run long running tests for installed gem on
-    #one specific docker/ruby version pair
-    - rvm: 2.2.4
-      env: installed=1 slow=1 docker_ver=1.12
-      services: docker
-    #Run community content tests for installed gem on
-    #one specific docker/ruby version pair
-    - rvm: 2.2.4
-      env: installed=1 community=1 docker_ver=1.12
-      services: docker
+rvm: 2.3.0
 
 notifications:
   email:
     - rbld-devel@rbld.io
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine="${docker_ver}*"
-
-install: ./tools/travis-install.sh
-script: ./tools/travis-run.sh
+script: ./tools/dockerhub-ci-clean.rb
