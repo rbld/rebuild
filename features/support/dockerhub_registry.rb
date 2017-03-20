@@ -1,46 +1,13 @@
 require 'singleton'
 require 'securerandom'
-require 'net/http'
-require 'uri'
+
+require_relative 'dockerhub'
 
 class BaseDockerHubRegistry
   private
 
   def cred(name)
     ENV["RBLD_CREDENTIAL_#{name.upcase}"]
-  end
-
-  def issue_kill_repo_request(uri_string)
-    uri = URI.parse(uri_string)
-    request = Net::HTTP::Delete.new(uri)
-    request.basic_auth(cred('username'), cred('password'))
-    request.content_type = 'application/json'
-    request["Accept"] = 'application/json'
-
-    req_options = { use_ssl: uri.scheme == "https" }
-
-    Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-      http.request(request)
-    end
-  end
-
-  def kill_dockerhub_repo(path)
-    begin
-      puts "Deleting DockerHub repository #{path}..."
-
-      uri = "https://index.docker.io/v1/repositories/#{path}"
-
-      response = issue_kill_repo_request(uri)
-
-      response = issue_kill_repo_request(response['location']) \
-        if response.kind_of? Net::HTTPRedirection
-
-      response.value \
-        unless response.kind_of? Net::HTTPNotFound
-
-    rescue => e
-      STDERR.puts "Removal of #{path} repo failed: #{e.msg}"
-    end
   end
 
   def create_registry
@@ -63,7 +30,8 @@ class BaseDockerHubRegistry
     at_exit do
       puts
       puts "Running post-test cleanups:"
-      @dockerhub_repos.each { |r| kill_dockerhub_repo(r) }
+      dh = Rebuild::DockerHub.new(cred('username'), cred('password'))
+      dh.kill_repos(@dockerhub_repos)
     end
 
     create_registry
