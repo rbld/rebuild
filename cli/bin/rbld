@@ -8,11 +8,15 @@ module Rebuild
   require_relative '../lib/rbld_plugins'
 end
 
+def notify_start
+  Rebuild::PlugMgr.instance.notify(:start) { return false }
+end
+
 begin
 
   rbld_log.info( "ARGV: #{ARGV.join(' ')}" )
 
-  Rebuild::PlugMgr.instance.notify(:start)
+  exit 100 unless notify_start
 
   if !ARGV[0] || (ARGV[0] == "help" && !ARGV[1])
     puts Rebuild::CLI::Main.usage
