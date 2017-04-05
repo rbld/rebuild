@@ -2,6 +2,7 @@ require_relative 'rbld_log'
 require_relative 'rbld_utils'
 require_relative 'rbld_verinfo'
 require_relative 'rbld_engine'
+require_relative 'rbld_plugins'
 
 module Rebuild::CLI
   extend Rebuild::Utils::Errors
@@ -104,6 +105,7 @@ module Rebuild::CLI
 
     def self.run(command, parameters)
       handler = handler!( command )
+      Rebuild::PlugMgr.instance.notify(:command, command, parameters) { return 100 }
       handler.run( parameters )
       handler.errno
     end

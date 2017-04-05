@@ -3,8 +3,18 @@
 set -e
 set -x
 
+plugin=rbld-plugin-hello
+plugin_version=0.0.4
+
 if [ "x${gem_sanity}" != "x1" ]; then
   rake spec
+
+  echo Running plugin infrastructure tests...
+  cp -v Gemfile Gemfile.backup
+  echo "gem '$plugin', '$plugin_version'" >> Gemfile
+  bundle install
+  plugins=1 rake citest
+  mv -v Gemfile.backup Gemfile
 
   echo Running local cucumber tests...
   local=1 rake citest
@@ -36,14 +46,12 @@ else
   rbld list
 
   #Do basic plugins tests
-  plugin=rbld-plugin-hello
-
-  gem install $plugin
+  gem install $plugin --version $plugin_version
   if test -z "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
     exit 1
   fi
 
-  gem uninstall $plugin
+  gem uninstall $plugin --version $plugin_version
   if test -n "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
     exit 1
   fi
