@@ -72,7 +72,7 @@ module Rebuild::CLI
     def self.deduce_cmd_name(handler_class)
       match = handler_class.name.match(/Rbld(.*)Command/)
       return nil unless match
-      match.captures[0].downcase
+      match.captures[0].gsub(/([^A-Z])([A-Z]+)/,'\1-\2').downcase
     end
 
     def self.handler!(command)
