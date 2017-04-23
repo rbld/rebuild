@@ -4,7 +4,7 @@ set -e
 set -x
 
 plugin=rbld-plugin-hello
-plugin_version=0.0.4
+plugin_version=0.0.5
 
 if [ "x${gem_sanity}" != "x1" ]; then
   rake spec
