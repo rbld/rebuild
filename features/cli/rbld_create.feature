@@ -14,7 +14,6 @@ Feature: rbld create
     And help output should match ".*-b.*--base.*Base image from Docker Hub"
     And help output should match ".*-f.*--basefile.*Base file"
     And help output should match ".*--help.*Print usage"
-    And the exit status should be 0
 
   Scenario: create environment without base
     When I run `rbld create test-env`
