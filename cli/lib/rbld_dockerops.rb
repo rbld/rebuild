@@ -1,7 +1,7 @@
 require 'docker_registry2'
 require_relative 'rbld_log'
 require_relative 'rbld_utils'
-require 'fancy_gets'
+require 'highline'
 
 module Rebuild
   module Registry
@@ -13,8 +13,6 @@ module Rebuild
       RegistryNotAuthenticatedError: nil
 
     class EnvironmentImage
-      include FancyGets
-
       def initialize(api_module = ::Docker)
         @api_module = api_module
       end
@@ -40,6 +38,10 @@ module Rebuild
         end
       end
 
+      def get_password
+        HighLine.new($stdin, $stderr).ask('') { |q| q.echo = '*' }
+      end
+
       def get_credential(name, is_secret = false)
         print "#{name}: "
         predefined = ENV["RBLD_CREDENTIAL_#{name.upcase}"]
@@ -47,7 +49,7 @@ module Rebuild
           puts "<environment>"
           predefined
         else
-          is_secret ? gets_password : STDIN.gets.chomp
+          is_secret ? get_password : STDIN.gets.chomp
         end
       end
 
