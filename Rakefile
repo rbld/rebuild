@@ -1,4 +1,7 @@
 require 'rubygems'
+require 'rubygems/tasks'
+
+Gem::Tasks.new
 
 begin
   require 'cucumber'

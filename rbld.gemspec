@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'retriable', '~> 2.1', '>= 2.1.0'
   s.add_development_dependency 'rspec', '~> 3.5', '>= 3.5.0'
   s.add_development_dependency 'timecop', '~> 0.8', '>= 0.8.1'
+  s.add_development_dependency 'rubygems-tasks', '~> 0.2', '>= 0.2.4'
 
   lib_files = `git ls-files -- cli/lib`.split("\n")
   bin_files = ['cli/bin/rbld']
