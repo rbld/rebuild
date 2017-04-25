@@ -3,7 +3,7 @@ require 'getoptlong'
 module Rebuild::CLI
   class RbldCreateCommand < Command
     def initialize
-      @usage = "create [OPTIONS] [ENVIRONMENT]"
+      @usage = "[OPTIONS] [ENVIRONMENT]"
       @description = "Create a new environment"
       @options = [
                   ["-b NAME, --base NAME", "Base image from Docker Hub"],

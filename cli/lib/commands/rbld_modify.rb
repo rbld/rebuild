@@ -5,10 +5,10 @@ module Rebuild::CLI
 
     def initialize
       @usage = [
-                { :syntax => "modify [OPTIONS] [ENVIRONMENT[:TAG]]",
+                { :syntax => "[OPTIONS] [ENVIRONMENT[:TAG]]",
                   :description => "Interactive mode: opens shell in the " \
                                   "specified enviroment" },
-                { :syntax => "modify [OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS",
+                { :syntax => "[OPTIONS] [ENVIRONMENT[:TAG]] -- COMMANDS",
                   :description => "Scripting mode: runs COMMANDS in the " \
                                   "specified environment" }
                ]

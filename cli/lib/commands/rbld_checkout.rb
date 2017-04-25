@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldCheckoutCommand < Command
     def initialize
-      @usage = "checkout [OPTIONS] [ENVIRONMENT[:TAG]]"
+      @usage = "[OPTIONS] [ENVIRONMENT[:TAG]]"
       @description = "Discard environment modifications"
     end
 

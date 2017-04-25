@@ -120,6 +120,10 @@ module Rebuild::CLI
       rbld_log.info( "Command handler class #{handler_class} registered" )
     end
 
+    def cmd_name
+      @cmd_name ||= Commands.deduce_cmd_name( self.class )
+    end
+
     def options_text
       options = (@options || []) + [["-h, --help", "Print usage"]]
       text = ""
@@ -163,11 +167,11 @@ module Rebuild::CLI
       if @usage.respond_to?(:each)
         text << "\n"
         @usage.each do |mode|
-          text << "\n  rbld #{mode[:syntax]}\n\n" \
+          text << "\n  rbld #{cmd_name} #{mode[:syntax]}\n\n" \
                   "    #{mode[:description]}\n"
         end
       else
-        text << "rbld #{@usage}\n"
+        text << "rbld #{cmd_name} #{@usage}\n"
       end
       text
     end

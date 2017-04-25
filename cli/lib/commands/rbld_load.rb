@@ -9,7 +9,7 @@ module Rebuild::CLI
     public
 
     def initialize
-      @usage = "load [OPTIONS] [FILE]"
+      @usage = "[OPTIONS] [FILE]"
       @description = "Load environment from file"
     end
 

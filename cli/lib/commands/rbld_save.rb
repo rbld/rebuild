@@ -9,7 +9,7 @@ module Rebuild::CLI
     public
 
     def initialize
-      @usage = "save [OPTIONS] [ENVIRONMENT] [FILE]"
+      @usage = "[OPTIONS] [ENVIRONMENT] [FILE]"
       @description = "Save local environment to file"
     end
 

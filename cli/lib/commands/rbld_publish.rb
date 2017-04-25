@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldPublishCommand < Command
     def initialize
-      @usage = "publish [OPTIONS] [ENVIRONMENT[:TAG]]"
+      @usage = "[OPTIONS] [ENVIRONMENT[:TAG]]"
       @description = "Publish environment on remote registry"
     end
 

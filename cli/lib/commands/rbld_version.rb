@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldVersionCommand < Command
     def initialize
-      @usage = "version [OPTIONS]"
+      @usage = "[OPTIONS]"
       @description = "Show the Rebuild version information"
     end
 

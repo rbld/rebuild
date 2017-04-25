@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldDeployCommand < Command
     def initialize
-      @usage = "deploy [OPTIONS] [ENVIRONMENT[:TAG]]"
+      @usage = "[OPTIONS] [ENVIRONMENT[:TAG]]"
       @description = "Deploy environment from remote registry"
     end
 

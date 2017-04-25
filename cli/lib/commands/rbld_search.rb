@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldSearchCommand < Command
     def initialize
-      @usage = "search [OPTIONS] [NAME[:TAG]|PREFIX]"
+      @usage = "[OPTIONS] [NAME[:TAG]|PREFIX]"
       @description = "Search remote registry for published environments"
     end
 

@@ -3,7 +3,7 @@ require 'getoptlong'
 module Rebuild::CLI
   class RbldCommitCommand < Command
     def initialize
-      @usage = "commit [OPTIONS] [ENVIRONMENT[:TAG]]"
+      @usage = "[OPTIONS] [ENVIRONMENT[:TAG]]"
       @description = "Commit environment modifications"
       @options = [["-t TAG,--tag TAG", "New tag to be created"]]
     end

@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldStatusCommand < Command
     def initialize
-      @usage = "status [OPTIONS]"
+      @usage = "[OPTIONS]"
       @description = "List modified environments"
     end
 

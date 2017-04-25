@@ -1,7 +1,7 @@
 module Rebuild::CLI
   class RbldListCommand < Command
     def initialize
-      @usage = "list [OPTIONS]"
+      @usage = "[OPTIONS]"
       @description = "List local environments"
     end
 
