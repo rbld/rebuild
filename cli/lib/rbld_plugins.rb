@@ -33,8 +33,8 @@ class Rebuild::PlugMgr
 
     require plugin
 
-    rescue LoadError
-      rbld_log.warn( "Failed to load plugin #{plugin}" )
+  rescue LoadError => e
+      rbld_log.warn( "Failed to load plugin #{plugin}: #{e}" )
     else
       rbld_log.info( "Loaded plugin #{plugin}" )
   end
