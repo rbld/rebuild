@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+try_with_sudo()
+{
+  $1 || sudo $1
+}
+
 set -e
 set -x
 
@@ -46,12 +51,15 @@ else
   rbld list
 
   #Do basic plugins tests
-  gem install $plugin --version $plugin_version
+
+  try_with_sudo "gem install $plugin --version $plugin_version"
+
   if test -z "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
     exit 1
   fi
 
-  gem uninstall $plugin --version $plugin_version
+  try_with_sudo "gem uninstall $plugin --version $plugin_version"
+
   if test -n "`rbld help | grep 'Hello from Rebuild CLI plugin'`"; then
     exit 1
   fi
