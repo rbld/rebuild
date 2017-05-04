@@ -2,18 +2,18 @@ Feature: rbld
   As a CLI user
   I want to interfere with system via main script called rbld
 
-  Scenario: rbld _unknown_command_ fails with error
-    Given I run `rbld _unknown_command_`
+  Scenario: rbld unknown_command fails with error
+    Given I run `rbld unknown_command`
     Then it should fail with:
     """
-    ERROR: Unknown command: _unknown_command_
+    ERROR: Unknown command: unknown_command
     """
 
-  Scenario: rbld help _unknown_command_ fails with error
-    Given I run `rbld help _unknown_command_`
+  Scenario: rbld help unknown_command fails with error
+    Given I run `rbld help unknown_command`
     Then it should fail with:
     """
-    ERROR: Unknown command: _unknown_command_
+    ERROR: Unknown command: unknown_command
     """
 
   Scenario: there is no log by default
