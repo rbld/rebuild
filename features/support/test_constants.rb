@@ -30,6 +30,10 @@ module RebuildTestConstants
     @root_dir
   end
 
+  def rebuild_conf_rakefile
+    File.join(tests_root_dir, 'tools', 'rebuild-conf', 'Rakefile')
+  end
+
   def dockerhub_namespace
     'rebuildci'
   end

@@ -21,4 +21,10 @@ class RebuildConfFile
         REMOTE_origin="#{path}"
       }
   end
+
+  def revert_to_default
+    cmdline = "rake -f #{rebuild_conf_rakefile} force"
+    output = %x(#{cmdline})
+    fail "Failed to run \"#{cmdline}\": #{output}" unless $?.success?
+  end
 end

@@ -4,6 +4,7 @@ Feature: environments for commonly used platforms
   I want access to precreated environments for commonly used platforms
 
   Background:
+    Given I use default rbld CLI configuration
     Given sample source code from "cli/tests/hello"
 
   Scenario: there are pre-created environments on Docker Hub

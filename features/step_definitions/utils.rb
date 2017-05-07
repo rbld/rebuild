@@ -31,3 +31,7 @@ Given (/^I send signal "([^"]*)" to rbld application$/) do |sig_name|
     Then the exit status should not be 0
   }
 end
+
+Given(/^I use default rbld CLI configuration$/) do
+  RebuildConfFile.new.revert_to_default
+end

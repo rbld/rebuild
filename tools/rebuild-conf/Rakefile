@@ -33,3 +33,9 @@ file RBLD_CONF do
     end
   end
 end
+
+task :RBLD_CONF_DELETE do |t|
+  FileUtils.rm_f( RBLD_CONF )
+end
+
+task force: [:RBLD_CONF_DELETE, RBLD_CONF]
