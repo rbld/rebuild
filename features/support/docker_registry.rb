@@ -1,5 +1,6 @@
 require 'singleton'
 require 'docker_registry2'
+require 'em-proxy'
 
 class BaseDockerRegistry
   REGISTRY_BASE="rbld_populated_test_registry"
@@ -12,6 +13,45 @@ class BaseDockerRegistry
     DockerRegistry2.connect("http://#{REGISTRY_HOST}:#{@registry_port}")
   end
 
+  def docker_machine_host
+    if docker_host = ENV['DOCKER_HOST']
+      if match = docker_host.match( %r{^.*://([^:]+):\d+$} )
+        return match[1]
+      end
+    end
+    return nil
+  end
+
+  def run_port_forwarder
+    return unless host = docker_machine_host
+
+    @forwarder_thread = Thread.new do
+      registry_port = @registry_port
+
+      @forwarder = Proxy.start(:host => REGISTRY_HOST, :port => registry_port) do |conn|
+        begin
+          conn.server :srv, :host => host, :port => registry_port
+          conn.on_data do |data|; data; end
+          conn.on_response do |backend, resp|; resp; end
+          conn.on_finish do |backend, name|; unbind if backend == :srv; end
+
+        rescue Exception => e
+          STDERR.puts "Port forwarder exception: #{e}"
+          STDERR.puts e.backtrace
+        end
+      end
+    end
+  end
+
+  def stop_port_forwarder
+    if @forwarder
+      @forwarder.stop
+      @forwarder_thread.join
+    end
+  rescue => e
+    STDERR.puts "Failed to stop port forwarder: #{e}"
+  end
+
   public
 
   def initialize
@@ -22,6 +62,8 @@ class BaseDockerRegistry
   end
 
   def kill_registry
+    stop_port_forwarder
+
     if %x(docker ps -a).include? @registry_name
       %x(docker rm -f #{@registry_name})
       fail "Failed to kill container #{@registry_name}" unless $?.success?
@@ -38,7 +80,11 @@ class BaseDockerRegistry
       @registry_name = "#{REGISTRY_BASE}_#{@registry_port}"
 
       output = %x(docker run -d -p #{@registry_port}:5000 --name #{@registry_name} #{registry_image_name} 2>&1)
-      return if $?.success?
+
+      if $?.success?
+        run_port_forwarder
+        return
+      end
 
       next if output.include? "is already in use by container"
 
