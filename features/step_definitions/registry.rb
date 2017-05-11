@@ -6,10 +6,6 @@ After('@with-registry') do |scenario|
   end
 end
 
-at_exit do
-  FileUtils.rm_rf(fs_registry_location)
-end
-
 Given /^remote registry is not configured$/ do
   rebuild_conf.fill("")
 end

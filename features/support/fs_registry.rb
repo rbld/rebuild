@@ -15,6 +15,7 @@ class BaseFSRegistry
     @registry_path = File.join(fs_registry_location, dirname)
     @rebuild_conf = RebuildConfFile.new
     recreate_registry
+    at_exit { FileUtils.rm_rf(fs_registry_location) }
   end
 
   def populate_registry
