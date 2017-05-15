@@ -5,6 +5,19 @@ try_with_sudo()
   $1 || sudo $1
 }
 
+retry_last_set()
+{
+  for i in {1..10}; do
+    if [ "x${error}" != "x1" ]; then break; fi
+
+    echo Running failed $1 tests again \(iteration \#$i\)...
+    error=0
+
+    cp tmp/last_failed_list.txt tmp/list_to_rerun.txt
+    rerun=1 registry_type=dockerhub rake citest || error=1
+  done
+}
+
 set -e
 set -x
 
@@ -22,7 +35,13 @@ if [ "x${gem_sanity}" != "x1" ]; then
   mv -v Gemfile.backup Gemfile
 
   echo Running local cucumber tests...
-  local=1 rake citest
+  if [ "x${slow}" != "x1" -a "x${community}" != "x1" ]; then
+    local=1 rake citest
+  else
+    error=0
+    local=1 rake citest || error=1
+    retry_last_set slow
+  fi
 
   echo Running remote cucumber tests for rebuild registry...
   remote=1 registry_type=rebuild rake citest
@@ -33,15 +52,7 @@ if [ "x${gem_sanity}" != "x1" ]; then
   echo Running remote cucumber tests for dockerhub registry...
   error=0
   remote=1 registry_type=dockerhub rake citest || error=1
-  for i in {1..10}; do
-    if [ "x${error}" != "x1" ]; then break; fi
-
-    echo Running failed dockerhub tests again \(iteration \#$i\)...
-    error=0
-
-    cp tmp/last_failed_list.txt tmp/list_to_rerun.txt
-    rerun=1 registry_type=dockerhub rake citest || error=1
-  done
+  retry_last_set DockerHub
 
   exit $error
 else
