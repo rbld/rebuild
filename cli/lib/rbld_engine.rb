@@ -406,12 +406,30 @@ module Rebuild::Engine
       Dir.pwd.sub(Dir.home, home)
     end
 
+    def macos_docker_machine?
+      OS.mac? && ENV['DOCKER_MACHINE_NAME']
+    end
+
     def get_uid
-      OS.windows? ? 1000 : Process.uid
+      case
+      when OS.windows?
+        1000
+      when macos_docker_machine?
+        0
+      else
+        Process.uid
+      end
     end
 
     def get_gid
-      OS.windows? ? 1000 : Process.gid
+      case
+      when OS.windows?
+        1000
+      when macos_docker_machine?
+        0
+      else
+        Process.gid
+      end
     end
   end
 
