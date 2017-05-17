@@ -27,7 +27,7 @@ Given (/^I send signal "([^"]*)" to rbld application$/) do |sig_name|
     And remote registry path is "rbld-dummy/environments-dummy"
     And existing environment test-env
     And I run `rbld publish test-env` in background
-    And I send the signal "HUP" to the command "rbld publish test-env"
+    And I send the signal "#{sig_name}" to the command "rbld publish test-env"
     Then the exit status should not be 0
   }
 end
