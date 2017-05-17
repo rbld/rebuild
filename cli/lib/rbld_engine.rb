@@ -652,7 +652,7 @@ module Rebuild::Engine
     end
 
     def run_external(cmdline)
-      rbld_log.info("Executing external command #{cmdline}")
+      rbld_log.info("Executing external command #{cmdline.squeeze( ' ' )}")
       system( cmdline )
       @errno = $?.exitstatus
       rbld_log.info( "External command returned with code #{@errno}" )
