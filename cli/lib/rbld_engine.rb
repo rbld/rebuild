@@ -403,7 +403,9 @@ module Rebuild::Engine
     end
 
     def get_pwd
-      Dir.pwd.sub(Dir.home, home)
+      pwd = Dir.pwd.sub(Dir.home, home)
+      rbld_log.info( "Deducing environment PWD: #{Dir.pwd}, #{Dir.home}, #{home} ==> #{pwd}" )
+      pwd
     end
 
     def macos_docker_machine?
