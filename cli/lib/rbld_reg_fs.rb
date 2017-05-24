@@ -15,6 +15,7 @@ module Rebuild
 
       def initialize(path)
         @path = path
+        @path.gsub!( '\\', '/' ) if OS.windows?
         rbld_log.info( "Connecting to registry #{@path}" )
         raise FSLookupError, @path unless Dir.exists?( @path )
       end
