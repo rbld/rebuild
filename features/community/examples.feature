@@ -3,6 +3,7 @@ Feature: environment creation examples
   As a rebuild community participant
   I want to see examples for creation of rebuild environments
 
+  @skip-on-windows
   Scenario Outline: verify example scripts
     Given non-existing environment <environment name>:initial
     And non-existing environment <environment name>:<environment tag>
