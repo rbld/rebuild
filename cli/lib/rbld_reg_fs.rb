@@ -25,6 +25,9 @@ module Rebuild
         rbld_log.info( "Searching for #{wildcard}" )
 
         Dir.glob( File.join( @path, wildcard ) ).map do |n|
+
+          rbld_log.debug( "Found entry: #{n}" )
+
           pfx = File.join( @path,'' )
           sfx = FILE_SFX
           s = File::SEPARATOR
