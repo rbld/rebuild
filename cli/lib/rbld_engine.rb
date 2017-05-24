@@ -403,8 +403,9 @@ module Rebuild::Engine
     end
 
     def get_pwd
-      pwd = Dir.pwd.sub(Dir.home, home)
-      rbld_log.info( "Deducing environment PWD: #{Dir.pwd}, #{Dir.home}, #{home} ==> #{pwd}" )
+      host_home = ( OS.mac? || OS.windows? ) ? /#{Dir.home}/i : Dir.home
+      pwd = Dir.pwd.sub(host_home, home)
+      rbld_log.info( "Deducing environment PWD: #{Dir.pwd}, #{host_home}, #{home} ==> #{pwd}" )
       pwd
     end
 
