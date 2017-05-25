@@ -41,8 +41,7 @@ Gem::Specification.new do |s|
   ver_path = 'cli/lib/data/'
   ver_file = ver_path + 'version'
 
-  FileUtils.rm_rf(ver_path)
-  FileUtils.mkdir_p(ver_path)
+  FileUtils.rm_f(ver_file)
   File.write(ver_file, s.version)
 
   s.files            = lib_files + bin_files + [ ver_file ]

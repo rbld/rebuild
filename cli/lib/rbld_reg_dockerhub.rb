@@ -1,4 +1,5 @@
 require 'docker_registry'
+require 'os'
 require_relative 'rbld_log'
 require_relative 'rbld_utils'
 require_relative 'rbld_dockerops'
@@ -45,6 +46,7 @@ module Rebuild
 
       def initialize(path)
         @path = path
+        override_cert_file
         rbld_log.info( "Connecting to DockerHub #{@path}" )
         begin
           endpoint = ENV['RBLD_OVERRIDE_INDEX_ENDPOINT'] || INDEX_ENDPOINT
@@ -93,6 +95,14 @@ module Rebuild
           rbld_log.warn( msg )
           return nil
         end
+      end
+
+      def override_cert_file
+        ENV['SSL_CERT_FILE'] = ssl_cert_file if OS.windows?
+      end
+
+      def ssl_cert_file
+        File.join( __dir__, 'data', 'dockerhub-cacert.pem' )
       end
     end
   end

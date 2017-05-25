@@ -1,6 +1,6 @@
 .bundle/
 Gemfile.lock
 *.gem
-cli/lib/data/
+cli/lib/data/version
 tmp/
 cli/tests/hello/hello
