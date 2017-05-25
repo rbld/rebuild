@@ -32,7 +32,7 @@ module Rebuild
           pfx = File.join( @path,'' )
           sfx = FILE_SFX
           s = File::SEPARATOR
-          nametag = n.match( /^#{pfx}([^#{s}]+)#{s}([^#{s}]+)#{sfx}$/ ).captures
+          nametag = match_fs_path( n, "^#{pfx}([^#{s}]+)#{s}([^#{s}]+)#{sfx}$" ).captures
           Rebuild::Utils::FullImageName.new( *nametag )
         end
       end
@@ -60,6 +60,12 @@ module Rebuild
         Rebuild::Engine::EnvironmentFile.new(reg_file).load!
       end
 
+      private
+
+      def match_fs_path(path, rule)
+        regex = ( OS.windows? || OS.mac? ) ? /#{rule}/i : /#{rule}/
+        path.match( regex )
+      end
     end
   end
   end
