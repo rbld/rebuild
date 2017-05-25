@@ -133,11 +133,9 @@ module Rebuild::CLI
 
     def replace_argv(parameters)
       orig_argv = ARGV.clone
-      ARGV.clear
-      parameters.each { |x| ARGV << x }
+      ARGV.replace( parameters )
       yield
-      ARGV.clear
-      orig_argv.each { |x| ARGV << x }
+      ARGV.replace( orig_argv )
     end
 
     def print_names(names, prefix = '')
