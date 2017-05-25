@@ -344,7 +344,7 @@ module Rebuild::Engine
     end
 
     def bootstrap_file_pathnames
-      src_path = File.join( File.dirname( __FILE__ ), "bootstrap" )
+      src_path = File.join( __dir__, "bootstrap" )
       src_path = File.expand_path( src_path )
       bootstrap_files.map { |f| File.join( src_path, f ) }
     end
