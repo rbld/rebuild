@@ -241,11 +241,15 @@ module Rebuild::Engine
       @api_module::Container.all( all: true, filters: rbld_obj_filter.to_json )
     end
 
+    def repo_tags(img)
+      img.info['RepoTags'] || []
+    end
+
     def cache_images
       @all = []
       rbld_images.each do |img|
         rbld_log.debug("Found docker image #{img}")
-        img.info['RepoTags'].each { |tag| @all << Environment.from_image( tag, img ) }
+        repo_tags( img ).each { |tag| @all << Environment.from_image( tag, img ) }
       end
       @all.compact!
     end
@@ -262,7 +266,7 @@ module Rebuild::Engine
     def attach_rerun_images
       rbld_images.each do |img|
         rbld_log.debug("Found docker image #{img}")
-        img.info['RepoTags'].each do |tag|
+        repo_tags( img ).each do |tag|
           @all.find { |e| e.attach_rerun_image( tag, img ) }
         end
       end
