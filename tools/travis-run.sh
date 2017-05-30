@@ -24,6 +24,8 @@ set -x
 plugin=rbld-plugin-hello
 plugin_version=0.0.7
 
+try_with_sudo "gem uninstall $plugin --all"
+
 if [ "x${gem_sanity}" != "x1" ]; then
   rake spec
 
