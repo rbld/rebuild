@@ -1,0 +1,61 @@
+---
+- - :whitelist
+  - Apache 2.0
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:16:52.635084962 Z
+- - :whitelist
+  - MIT
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:16:57.445361484 Z
+- - :whitelist
+  - New BSD
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:17:13.901738431 Z
+- - :whitelist
+  - 2-clause BSDL
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:17:57.442009446 Z
+- - :whitelist
+  - ISC
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:18:37.778366301 Z
+- - :whitelist
+  - ruby
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:21:02.286094669 Z
+- - :whitelist
+  - GPL-2.0
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:21:18.180404123 Z
+- - :whitelist
+  - Simplified BSD
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:21:29.977938602 Z
+- - :whitelist
+  - Artistic 2.0
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2017-06-01 09:23:30.461960231 Z
+- - :approve
+  - plugman
+  - :who: 
+    :why: MIT license accoring to the source code
+    :versions: []
+    :when: 2017-06-01 09:25:02.610525355 Z
