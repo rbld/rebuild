@@ -50,6 +50,8 @@ begin
     t.cucumber_opts = cucumber_opts [:fast]
   end
 
+  task :fasttest => [:spec]
+
   Cucumber::Rake::Task.new(:slowtest) do |t|
     t.cucumber_opts = cucumber_opts [:slow]
   end
