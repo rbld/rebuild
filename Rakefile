@@ -50,7 +50,7 @@ begin
     t.cucumber_opts = cucumber_opts [:fast]
   end
 
-  task :fasttest => [:spec]
+  task :fasttest => [:license, :spec]
 
   Cucumber::Rake::Task.new(:slowtest) do |t|
     t.cucumber_opts = cucumber_opts [:slow]
@@ -74,4 +74,10 @@ task :lint do
     rescue LoadError => e
       $stderr.puts "Failed to lint .travis.yml: #{e.message}"
     end
+end
+
+task :license do
+  puts 'Running license_finder...'
+  system('license_finder')
+  exit 1 unless $? == 0
 end
