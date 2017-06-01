@@ -27,6 +27,7 @@ plugin_version=0.0.7
 try_with_sudo "gem uninstall $plugin --all"
 
 if [ "x${gem_sanity}" != "x1" ]; then
+  rake license
   rake spec
 
   echo Running plugin infrastructure tests...
