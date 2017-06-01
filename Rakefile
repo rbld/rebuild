@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'rubygems/tasks'
+require 'rspec/core/rake_task'
 
 Gem::Tasks.new
 
@@ -60,11 +61,7 @@ rescue LoadError
   end
 end
 
-begin
-  require 'rspec/core/rake_task'
-  RSpec::Core::RakeTask.new(:spec)
-rescue LoadError
-end
+RSpec::Core::RakeTask.new(:spec)
 
 task :lint do
     begin
