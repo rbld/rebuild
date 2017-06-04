@@ -459,7 +459,13 @@ module Rebuild::Engine
     end
 
     def load!(filename)
-      EnvironmentFile.new( filename ).load!
+      if name = EnvironmentFile.new( filename ).load!
+        # In case a modified environment was overriden,
+        # drop modifications as well
+        rbld_log.info( "Loaded environment #{name}, running checkout")
+        checkout!( name ) if @cache.get( name )
+      end
+
       # If image with the same name but another
       # ID existed before load it becomes dangling
       # and should be ditched

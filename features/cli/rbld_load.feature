@@ -34,3 +34,9 @@ Feature: rbld load
       | environment state |
       | existing          |
       | non-existing      |
+
+  Scenario: override modified environment by loading from file
+    Given a file named "env.rbld" contains a saved environment test-env
+    And a modified environment test-env
+    When I successfully run `rbld load env.rbld`
+    Then environment test-env should not be marked as modified
