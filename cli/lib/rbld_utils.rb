@@ -37,6 +37,19 @@ module Rebuild
       alias_method :name, :repo
     end
 
+    class EnvNameHolder
+      def initialize(name, tag)
+        @name, @tag = name, tag
+        @full = "#{name}:#{tag}"
+      end
+
+      def to_s
+        @full
+      end
+
+      attr_reader :name, :tag, :full
+    end
+
     module Errors
       def rebuild_errors(definitions)
         definitions.each_pair do |name, msg_fmt|

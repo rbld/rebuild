@@ -42,6 +42,26 @@ module Rebuild
       end
     end
 
+    describe EnvNameHolder do
+      let(:obj) { EnvNameHolder.new('n', 't') }
+
+      it 'should know its name' do
+        expect(obj.name).to be == 'n'
+      end
+
+      it 'should know its tag' do
+        expect(obj.tag).to be == 't'
+      end
+
+      it 'should build full name from name and tag' do
+        expect(obj.full).to be == 'n:t'
+      end
+
+      it 'should provide full name as object string representation' do
+        expect(obj.to_s).to be == 'n:t'
+      end
+    end
+
     module Errors
         describe '#rebuild_error' do
           rebuild_error = Rebuild::Utils::Errors.instance_method(:rebuild_error)
