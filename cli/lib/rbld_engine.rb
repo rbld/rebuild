@@ -592,11 +592,8 @@ module Rebuild::Engine
           opts = { t: NameFactory.new(env_name).identity,
                    rm: true }
           new_img = Docker::Image.build_from_tar( tar, opts ) do |v|
-            begin
-              if ( log = JSON.parse( v ) ) && log.has_key?( "stream" )
-                rbld_print.raw_trace( log["stream"] )
-              end
-            rescue
+            Rebuild::Utils::SafeJSONParser.new( v ).get( 'stream' ) do |s|
+              rbld_print.raw_trace( s )
             end
           end
         end
