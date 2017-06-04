@@ -62,6 +62,63 @@ module Rebuild
       end
     end
 
+    describe SafeJSONParser do
+      let(:valid_json) { SafeJSONParser.new('{"k":"v"}') }
+      let(:invalid_json) { SafeJSONParser.new('not_json') }
+
+      it 'does not raise when valid JSON is given' do
+        expect { valid_json }.not_to raise_error
+      end
+
+      it 'does not fail when no valid JSON given' do
+        expect { invalid_json }.not_to raise_error
+      end
+
+      it 'returns nil for all requests when invalid JSON is given' do
+        expect( invalid_json.get('k') ).to be_nil
+      end
+
+      describe '#[]' do
+        it 'it retrieves JSON values' do
+          expect( valid_json['k'] ).to be == 'v'
+        end
+
+        it 'does not raise for non existing JSON keys' do
+          expect{ valid_json['x'] }.not_to raise_error
+        end
+
+        it 'returns nil for non existing JSON keys' do
+          expect( valid_json['x'] ).to be_nil
+        end
+      end
+
+      describe '#get' do
+        it 'it retrieves JSON values' do
+          expect( valid_json.get( 'k' ) ).to be == 'v'
+        end
+
+        it 'does not raise for non existing JSON keys' do
+          expect{ valid_json.get( 'x' ) }.not_to raise_error
+        end
+
+        it 'returns nil for non existing JSON keys' do
+          expect( valid_json.get( 'x' ) ).to be_nil
+        end
+
+        it 'accepts block and yields for existing JOSN keys' do
+          expect { |b| valid_json.get( 'k', &b ) }.to yield_control.once
+        end
+
+        it 'accepts block and yields value being retrieved' do
+          expect { |b| valid_json.get( 'k', &b ) }.to yield_with_args( 'v' )
+        end
+
+        it 'doe not yield when retrieving non existing key' do
+          expect { |b| valid_json.get( 'x', &b ) }.not_to yield_control
+        end
+      end
+    end
+
     module Errors
         describe '#rebuild_error' do
           rebuild_error = Rebuild::Utils::Errors.instance_method(:rebuild_error)

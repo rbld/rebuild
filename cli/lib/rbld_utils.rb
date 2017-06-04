@@ -1,5 +1,6 @@
 require 'delegate'
 require 'ruby-progressbar'
+require 'json'
 
 module Rebuild
   module Utils
@@ -121,5 +122,21 @@ module Rebuild
       end
     end
 
+    class SafeJSONParser
+      def initialize(string)
+        @json = JSON.parse( string )
+        rescue
+      end
+
+      def [](key)
+        get( key )
+      end
+
+      def get(key)
+        key = ( @json && @json.has_key?( key ) ) ? @json[key] : nil
+        yield key if key && block_given?
+        key
+      end
+    end
   end
 end
