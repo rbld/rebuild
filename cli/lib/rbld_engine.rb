@@ -639,7 +639,7 @@ module Rebuild::Engine
       rescue => msg
         rbld_log.fatal( msg )
         raise InaccessibleDockerService
-  end
+    end
 
     def registry
       return @registry if @registry
