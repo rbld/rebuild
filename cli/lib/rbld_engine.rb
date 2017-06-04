@@ -463,7 +463,7 @@ module Rebuild::Engine
       # If image with the same name but another
       # ID existed before load it becomes dangling
       # and should be ditched
-      @cache.dangling.each(&:remove)
+      @cache.dangling.each { |img| remove_docker_img_if_unused( img ) }
       @cache.refresh!
     end
 
@@ -758,6 +758,12 @@ module Rebuild::Engine
 
     def nonexisting_env(name)
       raise EnvironmentAlreadyExists, name.full if @cache.get(name)
+    end
+
+    def remove_docker_img_if_unused(image)
+      image.remove
+      rescue Docker::Error::ConflictError => e
+        rbld_log.info( "Unable to delete dangling image after load: #{e}" )
     end
   end
 end
