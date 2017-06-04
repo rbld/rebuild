@@ -16,6 +16,8 @@ env:
   - installed=1 fast=1 docker_ver=1.10
   - installed=1 fast=1 docker_ver=1.11
   - installed=1 fast=1 docker_ver=1.12
+  - installed=1 fast=1 docker_ver=1.13
+  - installed=1 fast=1 docker_ver=17
   #Sanity tests on gem without development dependencies
   - installed=1 gem_sanity=1 docker_ver=1.9
 
