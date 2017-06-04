@@ -15,7 +15,28 @@ module Rebuild::Engine
     end
 
     def load!
-      with_gzip_reader { |gz| Docker::Image.load(gz) }
+      loaded_name = nil
+
+      with_gzip_reader do |gz|
+        Docker::Image.load(gz) do |response|
+          Rebuild::Utils::SafeJSONParser.new( response ).get( 'stream' ) do |s|
+            response = s
+          end
+
+          if m = response.match( /Loaded image: (.*)$/ )
+            loaded_name = m.captures[0]
+          elsif m = response.match( /The image (.*) already exists/ )
+            loaded_name = m.captures[0]
+          end
+        end
+      end
+
+      if loaded_name
+        env = Environment.from_image( loaded_name, nil )
+        return Rebuild::Utils::EnvNameHolder.new( env.name, env.tag )
+      else
+        return nil
+      end
 
       rescue => msg
         rbld_print.trace( msg )
