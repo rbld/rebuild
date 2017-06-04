@@ -11,7 +11,7 @@ Given /^(?:existing )?(?:non\-modified )?environments:$/ do |table|
   end
 end
 
-Given /^modified (environment #{ENV_NAME_REGEX})$/ do |env|
+Given /^(?:a )?modified (environment #{ENV_NAME_REGEX})$/ do |env|
   env.ensure_exists
   env.ensure_modified
 end
