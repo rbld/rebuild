@@ -35,6 +35,10 @@ Feature: rbld load
       | existing          |
       | non-existing      |
 
+  # This scenario is unstable on older Docker versions
+  # because they do not always provide information
+  # about image being imported from file, therefore
+  @skip-on-docker-before-1-12-0
   Scenario: override modified environment by loading from file
     Given a file named "env.rbld" contains a saved environment test-env
     And a modified environment test-env
