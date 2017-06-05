@@ -69,11 +69,8 @@ module Rebuild
       private
 
       def trace_progress(log_item)
-        begin
-          line = JSON.parse( log_item )["progress"]
-          rbld_print.inplace_trace( line ) if line
-        rescue
-        end
+        line = Rebuild::Utils::SafeJSONParser.new( log_item )['progress']
+        rbld_print.inplace_trace( line ) if line
       end
 
       def parse_entry(internal_name)

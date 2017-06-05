@@ -100,13 +100,9 @@ module Rebuild
       end
 
       def process_log(log_item)
-        begin
-          json = JSON.parse( log_item )
-        rescue
-        else
-          trace_progress( json['progress'] )
-          save_last_error( json['errorDetail'] )
-        end
+        json = Rebuild::Utils::SafeJSONParser.new( log_item )
+        trace_progress( json['progress'] )
+        save_last_error( json['errorDetail'] )
       end
 
       def trace_progress(line)
