@@ -63,7 +63,7 @@ rbld commit rpi-raspbian --tag v001
 # Project documentation
 
 * Project WiKi at GitHub: https://github.com/rbld/rebuild/wiki
-* Living Documentation at RelishApp: http://www.relishapp.com/rbld/rebuild
+* Living Documentation at RelishApp: http://www.relishapp.com/rebuild/rebuild
 
 # Rebuild CLI gem
 
