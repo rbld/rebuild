@@ -62,7 +62,6 @@ else
   rbld help
   rbld version
   rbld help list
-  rbld list
 
   #Do basic plugins tests
 
