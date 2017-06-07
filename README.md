@@ -1,5 +1,6 @@
 [![Gem Version](https://img.shields.io/gem/v/rbld.svg)](https://rubygems.org/gems/rbld)
 [![Build Status](https://travis-ci.org/rbld/rebuild.svg?branch=master)](https://travis-ci.org/rbld/rebuild)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/rbld/rebuild?branch=master&svg=true)](https://ci.appveyor.com/project/daynix/rebuild)
 
 # Usage
 

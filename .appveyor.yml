@@ -1,0 +1,43 @@
+version: build-{build}-{branch}
+
+image:
+  - Visual Studio 2015
+  - Visual Studio 2017
+
+environment:
+  matrix:
+# Some native extensions do not compile on Appveyor's ruby 2.0
+#    - RUBY_VERSION: 200
+#    - RUBY_VERSION: 200-x64
+    - RUBY_VERSION: 21
+    - RUBY_VERSION: 21-x64
+    - RUBY_VERSION: 22
+    - RUBY_VERSION: 22-x64
+    - RUBY_VERSION: 23
+    - RUBY_VERSION: 23-x64
+
+install:
+  - set PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
+
+before_build:
+
+build_script:
+  - set installed=1
+  - set gem_sanity=1
+  - "\"C:\\Program Files\\Git\\bin\\bash.exe\" tools\\travis-install.sh"
+  - "\"C:\\Program Files\\Git\\bin\\bash.exe\" tools\\travis-run.sh"
+  - set installed=0
+  - set gem_sanity=0
+  - set unit_test=1
+  - "\"C:\\Program Files\\Git\\bin\\bash.exe\" tools\\travis-install.sh"
+  - "\"C:\\Program Files\\Git\\bin\\bash.exe\" tools\\travis-run.sh"
+
+skip_commits:
+  message: /\[ci skip\]/
+
+notifications:
+  - provider: Email
+    to: rbld-devel@rbld.io
+    on_build_success: false
+    on_build_failure: false
+    on_build_status_changed: true
