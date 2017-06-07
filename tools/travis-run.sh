@@ -30,6 +30,10 @@ if [ "x${gem_sanity}" != "x1" ]; then
   rake license
   rake spec
 
+  if [ "x${unit_test}" == "x1" ]; then
+    exit 0
+  fi
+
   echo Running plugin infrastructure tests...
   cp -v Gemfile Gemfile.backup
   echo "gem '$plugin', '$plugin_version'" >> Gemfile
