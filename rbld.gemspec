@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'json', '~> 2.1', '>= 2.1.0'
   # rake must be in runtime dependencies for proper gem installation
   # (to process tools/rebuild-conf/Rakefile)
-  s.add_runtime_dependency 'rake', '~> 11.2', '>= 11.2.2' #needed for install
+  s.add_runtime_dependency 'rake'
 
   s.add_development_dependency 'travis', '~> 1.8', '>= 1.8.2'
   s.add_development_dependency 'aruba-win-fix', '~> 0.14.1', '>= 0.14.0'
