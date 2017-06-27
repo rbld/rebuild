@@ -25,7 +25,8 @@ module Rebuild::Engine
       @name, @api_obj = name, api_obj
     end
 
-    def remove!
+    def remove!(with_containers = false)
+      remove_containers if with_containers
       @api_obj.remove( name: @name.to_s )
     end
 
@@ -36,6 +37,17 @@ module Rebuild::Engine
 
     def identity
       @name.to_s
+    end
+
+    private
+
+    def remove_containers
+      Docker::Container.all( opts = { all:true } ).each do |c|
+        if c.info['ImageID'] == @api_obj.info['id']
+          rbld_log.info("Removing dangling container #{c.info['id']}")
+          c.delete( force: true )
+        end
+      end
     end
   end
 
@@ -563,7 +575,7 @@ module Rebuild::Engine
 
         names = NameFactory.new( new_name )
         env.modification_container.flatten( names.identity )
-        env.rerun_img.remove! if env.rerun_img
+        env.rerun_img.remove!( true ) if env.rerun_img
       else
         raise NoChangesToCommit, env_name.full
       end
