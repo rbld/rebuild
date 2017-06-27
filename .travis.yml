@@ -12,30 +12,25 @@ rvm:
 
 env:
   #Fast tests for installed gem
-  - installed=1 fast=1 docker_ver=1.9
-  - installed=1 fast=1 docker_ver=1.10
-  - installed=1 fast=1 docker_ver=1.11
-  - installed=1 fast=1 docker_ver=1.12
-  - installed=1 fast=1 docker_ver=1.13
-  - installed=1 fast=1 docker_ver=17
+  - installed=1 fast=1 docker_ver=17.03
   #Sanity tests on gem without development dependencies
-  - installed=1 gem_sanity=1 docker_ver=1.9
+  - installed=1 gem_sanity=1 docker_ver=17.03
 
 matrix:
   include:
     #Run fast tests on working copy
     - rvm: 2.2.4
-      env: installed=0 fast=1 docker_ver=1.12
+      env: installed=0 fast=1 docker_ver=17.03
       services: docker
     #Run long running tests for installed gem on
     #one specific docker/ruby version pair
     - rvm: 2.2.4
-      env: installed=1 slow=1 docker_ver=1.12
+      env: installed=1 slow=1 docker_ver=17.03
       services: docker
     #Run community content tests for installed gem on
     #one specific docker/ruby version pair
     - rvm: 2.2.4
-      env: installed=1 community=1 docker_ver=1.12
+      env: installed=1 community=1 docker_ver=17.03
       services: docker
 
 notifications:
@@ -44,7 +39,7 @@ notifications:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine="${docker_ver}*"
+  - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce="${docker_ver}*"
 
 install: ./tools/travis-install.sh
 script: ./tools/travis-run.sh
