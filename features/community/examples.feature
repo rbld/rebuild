@@ -20,3 +20,5 @@ Feature: environment creation examples
       | qemu/qemu-fc23.sh              | qemu-fc23            | v001            |
       | bb-x15/bbx15-16-05.sh          | bb-x15               | 16-05           |
       | raspberry-pi/rpi-raspbian.sh   | rpi-raspbian         | v001            |
+      | nrf5/nrf5-13.sh                | nrf5                 | 13              |
+
