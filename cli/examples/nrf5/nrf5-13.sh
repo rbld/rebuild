@@ -15,4 +15,4 @@ rbld modify nrf5:initial -- "echo -e 'export NRF5_SDK_ROOT=/nRF5_SDK_13.1.0_7ca7
 rbld commit nrf5 --tag 13
 rbld rm nrf5:initial
 
-rm -f $TOOLCHAIN_FILE
+rm -f ${TOOLCHAIN_FILE}${TOOLCHAIN_FILE_EXT}
