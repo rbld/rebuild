@@ -55,11 +55,19 @@ if [ "x${gem_sanity}" != "x1" ]; then
 
   echo Running remote cucumber tests for docker registry...
   remote=1 registry_type=docker rake citest
-
-  echo Running remote cucumber tests for dockerhub registry...
   error=0
-  remote=1 registry_type=dockerhub rake citest || error=1
-  retry_last_set DockerHub
+
+  if [ "$TRAVIS_PULL_REQUEST" = "false" -o  "$TRAVIS_PULL_REQUEST" = "" ]; then
+
+    echo Running remote cucumber tests for dockerhub registry...
+    remote=1 registry_type=dockerhub rake citest || error=1
+    retry_last_set DockerHub
+
+  else
+
+    echo WARNING: Skipping dockerhub registry tests for pull requests...
+
+  fi
 
   exit $error
 else
