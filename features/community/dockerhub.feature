@@ -13,7 +13,7 @@ Feature: environments for commonly used platforms
     And the output should contain "bb-x15:16-05"
     And the output should contain "rpi-raspbian:v001"
 
-  Scenario Outline: deploy pre-created environments from Docker Hub
+  Scenario Outline: test pre-created environments that can build stand-alone applications
     Given non-existing environment <environment name>
     When I successfully run `rbld deploy <environment name>`
     And I cd to "hello"
@@ -24,3 +24,15 @@ Feature: environments for commonly used platforms
       | environment name        |
       | bb-x15:16-05            |
       | rpi-raspbian:v001       |
+
+  Scenario Outline: test pre-created environments that cannot build stand-alone applications
+    Given non-existing environment <environment name>
+    When I successfully run `rbld deploy <environment name>`
+    And I run `rbld run <environment name> -- exit 5`
+    Then the exit status should be 5
+    When I run `rbld run <environment name> -- exit 0`
+    Then the exit status should be 0
+
+    Examples:
+      | environment name        |
+      | nrf5:13                 |
