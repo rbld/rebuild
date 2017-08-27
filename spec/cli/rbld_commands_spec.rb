@@ -112,24 +112,24 @@ module Rebuild
         it 'validates given name' do
           expect{Environment.new('invalid~name:v001')}.to \
             raise_error('Invalid environment name (invalid~name), ' \
-                        'it may contain a-z, A-Z, 0-9, - and _ characters only')
+                        'it may contain lowercase and uppercase letters, digits, underscores, periods and dashes and may not start or end with a dash, period or underscore.')
         end
         it 'validates given tag' do
           expect{Environment.new('env:invalid~tag')}.to \
             raise_error('Invalid environment tag (invalid~tag), ' \
-                        'it may contain a-z, A-Z, 0-9, - and _ characters only')
+                        'it may contain lowercase and uppercase letters, digits, underscores, periods and dashes and may not start with a period or a dash.')
         end
       end
 
       context 'validates given environment name component' do
         it 'raises error on validation failure' do
-          expect{ Environment.validate_component('new tag', 'invalid~tag') }.to \
+          expect{ Environment.validate_tag_name('new tag', 'invalid~tag') }.to \
             raise_error('Invalid new tag (invalid~tag), ' \
-                        'it may contain a-z, A-Z, 0-9, - and _ characters only')
+                        'it may contain lowercase and uppercase letters, digits, underscores, periods and dashes and may not start with a period or a dash.')
         end
 
         it 'does not raise any error on validation success' do
-          expect{ Environment.validate_component('new tag', 'valid-tag') }.to_not \
+          expect{ Environment.validate_environment_name('new tag', 'valid-tag') }.to_not \
             raise_error
         end
       end

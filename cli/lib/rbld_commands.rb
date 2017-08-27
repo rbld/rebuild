@@ -7,10 +7,13 @@ require_relative 'rbld_plugins'
 module Rebuild::CLI
   extend Rebuild::Utils::Errors
 
+  name_error = "Invalid %s, it may contain lowercase and uppercase letters, digits, underscores, periods and dashes"
+
   rebuild_errors \
     EnvironmentNameEmpty: 'Environment name not specified',
     EnvironmentNameWithoutTagExpected: 'Environment tag must not be specified',
-    EnvironmentNameError: 'Invalid %s, it may contain a-z, A-Z, 0-9, - and _ characters only',
+    TagNameError: "#{name_error} and may not start with a period or a dash.",
+    EnvironmentNameError: "#{name_error} and may not start or end with a dash, period or underscore.",
     HandlerClassNameError: '%s'
 
   class Environment
@@ -24,9 +27,17 @@ module Rebuild::CLI
       @full = "#{@name}:#{@tag}"
     end
 
-    def self.validate_component( name, value )
+    def self.validate_environment_name( name, value )
       raise EnvironmentNameError, "#{name} (#{value})" \
-        unless value.match( /^[[:alnum:]\_\-]*$/ )
+        unless value.match(/^[[:alnum:]\.\-\_]*$/) and \
+          !value.start_with?('_','-','.') and \
+          !value.end_with?('_','-','.')
+    end
+
+    def self.validate_tag_name( name, value )
+      raise TagNameError, "#{name} (#{value})" \
+        unless value.match(/^[[:alnum:]\.\-\_]*$/) and \
+          !value.start_with?('-','.')
     end
 
     def to_s
@@ -59,8 +70,8 @@ module Rebuild::CLI
 
     def validate_name_tag(opts)
       raise EnvironmentNameEmpty if @name.empty? && !opts[:allow_empty]
-      self.class.validate_component( "environment name", @name ) unless @name.empty?
-      self.class.validate_component( "environment tag", @tag ) unless @tag.empty?
+      self.class.validate_environment_name( "environment name", @name ) unless @name.empty?
+      self.class.validate_tag_name( "environment tag", @tag ) unless @tag.empty?
     end
   end
 

@@ -36,12 +36,35 @@ Feature: rbld create
       ERROR: Environment tag must not be specified
       """
 
-  Scenario: create environment with incorrect name
-    When I run `rbld create --base alpine:3.4 incorrect~name`
+  Scenario Outline: create environment with incorrect name
+    Given non-existing environment <incorrect name>
+    When I run `rbld create --base alpine:3.4 <incorrect name>`
     Then it should fail with:
       """
-      ERROR: Invalid environment name (incorrect~name), it may contain a-z, A-Z, 0-9, - and _ characters only
+      ERROR: Invalid environment name (<incorrect name>), it may contain lowercase and uppercase letters, digits, underscores, periods and dashes and may not start or end with a dash, period or underscore.
       """
+    Examples:
+     | incorrect name |
+     | .envname       |
+     | _envname       |
+     | envname_       |
+     | envname-       |
+     | envname.       |
+     | env#name       |
+
+  Scenario Outline: create environment with correct name
+    Given non-existing environment <correct name>
+    When I run `rbld create --base alpine:3.4 <correct name>`
+    Then environment <correct name> should be successfully created
+
+      Examples:
+     | correct name |
+     | envname      |
+     | env-name     |
+     | env.name     |
+     | env_name     |
+     | envname8     |
+     | b            |
 
   Scenario: create environment from nonexisting base
     When I run `rbld create --base nonexisting:nonexisting test-env`

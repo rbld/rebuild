@@ -27,14 +27,42 @@ Feature: rbld commit
       | non-existing                  | non-existing:initial  |
       | non-existing:sometag          | non-existing:sometag  |
 
-  Scenario: commit environment with incorrect tag
+  Scenario Outline: commit environment with incorrect tag
     Given environment test-env:v001 is modified
-    When I run `rbld commit --tag incorr~ect test-env:v001`
+    When I run `rbld commit --tag <incorrect tag name> test-env:v001`
     Then it should fail with:
     """
-    ERROR: Invalid new tag (incorr~ect), it may contain a-z, A-Z, 0-9, - and _ characters only
+    ERROR: Invalid new tag (<incorrect tag name>), it may contain lowercase and uppercase letters, digits, underscores, periods and dashes and may not start with a period or a dash.
     """
     And environment test-env:v001 should be marked as modified
+
+    Examples:
+      | incorrect tag name |
+      | tag$name           |
+      | .tagname           |
+      | -tagname           |
+
+  Scenario Outline: commit environment with correct tag
+    Given environment test-env:v001 is modified
+    And non-existing environment test-env:<correct tag name>
+    When I run `rbld commit --tag <correct tag name> test-env:v001`
+    Then it should pass with:
+    """
+    Creating new environment test-env:<correct tag name>...
+    """
+    And environment test-env:v001 should not be marked as modified
+
+    Examples:
+      | correct tag name   |
+      | tag_name           |
+      | tag.name           |
+      | tag-name           |
+      | _tagname           |
+      | tagname_           |
+      | tagname-           |
+      | tagname.           |
+      | tag8name           |
+      | a                  |
 
   Scenario: commit environment which is not modified
     Given environment test-env:v001 is not modified

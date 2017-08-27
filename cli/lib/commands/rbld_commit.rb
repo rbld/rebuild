@@ -20,7 +20,7 @@ module Rebuild::CLI
         end
 
         raise "New tag not specified" unless tag
-        Environment.validate_component( 'new tag', tag )
+        Environment.validate_tag_name( 'new tag', tag )
         return tag, ARGV
       end
     end
