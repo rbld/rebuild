@@ -33,7 +33,7 @@ module Rebuild
       end
 
       def self.raw_trace(msg)
-        STDOUT.write( "#{msg}".light_black )
+        STDOUT.write( "#{msg}".cyan )
         STDOUT.flush
       end
 
