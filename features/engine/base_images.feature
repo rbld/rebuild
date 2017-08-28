@@ -28,8 +28,8 @@ Feature: various base images
       | fedora:23                           |
       | fedora:24                           |
       | fedora:25                           |
+      | fedora:26                      |
       | fedora:latest                       |
-      | fedora:rawhide                      |
       | ubuntu:12.04                        |
       | ubuntu:12.04.5                      |
       | ubuntu:14.04                        |
