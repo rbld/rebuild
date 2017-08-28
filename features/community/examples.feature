@@ -21,4 +21,5 @@ Feature: environment creation examples
       | bb-x15/bbx15-16-05.sh          | bb-x15               | 16-05           |
       | raspberry-pi/rpi-raspbian.sh   | rpi-raspbian         | v001            |
       | nrf5/nrf5-13.sh                | nrf5                 | 13              |
+      | qiskit/qiskit-r0.3.sh          | qiskit               | r0.3            |
 
