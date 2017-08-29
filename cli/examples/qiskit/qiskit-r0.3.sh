@@ -18,3 +18,4 @@ rbld modify qiskit:initial -- "sudo chmod 777 -R /Qiskit"
 rbld modify qiskit:initial -- "sudo pip install IBMQuantumExperience"
 rbld modify qiskit:initial -- "echo "c.NotebookApp.ip  = \\\''\$(hostname -i)'\\\'" | sudo tee /anaconda3/etc/jupyter/jupyter_notebook_config.py"
 rbld commit qiskit --tag r0.3
+rbld rm qiskit:initial
