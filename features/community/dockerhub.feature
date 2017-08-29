@@ -36,3 +36,4 @@ Feature: environments for commonly used platforms
     Examples:
       | environment name        |
       | nrf5:13                 |
+      | qiskit:r0.3             |
