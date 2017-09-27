@@ -6,12 +6,13 @@ Feature: rbld rm
     Given existing environments:
     | test-env:initial |
     | test-env:v001    |
+    | test-env2:v001   |
 
   Scenario: rm help succeeds and usage is printed
     Given I successfully request help for rbld rm
     Then help output should contain:
     """
-    Remove local environment
+    Remove one or more local environments
     """
 
   Scenario Outline: removal of non-existing environments
@@ -50,4 +51,17 @@ Feature: rbld rm
     Then it should fail with:
     """
     ERROR: Environment name not specified
+    """
+  Scenario: Removal of multiple environments
+    When I run `rbld rm test-env:v001 test-env2:v001`
+    Then environment test-env:v001 should not exist
+    And environment test-env2:v001 should not exist
+
+  Scenario: Removal of multiple environments
+    When I run `rbld rm test-env:v001 test-env3:v001 test-env2:v001`
+    Then environment test-env:v001 should not exist
+    And  environment test-env2:v001 should exist
+    And it should fail with:
+    """
+    ERROR: Unknown environment test-env3:v001
     """
