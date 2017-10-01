@@ -57,7 +57,7 @@ Feature: rbld rm
     Then environment test-env:v001 should not exist
     And environment test-env2:v001 should not exist
 
-  Scenario: Removal of multiple environments
+  Scenario: Removal of multiple environments with non-existing environment
     When I run `rbld rm test-env:v001 test-env3:v001 test-env2:v001`
     Then environment test-env:v001 should not exist
     And  environment test-env2:v001 should exist
