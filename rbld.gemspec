@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rake'
 
   s.add_development_dependency 'travis', '~> 1.8', '>= 1.8.2'
+  s.add_development_dependency 'cucumber', '~> 2.4.0', '>= 2.4.0'
   s.add_development_dependency 'aruba-win-fix', '~> 0.14.1', '>= 0.14.0'
   s.add_development_dependency 'ptools', '~> 1.3', '>= 1.3.3'
   s.add_development_dependency 'retriable', '~> 2.1', '>= 2.1.0'
