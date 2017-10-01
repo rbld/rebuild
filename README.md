@@ -4,6 +4,15 @@
 
 # Usage
 
+#### Install dependencies
+
+* ruby
+* ruby-dev
+* gem
+* gem-dev
+* gem rake
+* docker engine
+
 #### Install rebuild CLI
 
 ```bash
