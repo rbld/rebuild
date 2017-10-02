@@ -288,7 +288,7 @@ module Rebuild::Engine
   rebuild_errors \
    UnsupportedDockerService: 'Unsupported docker service: %s',
    InaccessibleDockerService: 'Unable to reach the docker engine',
-   EnvironmentIsModified: 'Environment is modified, commit or checkout first',
+   EnvironmentIsModified: 'Environment is modified, %s',
    EnvironmentNotKnown: 'Unknown environment %s',
    NoChangesToCommit: 'No changes to commit for %s',
    EnvironmentDeploymentFailure: 'Failed to deploy from %s',
@@ -454,6 +454,8 @@ module Rebuild::Engine
 
   class API
     extend Forwardable
+    REMOVE_MODIFIED_ERROR = 'use --force to delete anyway'
+    PUBLISH_MODIFIED_ERROR = 'commit or checkout first'
 
     def initialize(docker_api = Docker, cfg = Rebuild::Config.new)
       @docker_api, @cfg = docker_api, cfg
@@ -465,7 +467,7 @@ module Rebuild::Engine
     end
 
     def remove!(env_name)
-      env = unmodified_env( env_name )
+      env = unmodified_env( env_name , REMOVE_MODIFIED_ERROR )
       env.img.remove!
       @cache.refresh!
     end
@@ -523,7 +525,7 @@ module Rebuild::Engine
     end
 
     def publish(env_name)
-      env = unmodified_env( env_name )
+      env = unmodified_env( env_name, PUBLISH_MODIFIED_ERROR )
 
       rbld_print.progress "Checking for collisions..."
 
@@ -765,9 +767,9 @@ module Rebuild::Engine
       env
     end
 
-    def unmodified_env(name)
+    def unmodified_env(name, comment)
       env = existing_env( name )
-      raise EnvironmentIsModified if env.modified?
+      raise EnvironmentIsModified, comment if env.modified?
       env
     end
 

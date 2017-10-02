@@ -42,9 +42,14 @@ Feature: rbld rm
     When I run `rbld rm test-env:v001`
     Then it should fail with:
     """
-    ERROR: Environment is modified, commit or checkout first
+    ERROR: Environment is modified, use --force to delete anyway
     """
     And environment test-env:v001 should be marked as modified
+
+  Scenario: Force removal of modified environment
+    Given environment test-env:v001 is modified
+    When I successfully run `rbld rm --force test-env:v001`
+    Then environment test-evn:v001 should not exist
 
   Scenario: Error is printed when no environment name specified
     Given I run `rbld rm`
