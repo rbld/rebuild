@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'require_all', '~> 1.3', '>= 1.3.3'
   s.add_runtime_dependency 'os', '~> 0.9', '>= 0.9.6'
   s.add_runtime_dependency 'highline', '~> 1.7', '>= 1.7.8'
-  s.add_runtime_dependency 'ruby-progressbar', '~> 1.8', '>= 1.8.1'
+  s.add_runtime_dependency 'ruby-progressbar', '~> 1.8.1'
   s.add_runtime_dependency 'plugman', '~> 1.0', '>= 1.0.2'
   s.add_runtime_dependency 'json', '~> 2.1', '>= 2.1.0'
   # rake must be in runtime dependencies for proper gem installation
